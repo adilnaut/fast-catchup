@@ -1,0 +1,42 @@
+Recommendations from your Substacks Here's what Substacks you're subscribed to have been recommending this week.A
+Christine L of A Millennial Means of Finance recommendsbookbear expresshelp-self
+Founders Factory Startup Bulletin recommendsFemstreetWhere women in tech lead, shape and fund the future
+Founders Factory Startup Bulletin recommendsNot Boring by Packy McCormickTech, web3, optimism, and strategy... but Not Boring
+Founders Factory Startup Bulletin recommendsFintech Blueprint 🤖🏦🧭The Fintech Blueprint helps you find and build the next Fintech & DeFi unicorn with unbiased and expert insights on financial innovation. Join 50,000+ venture capitalists, entrepreneurs, and executives by signing up below. Subscribe to 4 publications© 2023 Substack Inc.548 Market Street PMB 72296, San Francisco, CA 94104 Unsubscribe from this digest
+
+{
+    "Delivered-To": "adilnaut@gmail.com",
+    "Received": "from <unknown> (<unknown> []) by 47c90c770c96 with HTTP id 63d2b0d441f80c63a4de47a4; Thu, 26 Jan 2023 16:56:52 GMT",
+    "X-Google-Smtp-Source": "AK7set+C9dAntS1utM5BAT6L4KbjnijYpnWEM5FWUTvK0W7mVhQaPzH1BRLOS6youqXoPuoILanY",
+    "X-Received": "by 2002:a05:6a00:4511:b0:58d:c728:6ee6 with SMTP id cw17-20020a056a00451100b0058dc7286ee6mr2364201pfb.34.1674752213633;        Thu, 26 Jan 2023 08:56:53 -0800 (PST)",
+    "ARC-Seal": "i=1; a=rsa-sha256; t=1674752213; cv=none;        d=google.com; s=arc-20160816;        b=i4OaE6zSwIImlVYTD1StjqyYRGjA8GUPsOnfaoD+2Jt70uMngdoGlCm1AYk+uhGsBz         zxvfRBgQW+s0StnZN5Ul7ADOOZEO6+2pmQHUQKVBU+O++X/Gv6cD6UdrFXpH+eW2faDH         3Rat+Fi3pV5KN5mig3rEiKJ0FI9iCpVJNanQ5uCys+oV1Zx7MAPg5fwWgZXMYJeZ8YQx         8qERO/dLfo+WDK1YTFB7vcCPxnrfETWf2zdv9ANsHsYwc/etahJ/BNZ7l309Yw1Szsje         0ramyXh79yqtCzES+UhztTRonFXhfIAUzOp4lX/zvaOb7qK9cXP0eUyYlIO0Zyd8hxUg         sdxQ==",
+    "ARC-Message-Signature": "i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;        h=content-transfer-encoding:list-url:reply-to:list-unsubscribe:date         :message-id:list-owner:list-id:to:from:subject:mime-version:sender         :dkim-signature:dkim-signature;        bh=q9mQzXtE4Xi5Mvtl0igZx1YFC4vgtFLi/OgmqOQqYSw=;        b=VvJqVxGyeBrHAFgHiHtxyahmhRC42JnJYf6t8i6ujZOxGzaq3+2acoPMpfF5Q5xaBo         D/q1xzEI0z9u6YG5uRHh+BWCIFvmiWGenm+V8RymKkvtVLSurxQIhZJndS8NALqE7EZw         lFCOHRR26Ma6yGGcM9dAoGf+K0CmlZ+ziTwrjWK4HQMBQ2Wre2keAWCA6AivG3Q7FZRX         CN+owEYsI8Oja0j/StvXcb4J4rc82BfM7H+cFjf5vAWPePajuPWTHm1FSvhsMBLmS7il         oJtrFo8Bn7oNCPmh1HQuMFz7yfuTxtOVT4zdFm8pK4zjxrUUonnUM6lPI3aj7Dk//1EX         hOCw==",
+    "ARC-Authentication-Results": "i=1; mx.google.com;       dkim=pass header.i=@mg1.substack.com header.s=mailo header.b=M6XKg9ow;       dkim=pass header.i=@mailgun.org header.s=mg header.b=lH9rV+rA;       spf=pass (google.com: domain of bounce+e67b7d.072c7b-adilnaut=gmail.com@mg1.substack.com designates 161.38.197.240 as permitted sender) smtp.mailfrom=\"bounce+e67b7d.072c7b-adilnaut=gmail.com@mg1.substack.com\";       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=substack.com",
+    "Return-Path": "<bounce+e67b7d.072c7b-adilnaut=gmail.com@mg1.substack.com>",
+    "Received-SPF": "pass (google.com: domain of bounce+e67b7d.072c7b-adilnaut=gmail.com@mg1.substack.com designates 161.38.197.240 as permitted sender) client-ip=161.38.197.240;",
+    "Authentication-Results": "mx.google.com;       dkim=pass header.i=@mg1.substack.com header.s=mailo header.b=M6XKg9ow;       dkim=pass header.i=@mailgun.org header.s=mg header.b=lH9rV+rA;       spf=pass (google.com: domain of bounce+e67b7d.072c7b-adilnaut=gmail.com@mg1.substack.com designates 161.38.197.240 as permitted sender) smtp.mailfrom=\"bounce+e67b7d.072c7b-adilnaut=gmail.com@mg1.substack.com\";       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=substack.com",
+    "DKIM-Signature": "a=rsa-sha256; v=1; c=relaxed/relaxed; d=mailgun.org; q=dns/txt; s=mg; t=1674752212; x=1674759412; h=Content-Transfer-Encoding: Content-Type: Reply-To: List-Unsubscribe: Date: Message-Id: List-Owner: List-Id: To: To: From: From: Subject: Subject: Mime-Version: Sender: Sender: X-Feedback-Id; bh=q9mQzXtE4Xi5Mvtl0igZx1YFC4vgtFLi/OgmqOQqYSw=; b=lH9rV+rAiDOXM3u3t3BlfOtzEs+A/dDK5FDhg6o4dKPKD/plBcwT6QgxJ2RsaY3kLDhxYqdO 0e6QnlErHRqRtdFarjvdqedwGfVaLaTTXPXQrsDMDPbtwivw6zM8LoEPcqJbTfmyz62HeuPb V4U8rLy6UBKuyth2MWtcFSUVCU8=",
+    "X-Feedback-Id": "5a78a772b6d1e3000132bb09:mailgun",
+    "X-Mailgun-Sending-Ip": "161.38.197.240",
+    "X-Mailgun-Sid": "WyI3M2MxYSIsImFkaWxuYXV0QGdtYWlsLmNvbSIsIjA3MmM3YiJd",
+    "Sender": "no-reply=substack.com@mg1.substack.com",
+    "Mime-Version": "1.0",
+    "Subject": "Recommendations from your Substacks",
+    "From": "Substack <no-reply@substack.com>",
+    "To": "adilnaut@gmail.com",
+    "X-Mailgun-Tag": "reader-recommendation-email",
+    "List-Id": "<www.substack.com>",
+    "List-Owner": "<mailto:no-reply@substack.com>",
+    "Message-Id": "<20230126165650.3.24065ce9a75e3a51.iatpvaal@mg1.substack.com>",
+    "Date": "Thu, 26 Jan 2023 16:56:50 +0000",
+    "List-Unsubscribe": "<https://substack.com/api/v1/email/notification/unsubscribe?token=eyJ1c2VyX2lkIjo5MDAyMTgzLCJ0b3BpYyI6InJlYWRlcl9wdWJsaWNhdGlvbl9yZWNvbW1lbmRhdGlvbiIsImlhdCI6MTY3NDc1MjIxMiwiZXhwIjoxNjc3MzQ0MjEyLCJpc3MiOiJwdWItMCIsInN1YiI6Im5vdGlmaWNhdGlvbi11bnN1YnNjcmliZSJ9.Pk3s9MSkqui_I9TRubNzMr4OAk8hjoGLyPE5XGvtNSo>",
+    "Reply-To": "Substack <no-reply@substack.com>",
+    "List-Url": "<https://substack.com/>",
+    "X-Mailgun-Variables": "{\"category\": \"reader-recommendation-email\", \"comment_id\": \"\", \"email_generated_at\": \"1674752212708\", \"is_freemail\": \"\", \"post_audience\": \"\", \"post_id\": \"\", \"post_type\": \"\", \"pub_community_enabled\": \"\", \"publication_id\": \"\", \"subdomain\": \"www\", \"user_id\": \"9002183\"}",
+    "Content-Type": "text/html; charset=\"ascii\"",
+    "Content-Transfer-Encoding": "quoted-printable"
+}
+Snippet:
+Recommendations from your Substacks Here&#39;s what Substacks you&#39;re subscribed to have been recommending this week. A Christine L of A Millennial Means of Finance recommends bookbear express
+Labels:
+['CATEGORY_PROMOTIONS', 'UNREAD', 'INBOX']

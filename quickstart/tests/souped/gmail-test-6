@@ -1,0 +1,57 @@
+
+Startup Investor Accelerator invites you to a new event
+‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌  ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌
+Startup Investor Accelerator scheduled a new event
+Accessing early stage funding
+Tuesday, February 07, 2023 7:30 PM to
+8:30 PM
+Online event
+RSVP now
+Details:
+Get Tickets at - https://www.eventbrite.co.uk/e/accessing-early-stage-funding-tickets-482970075497 (Can't nook on Meetup, sorry: This is a partnership event)
+About this event
+J﻿oin us as we sit down with experts in an informative dialogue to help you understand how to access early stage funding; what it entails and how to prepare for it. Learn...
+Hosted by:
+Astghik Zakharyan
+More events recommended for you:
+Preloved clothing sale & ladies networking event
+Fashion (Preloved, Reloved, Vintage, Designer )
+Barcelona dbt Meetup (in-person) 2023
+Barcelona dbt Meetup
+ENTERING CANNABIS - LIVE - SHOW [SPAIN]
+DAVINE BARCELONA
+You received this message because you are a registered member of Meetup.
+Unsubscribe from this type of email. Manage your settings
+for all types of email updates.
+Visit a your account page to change your contact details, privacy settings, and other settings.
+Meetup LLC, POB 4668 #37895 NY NY USA 10163
+Read our Privacy Policy.
+
+{
+    "Delivered-To": "adilnaut@gmail.com",
+    "Received": "from MjgzNjg5Njc (unknown) by geopod-ismtpd-5-3 (SG) with HTTP id 3BmD2qtHRvqFOQAaCq25kg Fri, 27 Jan 2023 17:29:42.456 +0000 (UTC)",
+    "X-Google-Smtp-Source": "AK7set+EbuBLk10jzKf6Utpuza4s2Yssw+xjrO0t2sYCrXD2W7QKmWnl+XPHZpH6VJ21PsIzzIjw",
+    "X-Received": "by 2002:a05:6902:1205:b0:80b:ac32:e577 with SMTP id s5-20020a056902120500b0080bac32e577mr5896612ybu.54.1674840584169;        Fri, 27 Jan 2023 09:29:44 -0800 (PST)",
+    "ARC-Seal": "i=1; a=rsa-sha256; t=1674840584; cv=none;        d=google.com; s=arc-20160816;        b=Ugqu+jaoDWKqE1DHLJ1vzMiRWKz4A4OpFDsYcaSlYpVkI8GSZIkRIWUCa80DuE1GDu         Mf7HakoCx4YH+1uKK9bASGhL/uIER2N8RapO7wecqaOBcq/oDrWgrAZ3bwM5eno92VgO         4HA8FAotaq8vxc/OczGkLJLaatNubTSrAIYkKV0jxlmZqnvvhHq+rGn+laTjGGSgDjLY         FNhSQ26Gs0YTr6uuJY2oFxsKF9fnPqKEdXC3a1CElnUiF52MH1PIZs8a1QTwVWRNKeNZ         N4VseDG5PaDtiwtBxZINHbTmyc1hVyyIHhDGU6kK6oM7sgxNi6NITo1i+pgCgbGluCE6         um9A==",
+    "ARC-Message-Signature": "i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;        h=to:subject:message-id:mime-version:from:date:dkim-signature         :dkim-signature;        bh=I9NBtly0fFlJv8xe85lIHlCaHcBaZLxhtl6vGXIt0lY=;        b=0rjnv7buKn9RtR31WHUR3H88Ww6wu9orXW1PHzVMsilHe1Qb29xtX/YO4DCbWintiK         w1ZtEGT4manh4LCJzp2RhuzhGuikAefkJCsEloj39KFQpEEnLvSbY2XsXMwQaTsHdrny         ZdLiNanSiBfQEL081ktlNsWWpbHwkL98i12eTbZ82fq86EsTcH2AkDbs/ULVAUPfV3AL         1rDIvylMtew8fs/TGUbMrOnVxnAaZoWZCTyFn4BZ5rEts8WWwyEHI7PyaKSgjionpX42         F62ZslvNhkPq8s8NKHF6/E58qS1etC2LEBtlds5iomWGG4bVlU0+TQ+Knk1g83wlf65M         r7fg==",
+    "ARC-Authentication-Results": "i=1; mx.google.com;       dkim=pass header.i=@email.meetup.com header.s=s1 header.b=\"Qn/aDoCv\";       dkim=pass header.i=@sendgrid.info header.s=smtpapi header.b=gBFlEKDs;       spf=pass (google.com: domain of bounces+28368967-0f1c-adilnaut=gmail.com@e.email.meetup.com designates 167.89.55.135 as permitted sender) smtp.mailfrom=\"bounces+28368967-0f1c-adilnaut=gmail.com@e.email.meetup.com\";       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=meetup.com",
+    "Return-Path": "<bounces+28368967-0f1c-adilnaut=gmail.com@e.email.meetup.com>",
+    "Received-SPF": "pass (google.com: domain of bounces+28368967-0f1c-adilnaut=gmail.com@e.email.meetup.com designates 167.89.55.135 as permitted sender) client-ip=167.89.55.135;",
+    "Authentication-Results": "mx.google.com;       dkim=pass header.i=@email.meetup.com header.s=s1 header.b=\"Qn/aDoCv\";       dkim=pass header.i=@sendgrid.info header.s=smtpapi header.b=gBFlEKDs;       spf=pass (google.com: domain of bounces+28368967-0f1c-adilnaut=gmail.com@e.email.meetup.com designates 167.89.55.135 as permitted sender) smtp.mailfrom=\"bounces+28368967-0f1c-adilnaut=gmail.com@e.email.meetup.com\";       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=meetup.com",
+    "DKIM-Signature": "v=1; a=rsa-sha256; c=relaxed/relaxed; d=sendgrid.info; h=content-type:from:mime-version:subject:x-feedback-id:to:cc: content-type:from:subject:to; s=smtpapi; bh=I9NBtly0fFlJv8xe85lIHlCaHcBaZLxhtl6vGXIt0lY=; b=gBFlEKDs+UL8RYnxYupUmmWN4g/v2UUqV6pbLB8vIF8tgqCi2yDzIyM77DIa4DgTZYon HRg2w3L84PxwkyFbCJ3imUMjXCuPyTmz+elAmpN8IQyfw4lgvJcm6T2WQIV+7c5hWVjbN/ assYcd08degx94R0NESkiPmBVjfb2txF0=",
+    "Content-Type": "multipart/alternative; boundary=ad6ca8c0407f9ebc6f254758383e788ee02fcd342b114f348ea50e69c9b6",
+    "Date": "Fri, 27 Jan 2023 17:29:42 +0000 (UTC)",
+    "From": "Startup Investor Accelerator <info@email.meetup.com>",
+    "Mime-Version": "1.0",
+    "Message-ID": "<3BmD2qtHRvqFOQAaCq25kg@geopod-ismtpd-5-3>",
+    "Subject": "\ud83d\udcc5 Just scheduled: Accessing early stage funding",
+    "X-Feedback-ID": "28368967:SG",
+    "X-SG-EID": "SXn4DRRFGDcxi5i24NZ2TKrYmZ82vPGtq4ef/kG5NVZLmwXb3hryLgsjBy3w//wPMhO2hnFR40Yo4HQOU2XqckSTfbjugfe1OOXKgysvtaELnnZUxKfTKW9guJXN3advI+kPuVUm3JbgnPsuXx0XAimhq2wsLiJT2/xUoKl97tOCQa+rFoB40iyM5e4aJLhGJXPdzc+anyK88o7g2I9/feWEys6g40Y71IMyplZBau4aORpeARhMorCy1S4aGMdL9A1dWdt20gAXXxQErL+xdw==",
+    "X-SG-ID": "N2C25iY2uzGMFz6rgvQsb8raWjw0ZPf1VmjsCkspi/KvUYPFb2vwyNNeBc9bJiChurQjJ/YMgY4wVwVq4jfmhv6eGd8r4FTQ0zlMks73/P2j4Tqi1H0qHnSihe8gn4ZtT54BNYc3Q3W0Bee+QNi34Fu0UhyPTVIIpqShoAj1GnKDzcabvxFPASGfWRn5Doqendtw0+4zOVKaNfewaYa9BDdbk9n26xZ2icB8qX+uouNf3Tksl/Nj+FNeIZstYobyN5Gkp0I88wLXFghDnC2P5jKWI5zEsLIemZjAH7nfwOid1Al7Quo71ypQgYBAaQ7nJ6lMyTM8TaZCRR4tM+yQCNTkmkWrtpezejsCUBgMEBPMOOpjJBIy3eQRy791TkKwwkLIpzPI+xj8O3/MBj+LCna855EHBr4hQgjMluk1Qa4WGapSCN89y3BvswTFrC4PCbpsQ50H6MfK3N6MEGO4ZCZG1jaItii2km7Go4MXgmIDFJhG+2Y4dfrmeCkM8ytAp0VSRJbfts/5MKNMqgSYuhGOkgYubH/mWoSCuVHp696QhOBRNspwXoYVHMIJPLwc",
+    "To": "adilnaut@gmail.com",
+    "X-Entity-ID": "yQyHiGYXYurLHzVm/MhzzQ=="
+}
+Snippet:
+Startup Investor Accelerator invites you to a new event ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌ ‌
+Labels:
+['UNREAD', 'CATEGORY_UPDATES', 'INBOX']

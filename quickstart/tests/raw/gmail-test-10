@@ -1,0 +1,884 @@
+<html style=""><head><title></title><meta charset="utf-8"><style>
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .typography .markup table.image-wrapper img,
+  .typography.editor .markup table.image-wrapper img,
+  .typography .markup table.kindle-wrapper img,
+  .typography.editor .markup table.kindle-wrapper img {
+    max-width: 550px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .typography .markup div.youtube-inner div.youtube-screen,
+  .typography.editor .markup div.youtube-inner div.youtube-screen,
+  .typography .markup div.vimeo-inner div.youtube-screen,
+  .typography.editor .markup div.vimeo-inner div.youtube-screen {
+    display: none !important;
+  }
+}
+
+
+@media screen and (max-width: 370px) {
+  .typography .markup div.tiktok-wrap,
+  .typography.editor .markup div.tiktok-wrap {
+    width: calc(95vw - 32px);
+    height: calc((95vw - 32px - 2px) / 0.485714);
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .typography .markup div.embedded-publication-wrap .embedded-publication.show-subscribe,
+  .typography.editor .markup div.embedded-publication-wrap .embedded-publication.show-subscribe {
+    padding: 24px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .typography .markup div.subscription-widget-wrap .subscription-widget.show-subscribe,
+  .typography.editor .markup div.subscription-widget-wrap .subscription-widget.show-subscribe,
+  .typography .markup div.captioned-button-wrap .subscription-widget.show-subscribe,
+  .typography.editor .markup div.captioned-button-wrap .subscription-widget.show-subscribe {
+    padding: 24px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .typography .markup div.subscription-widget-wrap .subscription-widget.show-subscribe .subscription-widget-subscribe .button,
+  .typography.editor .markup div.subscription-widget-wrap .subscription-widget.show-subscribe .subscription-widget-subscribe .button,
+  .typography .markup div.captioned-button-wrap .subscription-widget.show-subscribe .subscription-widget-subscribe .button,
+  .typography.editor .markup div.captioned-button-wrap .subscription-widget.show-subscribe .subscription-widget-subscribe .button {
+    padding: 10px 12px;
+    min-width: 110px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  .typography .markup .tweet,
+  .typography.editor .markup .tweet {
+    padding: 12px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  .typography .markup .tweet .tweet-text,
+  .typography.editor .markup .tweet .tweet-text {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  .typography .markup .tweet .tweet-photos-container.two,
+  .typography.editor .markup .tweet .tweet-photos-container.two,
+  .typography .markup .tweet .tweet-photos-container.three,
+  .typography.editor .markup .tweet .tweet-photos-container.three,
+  .typography .markup .tweet .tweet-photos-container.four,
+  .typography.editor .markup .tweet .tweet-photos-container.four {
+    height: 200px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  .typography .markup .tweet a.expanded-link .expanded-link-img,
+  .typography.editor .markup .tweet a.expanded-link .expanded-link-img {
+    max-height: 180px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  .typography .markup .tweet a.expanded-link .expanded-link-description,
+  .typography.editor .markup .tweet a.expanded-link .expanded-link-description {
+    display: none;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .typography .markup .apple-podcast-container,
+  .typography.editor .markup .apple-podcast-container {
+    width: unset;
+  }
+}
+
+
+@media (max-width: 420px) {
+  .typography .markup .install-substack-app-embed img.install-substack-app-embed-img,
+  .typography.editor .markup .install-substack-app-embed img.install-substack-app-embed-img {
+    margin: 0 auto 16px auto;
+  }
+}
+
+
+@media screen and (min-width: 420px) and (max-width: 600px) {
+  .typography .markup .install-substack-app-embed .install-substack-app-embed-text,
+  .typography.editor .markup .install-substack-app-embed .install-substack-app-embed-text {
+    max-width: calc(100% - 100px);
+    width: initial;
+  }
+}
+
+
+@media (max-width: 420px) {
+  .typography .markup .install-substack-app-embed .install-substack-app-embed-text,
+  .typography.editor .markup .install-substack-app-embed .install-substack-app-embed-text {
+    margin: 0 0 12px 0;
+    max-width: 100%;
+    width: auto;
+    text-align: center;
+  }
+}
+
+
+@media (max-width: 600px) {
+  .typography .markup .install-substack-app-embed .install-substack-app-embed-link,
+  .typography.editor .markup .install-substack-app-embed .install-substack-app-embed-link {
+    margin-top: 16px;
+    width: 100%;
+  }
+}
+
+
+@media screen and (min-width: 481px) {
+  .share-button-container {
+    height: 38px;
+  }
+}
+
+
+@media screen and (min-width: 481px) {
+  .share-button-container a.comment {
+    height: 38px;
+    line-height: 38px;
+    padding-right: 10px;
+  }
+}
+
+
+@media screen and (max-width: 480px) {
+  .share-button-container .separator {
+    display: block;
+    margin: 0;
+    height: 8px;
+    border-left: none;
+  }
+}
+
+
+@media screen and (max-width: 480px) {
+  .share-button-container a.share.first img {
+    padding-left: 0;
+  }
+}
+
+
+@media screen and (min-width: 481px) {
+  .share-button-container a.mobile {
+    display: none !important;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .social-media-share-preview__description {
+    -webkit-line-clamp: 2;
+  }
+}
+
+
+@media screen and (max-width: 1000px) {
+  .congrats-box {
+    flex-direction: column;
+  }
+  .congrats-box .congrats-box-right {
+    margin-left: 38px;
+    margin-top: 16px;
+  }
+}
+
+
+@media screen and (max-width: 500px) {
+  .congrats-box {
+    display: none;
+  }
+}
+
+
+@media screen and (min-width: 541px) {
+  .settings-add-pub-modal-wrapper .container .add-recommending-pub-modal-container {
+    padding: 36px;
+    height: 680px;
+  }
+}
+
+
+@media screen and (min-width: 541px) {
+  .settings-add-pub-modal-wrapper .container .add-recommending-pub-modal-container .footer {
+    position: absolute;
+    bottom: 36px;
+    margin: 0px;
+  }
+}
+
+
+@media screen and (max-width: 840px) {
+  .header-with-anchor-widget .header-anchor-widget,
+  .header-anchor-container .header-anchor-widget {
+    display: none;
+  }
+}
+
+
+@media screen and (min-width: 768px) {
+  .post {
+    padding: 32px 0 0 0;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post .post-header .post-label {
+    margin-top: 8px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post .post-header .meta-author-wrap.alternative-meta .meta-right-column .post-meta {
+    margin-top: 6px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post .footer-facepile-container {
+    height: 64px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post .post-footer.use-separators {
+    justify-content: center;
+    margin: 0 -16px;
+    padding: 0;
+    gap: 0;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post .post-footer.next-prev {
+    height: 64px;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post-contributor-footer .post-contributor-bio-table {
+    display: block;
+  }
+  .post-contributor-footer .post-contributor-bio-table-row {
+    display: flex;
+    flex-direction: row;
+  }
+  .post-contributor-footer .post-contributor-bio-userhead-cell,
+  .post-contributor-footer .post-contributor-bio-body-cell {
+    display: block;
+  }
+  .post-contributor-footer .post-contributor-bio-body-cell {
+    flex-grow: 1;
+  }
+  .post-contributor-footer .post-contributor-bio-body-table {
+    display: block;
+  }
+  .post-contributor-footer .post-contributor-bio-body-table-row {
+    display: block;
+  }
+  .post-contributor-footer .post-contributor-bio-copy-cell,
+  .post-contributor-footer .post-contributor-bio-controls-cell {
+    display: block;
+  }
+  .post-contributor-footer .post-contributor-bio-copy-cell {
+    margin: 0 0 16px 0;
+  }
+  .post-contributor-footer .post-contributor-bio-controls-cell {
+    width: auto;
+  }
+  .post-contributor-footer .post-contributor-bio-controls {
+    margin: auto;
+  }
+  .post-contributor-footer .post-contributor-bio-controls .button.primary {
+    width: 100%;
+  }
+  .post-contributor-footer .post-contributor-bio-text {
+    font-size: 14px;
+  }
+}
+
+
+@media screen and (min-width: 768px) {
+  .post-silhouette {
+    padding: 16px 0;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post-silhouette .post-silhouette-title {
+    margin-top: 10.44225025px;
+    height: 120px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post-silhouette .post-silhouette-meta {
+    width: 75%;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post-silhouette .post-silhouette-meta.with-byline-image {
+    margin: 20px 0;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .use-theme-bg .post-meta.alternative-meta .post-meta-item,
+  .post-meta.alternative-meta .post-meta-item {
+    padding-right: 16px;
+  }
+}
+
+
+@media screen and (max-width: 370px) {
+  .use-theme-bg .post-meta.alternative-meta .post-meta-item,
+  .post-meta.alternative-meta .post-meta-item {
+    font-size: 14px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .use-theme-bg .post-meta.alternative-meta .post-meta-item.guest-author-publication,
+  .post-meta.alternative-meta .post-meta-item.guest-author-publication {
+    display: none;
+  }
+}
+
+
+@media screen and (max-width: 370px) {
+  .post-meta .post-meta-item .post-meta-button {
+    height: 36px !important;
+  }
+  .post-meta .post-meta-item .post-meta-button .meta-button-label {
+    display: none;
+  }
+  .post-meta .post-meta-item .post-meta-button > svg {
+    margin-right: 0;
+  }
+}
+
+
+@media screen and (max-width: 370px) {
+  .post-meta .post-meta-item {
+    font-size: 12px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post-preview > .post-preview-content .post-preview-meta {
+    margin-top: 12px 0;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post-preview > .post-preview-image {
+    display: none;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post-preview-silhouette .post-preview-silhouette-image {
+    display: none;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post .floating-subscribe-button {
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  body .markup table.image-wrapper img,
+  body .markup table.kindle-wrapper img {
+    max-width: 550px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  body .markup div.youtube-inner div.youtube-screen,
+  body .markup div.vimeo-inner div.youtube-screen {
+    display: none !important;
+  }
+}
+
+
+@media screen and (max-width: 370px) {
+  body .markup div.tiktok-wrap {
+    width: calc(95vw - 32px);
+    height: calc((95vw - 32px - 2px) / 0.485714);
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  body .markup div.embedded-publication-wrap .embedded-publication.show-subscribe {
+    padding: 24px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  body .markup div.subscription-widget-wrap .subscription-widget.show-subscribe,
+  body .markup div.captioned-button-wrap .subscription-widget.show-subscribe {
+    padding: 24px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  body .markup div.subscription-widget-wrap .subscription-widget.show-subscribe .subscription-widget-subscribe .button,
+  body .markup div.captioned-button-wrap .subscription-widget.show-subscribe .subscription-widget-subscribe .button {
+    padding: 10px 12px;
+    min-width: 110px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  body .markup .tweet {
+    padding: 12px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  body .markup .tweet .tweet-text {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  body .markup .tweet .tweet-photos-container.two,
+  body .markup .tweet .tweet-photos-container.three,
+  body .markup .tweet .tweet-photos-container.four {
+    height: 200px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  body .markup .tweet a.expanded-link .expanded-link-img {
+    max-height: 180px;
+  }
+}
+
+
+@media (max-width: 650px) {
+  body .markup .tweet a.expanded-link .expanded-link-description {
+    display: none;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  body .markup .apple-podcast-container {
+    width: unset;
+  }
+}
+
+
+@media (max-width: 420px) {
+  body .markup .install-substack-app-embed img.install-substack-app-embed-img {
+    margin: 0 auto 16px auto;
+  }
+}
+
+
+@media screen and (min-width: 420px) and (max-width: 600px) {
+  body .markup .install-substack-app-embed .install-substack-app-embed-text {
+    max-width: calc(100% - 100px);
+    width: initial;
+  }
+}
+
+
+@media (max-width: 420px) {
+  body .markup .install-substack-app-embed .install-substack-app-embed-text {
+    margin: 0 0 12px 0;
+    max-width: 100%;
+    width: auto;
+    text-align: center;
+  }
+}
+
+
+@media (max-width: 600px) {
+  body .markup .install-substack-app-embed .install-substack-app-embed-link {
+    margin-top: 16px;
+    width: 100%;
+  }
+}
+
+
+@media screen and (min-width: 500px) {
+  body .header a.logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+  }
+}
+
+
+@media screen and (max-width: 420px) {
+  body .subscription-receipt table:first-of-type .subscription-amount .subscription-discount {
+    width: 72px !important;
+  }
+}
+
+
+@media screen and (min-width: 481px) {
+  body .share-button-container {
+    height: auto;
+  }
+}
+
+
+@media screen and (max-width: 480px) {
+  body .share-button-container .separator {
+    display: block !important;
+    margin: 0 !important;
+    height: 8px !important;
+    border-left: none !important;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .digest .item .post-meta-item.audience {
+    display: none;
+  }
+}
+
+
+@media screen and (min-width: 500px) {
+  .digest-publication .logo img {
+    width: 42px;
+    height: 42px;
+    border-radius: 4px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .comments-page .container .comment-list .collapsed-reply {
+    margin-left: 17px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .comment > .comment-list {
+    padding-left: 25px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .finish-magic-login-modal .modal-content .container {
+    padding: 24px 0;
+  }
+}
+
+
+@media (max-width: 650px) {
+  .reader2-text-b3 {
+    line-height: 22px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .reader2-text-h4 {
+    line-height: 22px;
+  }
+}
+
+
+@media screen and (min-width: 541px) {
+  .user-profile-modal {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .subscribe-widget form.form .sideBySideWrap button.rightButton {
+    padding: 10px 12px;
+  }
+}
+
+
+@media screen and (min-width: 541px) {
+  .pub-icon:hover .logo-hover,
+  .feed-item-icon:hover .logo-hover {
+    display: block;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .post-ufi.single-full-width-button .post-ufi-button-wrapper {
+    width: 100%;
+    padding: 0 16px;
+  }
+  .post-ufi.single-full-width-button .post-ufi-button-wrapper:empty {
+    display: none;
+  }
+  .post-ufi.single-full-width-button .post-ufi-button {
+    width: 100%;
+    margin: 16px 0;
+    justify-content: center;
+  }
+}
+
+
+@media screen and (max-width: 768px) {
+  .file-embed-wrapper {
+    padding: 0;
+  }
+}
+
+
+@media screen and (max-width: 768px) {
+  .file-embed-wrapper-editor {
+    padding: 0;
+  }
+}
+
+
+@media screen and (max-width: 768px) {
+  .file-embed-wrapper-editor:active {
+    padding: 0;
+  }
+}
+
+
+@media only screen and (max-width: 650px) {
+  .file-embed-button.wide,
+  .file-embed-error-button.wide {
+    display: none;
+  }
+}
+
+
+@media only screen and (min-width: 630px) {
+  .file-embed-button.narrow,
+  .file-embed-error-button.narrow {
+    display: none;
+  }
+}
+
+
+@media screen and (min-width: 541px) {
+  .audio-player-wrapper .audio-player {
+    min-width: 500px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .audio-player-wrapper .audio-player .audio-player-progress {
+    border-left-width: 16px;
+    border-right-width: 16px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .audio-player-wrapper .audio-player .audio-player-progress .audio-player-progress-bar .audio-player-progress-bar-popup {
+    top: -54px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .audio-player-wrapper-fancy .audio-player .audio-player-progress {
+    border-left-width: 16px;
+    border-right-width: 16px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .audio-player-wrapper-fancy .audio-player .audio-player-progress .audio-player-progress-bar .audio-player-progress-bar-popup {
+    top: -54px;
+  }
+}
+
+
+@media (min-width: 250px) {
+  .audio-player-wrapper-fancy .audio-player {
+    padding: 32px;
+  }
+  .audio-player-wrapper-fancy .audio-player .btn-group {
+    display: flex;
+  }
+  .audio-player-wrapper-fancy .audio-player .btn-group .button:last-of-type {
+    display: block;
+  }
+}
+
+
+@media (min-width: 300px) {
+  .audio-player-wrapper-fancy .audio-player .btn-group {
+    display: block;
+  }
+  .audio-player-wrapper-fancy .audio-player .btn-group .button:first-of-type {
+    display: block;
+  }
+}
+
+
+@media (min-width: 350px) {
+  .audio-player-wrapper-fancy .audio-player .audio-player-substack-logo {
+    display: block;
+  }
+  .audio-player-wrapper-fancy .audio-player .audio-player-title {
+    margin-top: 16px;
+  }
+  .audio-player-wrapper-fancy .audio-player .audio-player-hero-image-container {
+    padding-top: 15%;
+    width: 15%;
+    display: block;
+  }
+  .audio-player-wrapper-fancy .audio-player .btn-group .button:first-of-type {
+    display: block;
+  }
+  .audio-player-wrapper-fancy .audio-player .audio-player-substack-logo {
+    display: block;
+  }
+}
+
+
+@media (min-width: 350px) {
+  .audio-player-wrapper-fancy .audio-player .audio-player-hero-image-container {
+    padding-top: 25%;
+    width: 25%;
+    display: block;
+  }
+  .audio-player-wrapper-fancy .audio-player .btn-group {
+    display: flex;
+  }
+  .audio-player-wrapper-fancy .audio-player .btn-group .button:first-of-type {
+    display: block;
+  }
+}
+
+
+@media (min-width: 400px) {
+  .audio-player-wrapper-fancy .audio-player .audio-player-hero-image-container {
+    padding-top: 40%;
+    width: 40%;
+  }
+}
+
+
+@media (max-width: 400px) {
+  .audio-player-wrapper-fancy .audio-player .btn-group {
+    margin-top: 12px;
+  }
+  .audio-player-wrapper-fancy .audio-player .btn-group .button {
+    font-size: 13px;
+    padding: 6px 12px;
+    height: auto;
+    margin-top: 10px;
+  }
+}
+
+
+@media (min-width: 600px) {
+  .audio-player-wrapper-fancy .audio-player .audio-player-hero-image-container {
+    padding-top: 55%;
+    width: 55%;
+  }
+}
+
+
+@media (max-width: 650px) {
+  .poll-editor-modal {
+    min-width: calc(100% - 20px);
+  }
+}
+
+
+@media (max-width: 750px) {
+  .poll-embed .poll-anchor-target .poll-anchor-copy-button {
+    left: 8px;
+    top: 45px;
+  }
+}
+
+
+@media screen and (min-width: 541px) {
+  .poll-embed .poll-wrapper.poll-web .poll-dialog .modal-table .modal-row .modal-content > .container {
+    width: 552px;
+    padding: 26px 24px;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .poll-embed .poll-wrapper.poll-web .poll-dialog .modal-table .modal-row .modal-content > .container {
+    padding: 40px 0;
+  }
+}
+
+
+@media screen and (max-width: 650px) {
+  .poll-embed .poll-wrapper.poll-web .poll-dialog .modal-row .modal-cell .modal-exit-btn {
+    margin-right: -20px;
+  }
+}
+</style></head><body class="email-body" style="font-kerning: auto;"><img src="https://mailgun.substack.com/api/v1/email/open?token=eyJtIjoiPDIwMjMwMTI2MTY1NjUwLjMuMjQwNjVjZTlhNzVlM2E1MS5pYXRwdmFhbEBtZzEuc3Vic3RhY2suY29tPiIsInUiOjkwMDIxODMsInIiOiJhZGlsbmF1dEBnbWFpbC5jb20iLCJkIjoibWcxLnN1YnN0YWNrLmNvbSIsInAiOm51bGwsInQiOm51bGwsImEiOm51bGwsInMiOm51bGwsImMiOiJyZWFkZXItcmVjb21tZW5kYXRpb24tZW1haWwiLCJmIjpmYWxzZSwicG9zaXRpb24iOiJ0b3AiLCJpYXQiOjE2NzQ3NTIyMTIsImV4cCI6MTY3NzM0NDIxMiwiaXNzIjoicHViLTAiLCJzdWIiOiJlbyJ9.2iMCqV8dATcl14bhkmedjskuH8Cpt3u0Z3ALVzhiikM" alt="" width="1" height="1" border="0" style="height:1px !important;width:1px !important;border-width:0 !important;margin-top:0 !important;margin-bottom:0 !important;margin-right:0 !important;margin-left:0 !important;padding-top:0 !important;padding-bottom:0 !important;padding-right:0 !important;padding-left:0 !important;"/><table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" class="email-body-container"><tr><td></td><td width="550" class="content"></td><td></td></tr><tr><td></td><td align="left" width="550" class="content revamped-reader-recommendation notification" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';"><div style="font-size: 16px; line-height: 26px; margin: 0 auto; max-width: 550px; overflow-wrap: break-word; width: 100%;"><h2 style="-moz-osx-font-smoothing: antialiased; -webkit-font-smoothing: antialiased; color: #404040; font-family: 'SF Compact Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; font-size: 1.625em; font-weight: bold; line-height: 1.16em; margin: 1em 0 0.625em 0;">Recommendations from your Substacks</h2><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="email-body-center multipub-email-body" style="border-bottom: 1px solid #e0e0e0; margin: 0 auto; margin-bottom: 8px; margin-top: 32px;"><tr><td style="border-top: 1px solid #e0e0e0; padding-bottom: 16px; padding-top: 16px;"><img src="https://substackcdn.com/image/fetch/w_51.55555555555556,c_scale,f_png,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack.com%2Ficon%2FSubstackLogoIcon%3Fv%3D4%26height%3D58%26strokeWidth%3D2" width="26" height="29" style="border: none !important; max-width: 25.77777777777778px; vertical-align: middle;" alt=""><div class="description-text" style="font-size: 16px; line-height: 26px; margin-bottom: 16px; margin-top: 16px;"><div class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-16--yeezN frontend-pencraft-Text-module__line-height-22--2MbqA frontend-pencraft-Text-module__weight-normal--mEmBf frontend-pencraft-Text-module__color-primary--2I-sF" style="color: #404040; font-size: 16px; font-weight: 400; letter-spacing: -0.31px; line-height: 22px; margin: 0; text-decoration: unset;"> Here's what Substacks you're subscribed to have been recommending this week.</div></div></td></tr><tr><td style="border-top: 1px solid #e0e0e0; padding-bottom: 16px; padding-top: 16px;"><table><tr><td><div class="recommended-images" style="font-size: 16px; line-height: 26px; margin-bottom: 12px;"><div class="pub-and-pub-author" style="align-items: center; display: flex; font-size: 16px; line-height: 26px;"><div class="pub-icon pub-icon stacked-icons" style="border-radius: 4px; font-size: 16px; height: 30px; line-height: 26px; margin-right: 8px; min-width: 30px; position: relative; width: 30px;"><a href="https://email.mg1.substack.com/c/eJx9kMGOhCAMhp9muI0BRHEOHPayr0EqVKdZRAO4Zt5-0bnsXjYhDWm_tv9fBwXnNb1MQvCY7gnduiwYPRRa4x0XoMC2NRdbXhsatmdMlrx5cC7F0DJvuJZOj4yynRJevGHbPgZy14gTZk_jvIARJoXKT6ObhBj8Qw8OFXqheqXfO2D3hNHVPW8V5eoO5lnKlm_tx01-1rdQCBgjQZgoQnT1k5u8j7mA-2pqZ2UYGclly4XsRd_1HW_aRiredw4foDtsoRMNQdm-AcJN8WUWf0awZMBTiLCXWp1PW1e6OrOntj1SeVmMMAasEsu_97uinTFiquf2FooRvVa6k1JIzYe3-dNqleDXSkdzHAfDX9gPXvWRNQ" native="" style="color: #ff6719; text-decoration: none;"><span style="-moz-osx-font-smoothing: antialiased; -webkit-font-smoothing: antialiased; border: 5px solid #ddd; border-color: #4c0068 #6C0095 #6C0095 #4c0068; border-radius: 50%; box-sizing: border-box; color: #808080; display: block; font-family: 'Spectral', serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; font-weight: 400; height: 100%; line-height: 21px; text-align: center; text-transform: capitalize; width: 100%;" class="placeholder">A</span></a></div><div class="profile-image-wrapper" style="display: inline-block; font-size: 16px; height: auto; line-height: 26px; max-width: 100%; position: relative;"><img height="32" width="32" src="https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2Fb906c82b-5d8c-4d32-b082-dc7fe85ea0e7_400x400.jpeg" class="user-profile-head" style="border: none !important; border-radius: 50%; display: block; max-width: 550px; vertical-align: middle;"></div></div></div></td></tr><tr><td> <div class="tagline-whole" style="font-size: 16px; line-height: 26px; padding-bottom: 12px;"><span> <span><b style="font-weight: 600;">Christine L </b>of <b style="font-weight: 600;">A Millennial Means of Finance</b></span> recommends</span></div></td></tr><tr><td><a href="https://email.mg1.substack.com/c/eJx9UcFuhCAQ_Rq5rQEU0QOHJpv9DTPCaEkVDMJu9u8Lbpu0PTQhc3jzhvfmjYaIiw9PFRAMhktA7bcNnYFovbvgBnYluz_iGJ87KpIODKM1aqCUs74hRlHJtZyIPcY54MlXZE_TavX5RSGTd4W0mXUvJDMTtIJBq8WMQzeZVnaDaNlLA5Kx6HTWebmI5_Sq3mPcj6p5q_gtP7hDfaTpiKA_6kwsaHNLcRsPn4LGqrl-tyveFXxDY9OW8dPfF6i9i1kiowHvsO1o_mx_XGZfEinB5JmAM4Zg3TLm9bKxbOjKRS8ZJVZxyhvKeMc60QlaNzVvaSc0DiAFNiBYbSHud4C1aum2sF8LkKDA2NVBirm7FI8nXHSKoeRsfI7oYFox5xH_PdZZxwUdhnxbM0JUrJOtFJwzLmn_Srrkmi0Yn9lOPR4Pgj9on7cstqk" style="color: #ff6719; text-decoration: none;"><table class="link-card" style="background: #f5f5f5; border-radius: 8px; padding: 16px; width: 100%;"><tr><td><div class="pub-icon pub-icon-margin subscribe-image" style="border: none; border-radius: 4px; font-size: 16px; height: 40px; line-height: 26px; margin-bottom: 12px; margin-right: 10px; min-width: 30px; position: relative; width: 40px;"><a href="https://email.mg1.substack.com/c/eJx9kD2OhDAMhU9DukH5z1CkmGavEZnEMNFCQCHMaG6_AZrdZiXLhf3Zfs8eCo5L_tiMEDDfMvplnjEFKHFJN5whTmRdtuLKZ0VL9g2zi8F2lHJ2FyRYarg3PYmbGzKevCXr3k_RnysOmDyt8QPVjIdB8kGAF4DSQ8d0UBJoh_K6AXuImHy9c6ko5_Rkn6WsWyMeDf-qAS9ot73fCvjvtoIkWk65oIxrppVWtBUtl1Qrjx0YhQIUayOU9QUwNZLOI_s7ny2EOCXYS-2Oh4WzXF24Q8eeYvk4TNBPWOWUf391ZjdiwlxfGxwUy7SRRnHOuKH3y-hhq0oIS6WTfb_fBH9hP7M2iPU" native="" style="color: #ff6719; text-decoration: none;"><picture><source type="image/webp" srcset="https://substackcdn.com/image/fetch/w_80,h_80,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F72aad7d4-3198-4232-8c76-d317a93a0861_415x415.png"><img src="https://substackcdn.com/image/fetch/w_80,h_80,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F72aad7d4-3198-4232-8c76-d317a93a0861_415x415.png" sizes="100vw" alt="bookbear express" srcset="" width="80" height="80" class="frontend-components-responsive_img-module__img--1l4UG custom" style="border-radius: 4px; display: flex; height: 100%; max-width: 100%; width: 100%;"></picture></a></div></td></tr><tr><td><div class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-16--yeezN frontend-pencraft-Text-module__weight-semibold--2XLPl frontend-pencraft-Text-module__color-primary--2I-sF subscribe-title" style="color: #404040; font-size: 16px; font-weight: 600; letter-spacing: -0.31px; line-height: 20px; margin: 0; margin-bottom: 4px; text-decoration: unset;">bookbear express</div></td></tr><tr class="subscribe-desc"><td><div class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-14--1PYz8 frontend-pencraft-Text-module__weight-normal--mEmBf frontend-pencraft-Text-module__color-primary--2I-sF" style="color: #404040; font-size: 14px; font-weight: 400; letter-spacing: -0.15px; line-height: 18px; margin: 0; text-decoration: unset;">help-self</div></td></tr></table></a></td></tr></table></td></tr><tr><td style="border-top: 1px solid #e0e0e0; padding-bottom: 16px; padding-top: 16px;"><table><tr><td><div class="recommended-images" style="font-size: 16px; line-height: 26px; margin-bottom: 12px;"><div class="pub-and-pub-author" style="align-items: center; display: flex; font-size: 16px; line-height: 26px;"><div class="pub-icon pub-icon stacked-icons" style="border-radius: 4px; font-size: 16px; height: 30px; line-height: 26px; margin-right: 8px; min-width: 30px; position: relative; width: 30px;"><a href="https://email.mg1.substack.com/c/eJx9kLFuxCAMhp_m2C4yEAIZGLr0NSIHnBxqQiIgPd3bl-SWdqlkebB_299vh4XmLb1sIvSU7onctq4UPZawxTutGBa2b7kM5bWTZUemNARvewDBjWTeghZOjyzkYUp06S3bj3EJ7lpxitnDaqEAQWthqDdGAqEDAwZBiqmXpn3fwMMHiq7eeVOUa3qxj1L2fJMfN_FZY9qOWFnzhK5U9CYfYy7ovpo6VNssWAFCAhcd71SnoJGNaKFTjnrUiiQq3gQs-zficmthnfmfFSxZ9GGJeJTanU9HV7maGk6sI4byGijiuFClK_--7srDTJFS_bQfsFje6VYrIbjQYN6-T5cVwW9VHe3z-WT0S_YDHmGNdg" native="" style="color: #ff6719; text-decoration: none;"><picture><source type="image/webp" srcset="https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F6b215e86-80b3-47a0-aae8-1a6114d53c75_400x400.png"><img src="https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F6b215e86-80b3-47a0-aae8-1a6114d53c75_400x400.png" sizes="100vw" alt="Founders Factory Startup Bulletin" srcset="" width="64" height="64" class="frontend-components-responsive_img-module__img--1l4UG custom" style="border-radius: 4px; display: flex; height: 100%; max-width: 100%; width: 100%;"></picture></a></div><div class="profile-image-wrapper" style="display: inline-block; font-size: 16px; height: auto; line-height: 26px; max-width: 100%; position: relative;"><img height="32" width="32" src="https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2Ff4e8d9a5-bb9c-4509-b1c6-a357a7701427_400x400.jpeg" class="user-profile-head" style="border: none !important; border-radius: 50%; display: block; max-width: 550px; vertical-align: middle;"></div></div></div></td></tr><tr><td> <div class="tagline-whole" style="font-size: 16px; line-height: 26px; padding-bottom: 12px;"><span> <span><b style="font-weight: 600;"> </b><b style="font-weight: 600;">Founders Factory Startup Bulletin</b></span> recommends</span></div></td></tr><tr><td><a href="https://email.mg1.substack.com/c/eJx9UctuwyAQ_Bpzi4XBzwOHSlF-w1pg7aIabPFIlL8vOK3U9lAJ7WF2lpmdVRBx3f1TeASN_uJR7dai0xDN7i5owWzk2EOc4_NAQVJAPxstJkpZM3KiBR2YGiQxYV48nnxBjiQ3o84vCpm8iwGWjo1StrAgTpNUOLWUUwqD5ECVfGlA0gadyjovF_Gc3sR7jEeo-FvFbvktaEPMWrEOSYYI6qPO9NLjtxTtHPbkFVb8-t2uWF9wi9okm_HT5ReodhezUEY93sEeqP9kEC7LXnIp8eQZjwt6b9w65yWzvWzryjs-TiMxglHGacP6pu_6jta8Zi3tu7wrDB1y6JraQDzuAFvVUrs2vxYgXoA2m4MUc3ctHk-46BRDyZn4nNGB3DCnEv892VnnFR36fGE9QxRNP7RDx1jDBjq-8i7pZgt6z2wnHo8HwR-0T-hkufo" style="color: #ff6719; text-decoration: none;"><table class="link-card" style="background: #f5f5f5; border-radius: 8px; padding: 16px; width: 100%;"><tr><td><div class="pub-icon pub-icon-margin subscribe-image" style="border: none; border-radius: 4px; font-size: 16px; height: 40px; line-height: 26px; margin-bottom: 12px; margin-right: 10px; min-width: 30px; position: relative; width: 40px;"><a href="https://email.mg1.substack.com/c/eJx9kE1uxCAMhU8z7CbiJ4TJgkU3vQZywMmgJiQCp9HcviSzaTeVkBf4s9979kA4rfllM0LAfM_o12XBFIDimu64QJzZthZy9NrQsr1gdjHYnnMpHooFy430ZmCxuDHjxVu27cMc_bXihNnTyh68NB71KPxgHjiMWmjV96CQt2ZQbw3YQ8Tkq87bBV3Ts30SbeWmPm7ys74Rl0JVi5qyD4XAfzUVZ9FKLhUXshOd7jRvVCNb3mmPPRiNCrRoItD2DTDfWr5M4u98thDinGCn2p3OINd3zeJON3uK9HKYYJixmqJ_L3ZVN2HCXA8cHJAVnWmNllJIwx_vuGe4aiGslU72OA6Gv7AfUmKLaw" native="" style="color: #ff6719; text-decoration: none;"><picture><source type="image/webp" srcset="https://substackcdn.com/image/fetch/w_80,h_80,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F4043037b-5adb-41f7-8ebf-d01abb10430a_1280x1280.png"><img src="https://substackcdn.com/image/fetch/w_80,h_80,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F4043037b-5adb-41f7-8ebf-d01abb10430a_1280x1280.png" sizes="100vw" alt="Femstreet" srcset="" width="80" height="80" class="frontend-components-responsive_img-module__img--1l4UG custom" style="border-radius: 4px; display: flex; height: 100%; max-width: 100%; width: 100%;"></picture></a></div></td></tr><tr><td><div class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-16--yeezN frontend-pencraft-Text-module__weight-semibold--2XLPl frontend-pencraft-Text-module__color-primary--2I-sF subscribe-title" style="color: #404040; font-size: 16px; font-weight: 600; letter-spacing: -0.31px; line-height: 20px; margin: 0; margin-bottom: 4px; text-decoration: unset;">Femstreet</div></td></tr><tr class="subscribe-desc"><td><div class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-14--1PYz8 frontend-pencraft-Text-module__weight-normal--mEmBf frontend-pencraft-Text-module__color-primary--2I-sF" style="color: #404040; font-size: 14px; font-weight: 400; letter-spacing: -0.15px; line-height: 18px; margin: 0; text-decoration: unset;">Where women in tech lead, shape and fund the future </div></td></tr></table></a></td></tr></table></td></tr><tr><td style="border-top: 1px solid #e0e0e0; padding-bottom: 16px; padding-top: 16px;"><table><tr><td><div class="recommended-images" style="font-size: 16px; line-height: 26px; margin-bottom: 12px;"><div class="pub-and-pub-author" style="align-items: center; display: flex; font-size: 16px; line-height: 26px;"><div class="pub-icon pub-icon stacked-icons" style="border-radius: 4px; font-size: 16px; height: 30px; line-height: 26px; margin-right: 8px; min-width: 30px; position: relative; width: 30px;"><a href="https://email.mg1.substack.com/c/eJx9kLFuxCAMhp_m2C4yEAIZGLr0NSIHnBxqQiIgPd3bl-SWdqlkebB_299vh4XmLb1sIvSU7onctq4UPZawxTutGBa2b7kM5bWTZUemNARvewDBjWTeghZOjyzkYUp06S3bj3EJ7lpxitnDaqEAQWthqDdGAqEDAwZBiqmXpn3fwMMHiq7eeVOUa3qxj1L2fJMfN_FZY9qOWFnzhK5U9CYfYy7ovpo6VNssWAFCAhcd71SnoJGNaKFTjnrUiiQq3gQs-zficmthnfmfFSxZ9GGJeJTanU9HV7maGk6sI4byGijiuFClK_--7srDTJFS_bQfsFje6VYrIbjQYN6-T5cVwW9VHe3z-WT0S_YDHmGNdg" native="" style="color: #ff6719; text-decoration: none;"><picture><source type="image/webp" srcset="https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F6b215e86-80b3-47a0-aae8-1a6114d53c75_400x400.png"><img src="https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F6b215e86-80b3-47a0-aae8-1a6114d53c75_400x400.png" sizes="100vw" alt="Founders Factory Startup Bulletin" srcset="" width="64" height="64" class="frontend-components-responsive_img-module__img--1l4UG custom" style="border-radius: 4px; display: flex; height: 100%; max-width: 100%; width: 100%;"></picture></a></div><div class="profile-image-wrapper" style="display: inline-block; font-size: 16px; height: auto; line-height: 26px; max-width: 100%; position: relative;"><img height="32" width="32" src="https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2Ff4e8d9a5-bb9c-4509-b1c6-a357a7701427_400x400.jpeg" class="user-profile-head" style="border: none !important; border-radius: 50%; display: block; max-width: 550px; vertical-align: middle;"></div></div></div></td></tr><tr><td> <div class="tagline-whole" style="font-size: 16px; line-height: 26px; padding-bottom: 12px;"><span> <span><b style="font-weight: 600;"> </b><b style="font-weight: 600;">Founders Factory Startup Bulletin</b></span> recommends</span></div></td></tr><tr><td><a href="https://email.mg1.substack.com/c/eJx9kcGOpSAQRb9Gds8gKOqCxSSd_g1TQmmTETAI_fL-fgrfTDKZxSSExaWKe-qWgYx7TC-dECymR0ITvcdgIbsYHujBHeyMV17y60TNyoVpcVbPnItuksxqPgozrsxdy5bwrtfsLOvhzP1FLWZfepjmdVJdP_Uj78dhltOGMIMFta0KxvntAcU6DIZ83hT57j70V87n1cgfjfik83w-2xDzGpMLe2tiVeVnyX65YkkGG_lxlfXKYH42QlXdo3XFk37z_RZNDJksSE34Df5E-8_012OLNZEaDPUk3DBVy4XGIzAC-pCDnOaJOS24kLwTqlODGngrW9FzNRicYRxQwtC1DvL5DXA0Pfd71_4hJH7PkgbrjgAl0-teGW-5-lSgElx-LRhgPZDyyP9d1n0vOwZMtFu7QNadGilzITox8umddM2VEGyk6qApUYZ_lf0Chge2og" style="color: #ff6719; text-decoration: none;"><table class="link-card" style="background: #f5f5f5; border-radius: 8px; padding: 16px; width: 100%;"><tr><td><div class="pub-icon pub-icon-margin subscribe-image" style="border: none; border-radius: 4px; font-size: 16px; height: 40px; line-height: 26px; margin-bottom: 12px; margin-right: 10px; min-width: 30px; position: relative; width: 40px;"><a href="https://email.mg1.substack.com/c/eJx9kLFuhDAMhp_mshUlhoRjyNClrxGZxHBRIUHB9HRv38AtnSpZHuzf9v_ZI9Ocy8sWwkDlo5DP60opIMecPmjFuIgt7-z4tZEVx07FxWAHKUHdWxGs7MH3o4i7mwpdeiu2Y1yiv1acYvGwypgOAXHQ0JHyQXoZYFCgp9D1k5neN_AIkZKvd94u-Jpe7IN522_t5w2-ajyfzyZlHnOJaW58FtGChFYqMMpoo2XTNtBJoz0N2GtqUasmIm8_iMutk-usmv0Yd0b_XcdXUSyGuCQ8uHbnE-EqVwp3-jhS5JejhONC1Q7_-6sru5kSlfra4JAre9_1GkBBL-9v0BOrWgi5qpOtQIL-yH4Bb1OIyA" native="" style="color: #ff6719; text-decoration: none;"><picture><source type="image/webp" srcset="https://substackcdn.com/image/fetch/w_80,h_80,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F62784289-29bb-4fdf-9ada-642905c5a28b_400x400.png"><img src="https://substackcdn.com/image/fetch/w_80,h_80,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F62784289-29bb-4fdf-9ada-642905c5a28b_400x400.png" sizes="100vw" alt="Not Boring by Packy McCormick" srcset="" width="80" height="80" class="frontend-components-responsive_img-module__img--1l4UG custom" style="border-radius: 4px; display: flex; height: 100%; max-width: 100%; width: 100%;"></picture></a></div></td></tr><tr><td><div class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-16--yeezN frontend-pencraft-Text-module__weight-semibold--2XLPl frontend-pencraft-Text-module__color-primary--2I-sF subscribe-title" style="color: #404040; font-size: 16px; font-weight: 600; letter-spacing: -0.31px; line-height: 20px; margin: 0; margin-bottom: 4px; text-decoration: unset;">Not Boring by Packy McCormick</div></td></tr><tr class="subscribe-desc"><td><div class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-14--1PYz8 frontend-pencraft-Text-module__weight-normal--mEmBf frontend-pencraft-Text-module__color-primary--2I-sF" style="color: #404040; font-size: 14px; font-weight: 400; letter-spacing: -0.15px; line-height: 18px; margin: 0; text-decoration: unset;">Tech, web3, optimism, and strategy... but Not Boring</div></td></tr></table></a></td></tr></table></td></tr><tr><td style="border-top: 1px solid #e0e0e0; padding-bottom: 16px; padding-top: 16px;"><table><tr><td><div class="recommended-images" style="font-size: 16px; line-height: 26px; margin-bottom: 12px;"><div class="pub-and-pub-author" style="align-items: center; display: flex; font-size: 16px; line-height: 26px;"><div class="pub-icon pub-icon stacked-icons" style="border-radius: 4px; font-size: 16px; height: 30px; line-height: 26px; margin-right: 8px; min-width: 30px; position: relative; width: 30px;"><a href="https://email.mg1.substack.com/c/eJx9kLFuxCAMhp_m2C4yEAIZGLr0NSIHnBxqQiIgPd3bl-SWdqlkebB_299vh4XmLb1sIvSU7onctq4UPZawxTutGBa2b7kM5bWTZUemNARvewDBjWTeghZOjyzkYUp06S3bj3EJ7lpxitnDaqEAQWthqDdGAqEDAwZBiqmXpn3fwMMHiq7eeVOUa3qxj1L2fJMfN_FZY9qOWFnzhK5U9CYfYy7ovpo6VNssWAFCAhcd71SnoJGNaKFTjnrUiiQq3gQs-zficmthnfmfFSxZ9GGJeJTanU9HV7maGk6sI4byGijiuFClK_--7srDTJFS_bQfsFje6VYrIbjQYN6-T5cVwW9VHe3z-WT0S_YDHmGNdg" native="" style="color: #ff6719; text-decoration: none;"><picture><source type="image/webp" srcset="https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F6b215e86-80b3-47a0-aae8-1a6114d53c75_400x400.png"><img src="https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F6b215e86-80b3-47a0-aae8-1a6114d53c75_400x400.png" sizes="100vw" alt="Founders Factory Startup Bulletin" srcset="" width="64" height="64" class="frontend-components-responsive_img-module__img--1l4UG custom" style="border-radius: 4px; display: flex; height: 100%; max-width: 100%; width: 100%;"></picture></a></div><div class="profile-image-wrapper" style="display: inline-block; font-size: 16px; height: auto; line-height: 26px; max-width: 100%; position: relative;"><img height="32" width="32" src="https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2Ff4e8d9a5-bb9c-4509-b1c6-a357a7701427_400x400.jpeg" class="user-profile-head" style="border: none !important; border-radius: 50%; display: block; max-width: 550px; vertical-align: middle;"></div></div></div></td></tr><tr><td> <div class="tagline-whole" style="font-size: 16px; line-height: 26px; padding-bottom: 12px;"><span> <span><b style="font-weight: 600;"> </b><b style="font-weight: 600;">Founders Factory Startup Bulletin</b></span> recommends</span></div></td></tr><tr><td><a href="https://email.mg1.substack.com/c/eJx9UctuwyAQ_Bpzi8XD-HHgUKnqb1hrWDuoNlgYkubvC04rtT1UQgjNzjKzsxoiLj48VEAwGC4Btd82dAai9e6CG9iV7P6IY3zsqEg6MIzWqIFSznpBjKId191E7DHOAU--InuaVqvPLwqZXBX00AAHMyFn2JmBzoCcD7PI76aR_KkByVh0Ous8XcSze1XXGPejEi8Vf8tnxY_6SNMRQb_XmVhQ8ZbiNh4-BY2VeP0uV7wt-IbGpi3jp78vUHsXs0RGA95g29H8mf64zL4kUoLJPQFnDMG6ZczjZWPZ0KuQoh96YhWnXFDGW9bKVtJa1LyhrdQ4QCdRgGS1hbjfANaqodvCfg1AggJjVwcp5upSPJ5w0SmGkrPxMaKDacWcR_x3Wec9Lugw5N2aEaJibdd0knPGO9o_ky65ZgvGZ7ZT9_ud4A_aJ2gptx0" style="color: #ff6719; text-decoration: none;"><table class="link-card" style="background: #f5f5f5; border-radius: 8px; padding: 16px; width: 100%;"><tr><td><div class="pub-icon pub-icon-margin subscribe-image" style="border: none; border-radius: 4px; font-size: 16px; height: 40px; line-height: 26px; margin-bottom: 12px; margin-right: 10px; min-width: 30px; position: relative; width: 40px;"><a href="https://email.mg1.substack.com/c/eJx9kMFyhSAMRb_msXsORBFdsOimv8FESH1MER3EWv--qJt205lMFslJcm8sZhrndOhE6Cg9E9l5mig6zH6OT5rQB7bMazb5WEizbaVkvNM95yC6mjnNFVg1ML-aj0QXr9myDcHba8UJs5cmlEp2CnpQnXAtl7WTgKJvettRj3DfwM15irbcuVXkazroV87L-qjfHvBeItB3tW7DmtF-VgVkXgOHmgtoRStbyau6goa30pbNSlKNUlQe8_KFGB4Nn0bxdz5pdD5E3HLpjqeFq1xcmFPHFn0-DEUcAhU5-d9fXdmMFCmV1zqDWYtWNUoCCFC8u42etooENxc66n3fGf3CfgCdiIgD" native="" style="color: #ff6719; text-decoration: none;"><picture><source type="image/webp" srcset="https://substackcdn.com/image/fetch/w_80,h_80,c_fill,f_webp,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F5509758f-5f6d-4ec8-afd6-6aea3c530922_256x256.png"><img src="https://substackcdn.com/image/fetch/w_80,h_80,c_fill,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fbucketeer-e05bbc84-baa3-437e-9518-adb32be77984.s3.amazonaws.com%2Fpublic%2Fimages%2F5509758f-5f6d-4ec8-afd6-6aea3c530922_256x256.png" sizes="100vw" alt="Fintech Blueprint &#129302;&#127974;&#129517;" srcset="" width="80" height="80" class="frontend-components-responsive_img-module__img--1l4UG custom" style="border-radius: 4px; display: flex; height: 100%; max-width: 100%; width: 100%;"></picture></a></div></td></tr><tr><td><div class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-16--yeezN frontend-pencraft-Text-module__weight-semibold--2XLPl frontend-pencraft-Text-module__color-primary--2I-sF subscribe-title" style="color: #404040; font-size: 16px; font-weight: 600; letter-spacing: -0.31px; line-height: 20px; margin: 0; margin-bottom: 4px; text-decoration: unset;">Fintech Blueprint &#129302;&#127974;&#129517;</div></td></tr><tr class="subscribe-desc"><td><div class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-14--1PYz8 frontend-pencraft-Text-module__weight-normal--mEmBf frontend-pencraft-Text-module__color-primary--2I-sF" style="color: #404040; font-size: 14px; font-weight: 400; letter-spacing: -0.15px; line-height: 18px; margin: 0; text-decoration: unset;">The Fintech Blueprint helps you find and build the next Fintech &amp; DeFi unicorn with unbiased and expert insights on financial innovation. Join 50,000+ venture capitalists, entrepreneurs, and executives by signing up below. </div></td></tr></table></a></td></tr></table></td></tr></table><div class="cta" style="font-size: 16px; line-height: 26px; margin-bottom: 16px; margin-top: 6px; padding-top: 10px; text-align: center;"><a role="button" href="https://email.mg1.substack.com/c/eJytU9tu2zAM_Rr7LYEuluU86KFd0N8QdGFSobZsyHKz_H0pu02yYRiKYYBB0TTP0SFNOpPhPKarSmA8pF0CNw4DRG9yGOMOBhP6ehrnrPN1AlUvMyQdvDoQwmjHa6-IZE7aOsz6lGDNV_W02D64laIk16-K-ZY623Qn4Q9OUGaZh5aVs2uscXa7wyw-QHR4z6Yir-heveY8zRV_qtgLPvNi52zc2x6T8DVEO_6s-Mt6d8WPxoc-miVXTDTkXIJbYouqkG_WedR26d904XEpWEAQ4w2ViGA_KO8ObPOwRrF6nTyg0y550PO4JFcQXyo-4wP4sAwY32RsQTfGjFVgNMG7GSbwvzV43p3G0vTSe8T8-lEPZkIoKhDPaGQxjAW_Hmj40131GrvBQzyXSu-JKwcTnaSkuIVTHr-AfyC-N-E7xFxgevc94ltP_zPx9ov-nVcc66AYYZxQ1tJWtILs-Z41pBUODkYK4EbQfTB5ejemrxoynOn-cRTrpG6j9zB4ZRl0UbPEkK8aorE94FTnv67cavUZIiTcUK9NVrSVjcQyKJOk2_albAdK8CNmR3W5XGp4SPsAHnorBQ" class="button primary" style="background-color: #FF6719; border: none; border-radius: 6px; box-sizing: border-box; color: #ffffff !important; cursor: pointer; display: inline-block; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; font-size: 14px; font-weight: 600; height: auto; line-height: 20px; margin: 0; opacity: 1; outline: none; padding: 10px 24px; text-align: center; text-decoration: none !important; white-space: nowrap; width: 100%;"><div class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-14--1PYz8 frontend-pencraft-Text-module__line-height-20--1soeQ frontend-pencraft-Text-module__weight-semibold--2XLPl" style="font-size: 14px; font-weight: 600; letter-spacing: -0.15px; line-height: 20px; margin: 0; text-decoration: unset;">Subscribe to 4 publications</div></a></div><div class="footer frontend-email-shared-typed-module__footer--WmMp1" style="color: #808080; font-size: 16px; line-height: 26px; padding: 24px 0; text-align: center;"><div style="font-size: 16px; line-height: 26px; padding-bottom: 24px;"><p class="frontend-pencraft-Text-module__reset--20JLV frontend-pencraft-Text-module__size-12--2onFT frontend-pencraft-Text-module__color-secondary--XjVGl small frontend-email-shared-typed-module__meta--AAyPr" style="color: #808080; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; font-size: 12px; letter-spacing: 0; line-height: 16px; margin: 0; padding-bottom: 0; text-decoration: unset;">&#169; 2023 <span>Substack Inc.</span><br>548 Market Street PMB 72296, San Francisco, CA 94104 <br><a href="https://email.mg1.substack.com/c/eJx9Uk2PozAM_TXlNogk5evAodvOVKCBmW2r7ccFJSQtKSGwEGDor99AV6s5rRQ5sv38nmU7w4rdqmYMGoYpa14allVlySTFilfyhZWYC6OuWpWqsWaB0bWsSTkNfMuCwEMGDSwXZi4xeJteGzbjA6PuiODZTDGBjTxwPLT0rsh2AfKu0AOUAkiJ47seshFA9lMDd5QzmWmdZxdqrhZBrlTdLtBqAd_0azvSKpwVpgZpF9dc2x5oM8vrX1aKX_82oN1OTiVZwwlboDdVFUwu0IaNEcjgr_EERRHeKzverMb4cHu8ryOLoB_1eQydUEbifNyJTPgDPUYtPiY53YqeCH-8HJOeHIEg5e4Z42EbliKn69CJD2eUbDIQ38OvmA_8csoHrfGV3DMUP35a8f111Dq19vgHjzR3qOK1rpcJOHOtW9q95iz_6XEAyJSTmqEU_LKPfPOzQK0f74vfHU9D_7DrSPKIm-XHqvDye7V9Hz9f7dO2V8m-MngALYgsAB3g2I5tmciES8uxM-Zj12YI28DkWNU9xmKxtMobML-P2WgCTLmQuFM6e5vGPIf1otNpVZ3kakyZxEQwvTH133OabXpjkjX6-miKVQAcd-naEALoWt7zFqbN6xZopdEyGIbBYN9gfwDvLuwh" style="color: #808080; text-decoration: underline;"><span style="color: #808080; text-decoration: underline;">Unsubscribe from this digest</span></a></p></div><p class="frontend-email-shared-typed-module__footerSection--9vwqp small powered-by-substack" style="color: #808080; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; font-size: 12px; line-height: 20px; margin: 0; margin-top: 0; padding: 0 24px; padding-bottom: 0;"><a href="https://email.mg1.substack.com/c/eJx9Uc2OgyAQfhq5aQAr1AOHTTZ9DTPCaMkqGBy26dsv6qWnTcgkMB_z_YwFwjmmt0kIDlOd0MZ1xeCAfAw1ruAXtsWdBnpvaFjeMQ3emZ5zKe4tc4ZrafXI_D5MCU-8YVseF2_PEQeYPY2ESbT9pLma-q4HQHHvlHZSKi0VaLw4IDuPwRaeSwWdvxfzJNr2qv2q5KOcPY87gf1pCqhcYduuWu8UExYLzhcbVLWPTOtgYd3Az6Fqvw_MCukHyYe5kupsx0CFqHRP7fUUI5UcxkwUA_NGctlyIZVQnep40zbyxlVnsQfdYQudaDzQ9guwVDe-zqL5VMeSAeeXAJlKdz4IzueSz3A4zMHTe8AA44LFKP27hbMOMwZMZWluADJC6ZvupBRS8_sV4RFYkeBiQQfzer0YfsD-ADuQqUQ" style="color: #808080; display: inline-block; margin: 0 4px; text-decoration: none;"><img src="https://substackcdn.com/image/fetch/w_260,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack.com%2Fimg%2Femail%2Fgeneric-app-button%402x.png" srcset="https://substackcdn.com/image/fetch/w_130,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack.com%2Fimg%2Femail%2Fgeneric-app-button.png, https://substackcdn.com/image/fetch/w_260,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack.com%2Fimg%2Femail%2Fgeneric-app-button%402x.png 2x, https://substackcdn.com/image/fetch/w_390,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack.com%2Fimg%2Femail%2Fgeneric-app-button%403x.png 3x" width="130" alt="Get the app" height="40" style="border: none !important; max-width: 550px; vertical-align: middle;"></a><a href="https://email.mg1.substack.com/c/eJx9kU1uwyAQhU9jdrH4McZZsKjU5gI9gIVh7KLaYGFolNt37DRVFlUlhMTTx7w3M9ZkmGK66QTGQTolsHFZIDiTfQwnWIyfyRq33OfbCpqUDVLvnT5TylkniNNUcasG4rd-THDwmqxlmL09Suww-dBy5B0MXDScM2CdO1vZKCFFyzs3KNvcPUxxHoJFn3uKfPye9UfO61aJl4pf8Gxl2LKxnzVC-9NPoayVuJS89FssyUIlXh9QxdtdX8D5sqB-JPwRbQwZTVAdY8yQHrJZVoNFUTclx9HPM7jTL7K3-X54vh21kHJ-DohWDZ12aQ9GvOaUC8p4y1rZSlqLmje0lRbORkkQRrLam7x-GTPjx2Vi9XNjJOk_y-Jo-304Jfh86yGYAcNpkv9d4HH3EwRIuG_Xm6xZqxolcRtc0e4-_X3WGMFFpIO-Xq8EnrBvk7C-Dw" style="color: #808080; display: inline-block; margin: 0 4px; text-decoration: none;"><img src="https://substackcdn.com/image/fetch/w_270,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack.com%2Fimg%2Femail%2Fpublish-button%402x.png" srcset="https://substackcdn.com/image/fetch/w_135,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack.com%2Fimg%2Femail%2Fpublish-button.png, https://substackcdn.com/image/fetch/w_270,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack.com%2Fimg%2Femail%2Fpublish-button%402x.png 2x, https://substackcdn.com/image/fetch/w_405,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack.com%2Fimg%2Femail%2Fpublish-button%403x.png 3x" width="135" alt="Start writing" height="40" style="border: none !important; max-width: 550px; vertical-align: middle;"></a></p></div></div></td><td></td></tr></table><img src="https://mailgun.substack.com/api/v1/email/open?token=eyJtIjoiPDIwMjMwMTI2MTY1NjUwLjMuMjQwNjVjZTlhNzVlM2E1MS5pYXRwdmFhbEBtZzEuc3Vic3RhY2suY29tPiIsInUiOjkwMDIxODMsInIiOiJhZGlsbmF1dEBnbWFpbC5jb20iLCJkIjoibWcxLnN1YnN0YWNrLmNvbSIsInAiOm51bGwsInQiOm51bGwsImEiOm51bGwsInMiOm51bGwsImMiOiJyZWFkZXItcmVjb21tZW5kYXRpb24tZW1haWwiLCJmIjpmYWxzZSwicG9zaXRpb24iOiJib3R0b20iLCJpYXQiOjE2NzQ3NTIyMTIsImV4cCI6MTY3NzM0NDIxMiwiaXNzIjoicHViLTAiLCJzdWIiOiJlbyJ9.kQKwnr-PjCqdd0TzSZu-tArZJZL3w7zNStzlQ8sokcY" alt="" width="1" height="1" border="0" style="height:1px !important;width:1px !important;border-width:0 !important;margin-top:0 !important;margin-bottom:0 !important;margin-right:0 !important;margin-left:0 !important;padding-top:0 !important;padding-bottom:0 !important;padding-right:0 !important;padding-left:0 !important;"/><img width="1px" height="1px" alt="" src="https://email.mg1.substack.com/o/eJx9kE1uxSAMhE9Tdi_iJ0Cy4CzIgJuiJiQi0Ci3L-FtuurGsjxjzyd7KLjs-TYZIWB-ZfT7tmEKUOKeXrhBXEmvdsGEudmDhWKY0qOWnDOu6USCoZp77Ug87WfG7jfkqG6Nvh-yMRjyZSbK1QzMOzohukCFDzyISbZOTjyM5NjPYqGGiMmjIW-W0re79DTRcMoFZVwxJZWkgxj4SJX0OIOWKECyIUI5fgDWj5FuCxvO6s4C_ntoB0k2EOKaoJamLg9qHzda--TVFMttMYFbsaWVfz9TT8wP1EwpZ5N4Q5b7aOwtM-zNlMx1XQT_fOwXtqp9jA"></body></html>
+
