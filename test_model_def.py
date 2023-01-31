@@ -11,6 +11,16 @@ def get_dict_from_file(filepath):
         d = json.load(f)
         return d
 
+def return_test_instance(filepath, model_name):
+    Model = getattr(models, model_name)
+
+    filepath = os.path.join('samples', filepath)
+    d = get_dict_from_file(filepath)
+    d = dict(d)
+    m = Model(**d)
+    return m
+
+
 if __name__ == '__main__':
 
     if len(sys.argv) <= 1:
