@@ -1,0 +1,23 @@
+{
+    "channel_id": "C04KZ5R3CUB",
+    "name": "building-catchup-fast-product",
+    "is_channel": true,
+    "is_group": false,
+    "is_im": false,
+    "created": 1674342516,
+    "creator": "U04KZ92MWV8",
+    "is_archived": false,
+    "is_general": false,
+    "unlinked": 0,
+    "name_normalized": "building-catchup-fast-product",
+    "is_shared": false,
+    "is_ext_shared": false,
+    "is_org_shared": false,
+    "is_pending_ext_shared": false,
+    "is_member": true,
+    "is_private": false,
+    "is_mipm": false,
+    "topic": "",
+    "purpose": "This channel is for everything #building-catchup-fast-product. Hold meetings, share docs, and make decisions together with your team.",
+    "num_members": 6
+}

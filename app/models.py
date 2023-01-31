@@ -48,3 +48,31 @@ class SlackUser(db.Model):
 
     def __repr__(self):
         return '<s-user {}-{}>'.format(self.user_id, self.name)
+
+
+class SlackChannel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    channel_id = db.Column(db.String(20), index=True, unique=True)
+    name = db.Column(db.String(120), index=True)
+    is_channel = db.Column(db.Boolean())
+    is_group = db.Column(db.Boolean())
+    is_im = db.Column(db.Boolean())
+    created = db.Column(db.Integer())
+    creator = channel_id = db.Column(db.String(20), index=True)
+    is_archived = db.Column(db.Boolean())
+    is_general = db.Column(db.Boolean())
+    unlinked = db.Column(db.Integer())
+    name_normalized = db.Column(db.String(120))
+    is_shared = db.Column(db.Boolean())
+    is_ext_shared = db.Column(db.Boolean())
+    is_org_shared = db.Column(db.Boolean())
+    is_pending_ext_shared = db.Column(db.Boolean())
+    is_member = db.Column(db.Boolean())
+    is_private = db.Column(db.Boolean())
+    is_mipm = db.Column(db.Boolean())
+    topic = db.Column(db.Text())
+    purpose = db.Column(db.Text())
+    num_members = db.Column(db.Integer())
+
+    def __repr__(self):
+        return '<s-channel {}-{}>'.format(self.channel_id, self.name)
