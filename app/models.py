@@ -11,8 +11,8 @@ class User(db.Model):
         return '<user {}>'.format(self.username)
 
 class SlackUser(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(20), index=True, unique=True)
+    # id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(20), primary_key=True)
     name = db.Column(db.String(120), index=True)
     team_id = db.Column(db.String(20), index=True)
     deleted = db.Column(db.Boolean())
@@ -47,18 +47,18 @@ class SlackUser(db.Model):
     has_2fa = db.Column(db.Boolean())
 
     def __repr__(self):
-        return '<s-user {}-{}>'.format(self.user_id, self.name)
+        return '<s-user {}-{}>'.format(self.id, self.name)
 
 
 class SlackChannel(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    channel_id = db.Column(db.String(20), index=True, unique=True)
+    # id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(20), primary_key=True)
     name = db.Column(db.String(120), index=True)
     is_channel = db.Column(db.Boolean())
     is_group = db.Column(db.Boolean())
     is_im = db.Column(db.Boolean())
     created = db.Column(db.Integer())
-    creator = channel_id = db.Column(db.String(20), index=True)
+    creator = db.Column(db.String(20), index=True)
     is_archived = db.Column(db.Boolean())
     is_general = db.Column(db.Boolean())
     unlinked = db.Column(db.Integer())
@@ -75,18 +75,18 @@ class SlackChannel(db.Model):
     num_members = db.Column(db.Integer())
 
     def __repr__(self):
-        return '<s-channel {}-{}>'.format(self.channel_id, self.name)
+        return '<s-channel {}-{}>'.format(self.id, self.name)
 
 
 class SlackMessage(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    ts = db.Column(db.String(120), index=True, unique=True)
+    # id = db.Column(db.Integer, primary_key=True)
+    ts = db.Column(db.String(40), primary_key=True)
     type = db.Column(db.String(60))
-    user = db.Column(db.String(20), index=True)
-    channel = db.Column(db.String(20), index=True)
+    slack_user_id = db.Column(db.String(20), db.ForeignKey('slack_user.id'))
+    slack_channel_id = db.Column(db.String(20), db.ForeignKey('slack_channel.id'))
     text = db.Column(db.Text())
 
     def __repr__(self):
         # channel_name = SlackChannel.query.get(channel_id=self.channel)
         # user_name = SlackUser.query.get(user_id=self.user)
-        return '<s-message in {} by {} on {}>'.format(self.channel, self.user, self.ts)
+        return '<s-message in {} by {} on {}>'.format(self.slack_channel_id, self.slack_user_id, self.ts)
