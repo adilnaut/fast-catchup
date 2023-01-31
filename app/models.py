@@ -76,3 +76,17 @@ class SlackChannel(db.Model):
 
     def __repr__(self):
         return '<s-channel {}-{}>'.format(self.channel_id, self.name)
+
+
+class SlackMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ts = db.Column(db.String(120), index=True, unique=True)
+    type = db.Column(db.String(60))
+    user = db.Column(db.String(20), index=True)
+    channel = db.Column(db.String(20), index=True)
+    text = db.Column(db.Text())
+
+    def __repr__(self):
+        # channel_name = SlackChannel.query.get(channel_id=self.channel)
+        # user_name = SlackUser.query.get(user_id=self.user)
+        return '<s-message in {} by {} on {}>'.format(self.channel, self.user, self.ts)
