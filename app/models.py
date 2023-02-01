@@ -88,6 +88,71 @@ class SlackMessage(db.Model):
     is_unread = db.Column(db.Boolean())
 
     def __repr__(self):
-        # channel_name = SlackChannel.query.get(channel_id=self.channel)
-        # user_name = SlackUser.query.get(user_id=self.user)
         return '<s-message in {} by {} on {}>'.format(self.slack_channel_id, self.slack_user_id, self.ts)
+
+class GmailMessageLabel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'))
+    label = db.Column(db.String(240))
+    def __repr__(self):
+        return '<g-label {}>'.format(self.label)
+
+class GmailMessageText(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'))
+    text = db.Column(db.UnocodeText())
+    is_primary = db.Column(db.Boolean())
+    is_multipart = db.Column(db.Boolean())
+    is_summary = db.Column(db.Boolean())
+    is_snippet = db.Column(db.Boolean())
+    multipart_index = db.Column(db.Integer)
+
+    def __repr__(self):
+        if self.is_multipart:
+            return '<g-message-multipart {}>'.format(self.multipart_index)
+        else:
+            return '<g-message-text {}>'.format(self.text[10:])
+
+
+class GmailMessageListMetadata(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'))
+    # what about list/newsletter fields
+    list_id = db.Column(db.Text())
+    message_id = db.Column(db.Text())
+    list_unsubscribe = db.Column(db.Text())
+    list_url = db.Column(db.Text())
+
+    def __repr__(self):
+        return '<g-message-list mdata {}>'.format(self.list_id)
+
+
+class GmailMessageTag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'))
+    tag = db.Column(db.String(240))
+
+    def __repr__(self):
+        return '<g-tag {}>'.format(self.tag)
+
+class GmailMessage(db.Model):
+    id = db.Column(db.String(240), primary_key=True)
+    content_type = db.Column(db.Text())
+    date = db.Column(db.Text())
+    from_string = db.Column()
+    from_user_email = db.Column(db.String(240), db.ForeignKey('gmail_user.email'))
+    mime_version = db.Column(db.String(10))
+    subject = db.Column(db.Text())
+
+    def __repr__(self):
+        return '<g-message by {} on {}>'.format(self.from_string, self.date)
+
+
+class GmailUser(db.Model):
+    email = db.Column(db.String(240), primary_key=True)
+    name = db.Column(db.Text())
+    is_newsletter = db.Column(db.Boolean())
+    type = db.Column(db.String(120))
+
+    def __repr__(self):
+        return '<g-user{} with email {}>'.format(self.name, self.email)

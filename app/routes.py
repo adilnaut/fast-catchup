@@ -3,8 +3,10 @@ import os
 
 from flask import render_template, send_file, request
 from app import app
-from quickstart.quickstart import generate_summary, get_slack_comms, get_gmail_comms
+from quickstart.quickstart import generate_summary
+
 from quickstart.slack_utils import get_slack_comms
+from quickstart.gmail_utils import get_gmail_comms
 
 
 
@@ -15,7 +17,7 @@ def first():
 
     # print(unread_slack)
 
-    unread_gmail = list(get_gmail_comms(return_dict=True).values())
+    unread_gmail = get_gmail_comms(return_list=True)
 
     gptin = {'slack_list': unread_slack,
              'gmail_list': unread_gmail,
