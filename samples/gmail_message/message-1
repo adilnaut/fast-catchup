@@ -1,13 +1,11 @@
 {
     "id": "1860ca92f47ca066",
-    "from": "Startup Investor Accelerator <info@email.meetup.com>",
-    "snippet": "Meetup Event reminders Startup Investor Accelerator Tuesday Tue Feb 7 6:30 PM Startup Open Coffee Networking. Let&#39;s talk Startups, Investments and Growth! at Aticco Med - Coworking F\u00f3rum 10 Members",
-    "subject": "Startup Investor Accelerator Reminder: 2 events coming up soon",
     "date": "Wed, 01 Feb 2023 11:07:38 +0000 (UTC)"
+    "from_string": "Startup Investor Accelerator <info@email.meetup.com>",
+    "gmail_user_email": "info@email.meetup.com",
+    "mime_version": "1.0",
+    "content_type": "multipart/alternative; boundary=3be7dfa285f69652c335f8be884424a2ddcf47e8d20ccb21d31a7c5e9a25",
     "subject": "Recommendations from your Substacks",
-    "from": "Substack <no-reply@substack.com>",
-    "list_id": "<www.substack.com>",
-    "message-id": "<20230126165650.3.24065ce9a75e3a51.iatpvaal@mg1.substack.com>",
-    "list_unsubscribe": "<https://substack.com/api/v1/email/notification/unsubscribe?token=eyJ1c2VyX2lkIjo5MDAyMTgzLCJ0b3BpYyI6InJlYWRlcl9wdWJsaWNhdGlvbl9yZWNvbW1lbmRhdGlvbiIsImlhdCI6MTY3NDc1MjIxMiwiZXhwIjoxNjc3MzQ0MjEyLCJpc3MiOiJwdWItMCIsInN1YiI6Im5vdGlmaWNhdGlvbi11bnN1YnNjcmliZSJ9.Pk3s9MSkqui_I9TRubNzMr4OAk8hjoGLyPE5XGvtNSo>",
-    "list_url": "<https://substack.com/>",
+    "is_multipart": True,
+    "multipart_num": 1
 }

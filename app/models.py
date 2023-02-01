@@ -137,12 +137,14 @@ class GmailMessageTag(db.Model):
 
 class GmailMessage(db.Model):
     id = db.Column(db.String(240), primary_key=True)
-    content_type = db.Column(db.Text())
     date = db.Column(db.Text())
-    from_string = db.Column()
-    from_user_email = db.Column(db.String(240), db.ForeignKey('gmail_user.email'))
+    from_string = db.Column(db.Text())
+    gmail_user_email = db.Column(db.String(240), db.ForeignKey('gmail_user.email'))
     mime_version = db.Column(db.String(10))
+    content_type = db.Column(db.Text())
     subject = db.Column(db.Text())
+    is_multipart = db.Column(db.Boolean())
+    multupart_num = db.Column(db.Integer)
 
     def __repr__(self):
         return '<g-message by {} on {}>'.format(self.from_string, self.date)
