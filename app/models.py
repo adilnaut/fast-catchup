@@ -85,6 +85,7 @@ class SlackMessage(db.Model):
     slack_user_id = db.Column(db.String(20), db.ForeignKey('slack_user.id'))
     slack_channel_id = db.Column(db.String(20), db.ForeignKey('slack_channel.id'))
     text = db.Column(db.Text())
+    is_unread = db.Column(db.Boolean())
 
     def __repr__(self):
         # channel_name = SlackChannel.query.get(channel_id=self.channel)

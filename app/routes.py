@@ -1,12 +1,20 @@
+import os
+
+
 from flask import render_template, send_file, request
 from app import app
 from quickstart.quickstart import generate_summary, get_slack_comms, get_gmail_comms
+from quickstart.slack_utils import get_slack_comms
 
-import os
+
 
 @app.route('/first', methods=['GET'])
 def first():
-    unread_slack = list(get_slack_comms(return_dict=True).values())
+    # unread_slack = list(get_slack_comms(return_dict=True).values())
+    unread_slack = get_slack_comms(return_list=True)
+
+    # print(unread_slack)
+
     unread_gmail = list(get_gmail_comms(return_dict=True).values())
 
     gptin = {'slack_list': unread_slack,

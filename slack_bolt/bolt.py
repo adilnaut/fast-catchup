@@ -1,6 +1,9 @@
 import os
 import json
-# Use the package we installed
+
+from connection import db_ops
+
+
 from slack_bolt import App
 # from slack_bolt.adapter.socket_mode import SocketModeHandler
 # Initializes your app with your bot token and signing secret
@@ -86,20 +89,51 @@ def message_hello(message, say):
 
 @app.event("message")
 def handle_message_events(client, body, logger, say):
-    logger.info(body)
-    with open('slack_bolt/output_body','w') as d:
-        json.dump(body, d, indent=4)
-    user_id = body['event']['user']
-    text = body['event']['text']
-    user_info = client.users_profile_get(user=user_id)
-    # if 'ok' in user_info:
-    #     user_name = user_info['profile']['display_name']
-    #     with open('../unread_slack.txt', 'a') as f:
-    #         f.write('%s wrote %s \n' % (user_name, text))
-    logger.info("Some general message received!")
-    logger.info("This was a text from %s saying %s" % (f"<@{user_id}>", text))
-    # say("This was a text from %s saying %s" % (f"<@{user_id}>", text))
-    # handle message text here
+    verbose = False
+    if verbose:
+        logger.info("Some general message received!")
+        logger.info(body)
+
+    export_sample = False
+    if export_sample:
+        with open('slack_bolt/output_body','w') as d:
+            json.dump(body, d, indent=4)
+
+    event = body.get('event')
+
+    if not event:
+        if verbose:
+            logger.info("Message body doesn't contain event!")
+        return
+
+    user_id = event.get('user')
+    text = event.get('text')
+    ts = event.get('ts')
+    type = event.get('type')
+    channel_id = event.get('channel')
+    channel_type = event.get('channel_type')
+    team_id = event.get('team')
+
+    if not ts:
+        if verbose:
+            logger.info("No primary key - timestamp ts for slack user!")
+        return
+
+    slack_message_kwargs = {
+        'ts': ts,
+        'text': text,
+        'type': type,
+        'is_unread': True, # todo check out if you should mark them false anytime
+        'slack_user_id': user_id,
+        'slack_channel_id': channel_id
+    }
+    with db_ops(model_names=['SlackMessage']) as (db, SlackMessage):
+        slack_message = SlackMessage(**slack_message_kwargs)
+        db.session.add(slack_message)
+        if verbose:
+            logger.info("Slack message with ts %s added successfully!" % ts)
+
+
 
 # action id changes arbitrary - might need a different identification
 # @app.action("3i7Cw")
