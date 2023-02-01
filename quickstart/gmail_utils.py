@@ -14,20 +14,7 @@ from googleapiclient.errors import HttpError
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
 
-
-def save_dict(in_dict, name, overwrite=False):
-    # todo implement right behavior for overwrite=False
-    with open('quickstart/database/%s' % name, 'w') as f:
-        json.dump(in_dict, f)
-
-def load_dict(name):
-    with open('quickstart/database/%s' % name, 'r') as f:
-        return json.load(f)
-
-
-def extract_messages_from_gmail_service(service):
-
-    gmail_messages = {}
+def etl_gmail(service):
 
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
@@ -52,6 +39,7 @@ def extract_messages_from_gmail_service(service):
         if not payload:
             continue
         mimeType = payload.get('mimeType', '')
+        contentType = payload.get('contentType', '')
 
         body = payload.get('body')
         if not body:
@@ -91,9 +79,10 @@ def extract_messages_from_gmail_service(service):
                 pass
             date_string = headers_dict["Date"]
             if is_day_old(date_string):
-                gmail_messages[id] = {'from': headers_dict["From"],
+                gmail_messages = {'id': id,
+                    'from': headers_dict['From'],
                     'snippet':snippet,
-                    'subject':headers_dict["Subject"],
+                    'subject':headers_dict['Subject'],
                     'date':date_string}
 
         show_raw = False
@@ -148,14 +137,16 @@ def dumps_emails(gmail_messages):
 
     return result_text
 
-
-def get_gmail_comms(use_last_cached_emails=True, return_dict=False):
-    if use_last_cached_emails:
-        gmail_messages = load_dict('last_gmail_messages')
-    else:
+def get_gmail_comms(use_last_cached_emails=True, return_list=False):
+    if not use_last_cached_emails:
         service = auth_and_load_session_gmail()
-        gmail_messages = extract_messages_from_gmail_service(service)
-        save_dict(gmail_messages, 'last_gmail_messages')
+        etl_gmail(service)
+
+    gmail_messages = None
+    with db_ops(model_names=['GmailMessage']) as (db, GmailMessage):
+        # todo make complex sql query join with table gmail_message_label
+        gmail_messages = GmailMessage.query.all()
+
     if return_dict:
         return gmail_messages
     result_text = dumps_emails(gmail_messages)
