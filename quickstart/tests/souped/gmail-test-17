@@ -1,0 +1,80 @@
+View Online <[[https://info.a16z.com/index.php/email/emailWebview?mkt_tok=MzgyLUpaQi03OTgAAAGJgcukGOTMU_CyF5YrS1-54t2M6qoBahY8F4i392p4gCraRQPtgWkeb_RmtvvcJXHayr1W_IjzXYwc3-mKTqT03Rp0lDh8sHApEhmps0KJK6xoCg&md_id=15699&aliId=jEpYeMXJLgEMzTQHhYDgS8eR%2BlGuEOLEycUMfZKZt6tYtzoaFo6kRQ%3D%3D]]>
+Welcome to the American Dynamism Newsletter
+Welcome to the American Dynamism newsletter, a16z's update on the ideas, companies, and individuals building toward a more dynamic future.
+In each issue, the a16z team will deliver original and curated articles, podcasts, and videos that highlight the resurgence of American industry and innovation, as well as insights into the critical problems — from national security and public safety to housing and education — that entrepreneurs are tackling.
+In advance of receiving the next issue, please enjoy a selection of previously published articles and podcasts from the American Dynamism team:
+- Building American Dynamism
+By Katherine Boyle, a16z General Partner
+- Investing in Flock Safety
+By David Ulevitch, a16z General Partner and David George, a16z General Partner
+- Innovating Mom-and-Pop Machine Shops for Aerospace and Defense  [podcast] With Katherine Boyle; Chris Power, Hadrian founder and CEO; Packy McCormick, Not Boring founder; and Marc Andreessen, a16z cofounder
+Software Is eating the world
+MENLO PARK OFFICE
+2865 Sand Hill Road, Suite 101
+Menlo Park, CA 94025
+SAN FRANCISCO OFFICE
+180 Townsend Street
+San Francisco, CA 94107
+NEW YORK OFFICE
+11 Madison Avenue, 15th Floor
+New York, NY 10010
+©2022 Andreessen Horowitz. All rights reserved.
+Update email preferences
+Unsubscribe from list <[[https://info.a16z.com/UnsubscribePage.html?mkt_unsubscribe=1&mkt_tok=MzgyLUpaQi03OTgAAAGJgcukGOTMU_CyF5YrS1-54t2M6qoBahY8F4i392p4gCraRQPtgWkeb_RmtvvcJXHayr1W_IjzXYwc3-mKTqT03Rp0lDh8sHApEhmps0KJK6xoCg]]>
+A new quarterly update on the ideas, companies, and individuals promoting a more dynamic future.
+View Online
+Welcome to the American Dynamism Newsletter
+Welcome to the American Dynamism newsletter, a16z's update on the ideas, companies, and individuals building toward a more dynamic future.
+In each issue, the a16z team will deliver original and curated articles, podcasts, and videos that highlight the resurgence of American industry and innovation, as well as insights into the critical problems — from national security and public safety to housing and education — that entrepreneurs are tackling.
+In advance of receiving the next issue, please enjoy a selection of previously published articles and podcasts from the American Dynamism team:
+Building American Dynamism By Katherine Boyle, a16z General Partner
+Investing in Flock Safety By David Ulevitch, a16z General Partner and David George, a16z General Partner
+Innovating Mom-and-Pop Machine Shops for Aerospace and Defense [podcast] With Katherine Boyle; Chris Power, Hadrian founder and CEO; Packy McCormick, Not Boring founder; and Marc Andreessen, a16z cofounder
+Software Is eating the world
+MENLO PARK OFFICE
+2865 Sand Hill Road, Suite 101
+Menlo Park, CA 94025
+SAN FRANCISCO OFFICE
+180 Townsend Street
+San Francisco, CA 94107
+NEW YORK OFFICE
+11 Madison Avenue, 15th Floor
+New York, NY 10010
+©2022 Andreessen Horowitz. All rights reserved.
+•
+Update email preferences
+•
+Unsubscribe from list
+
+{
+    "Delivered-To": "adilnaut@gmail.com",
+    "Received": "from potomac1229.mktomail.com (potomac1229.mktomail.com. [192.28.150.229])        by mx.google.com with ESMTPS id e9-20020ac84909000000b003b6468f9d8asi1096928qtq.580.2023.01.24.00.09.14        for <adilnaut@gmail.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Tue, 24 Jan 2023 00:09:14 -0800 (PST)",
+    "X-Google-Smtp-Source": "AMrXdXvp4kP3wOWMzV8topomqZK08pNk3gIoztBFovtIvqZB0NnAs5q/farDZK5yl4bhH7v23JhW",
+    "X-Received": "by 2002:a05:622a:2593:b0:3b6:694f:d710 with SMTP id cj19-20020a05622a259300b003b6694fd710mr34538065qtb.50.1674547754228;        Tue, 24 Jan 2023 00:09:14 -0800 (PST)",
+    "ARC-Seal": "i=1; a=rsa-sha256; t=1674547754; cv=none;        d=google.com; s=arc-20160816;        b=EY3teG5/Lp9CnA8C6xNPPnsOQ+8RAtSj2StmYPsoBcPejNdRZfAC2ND0AmmbCv47aW         CGYrF2Ycw1YirWuiqazur2MrxViCq3knD8s0hdRO8VonzW5JCZW3XsXiwQS3H32jOk8z         bwu7PBHJMoXLZ5ZDWAjWtiYcT1okk9OQRkEWFfZAhmUkAd9jCnx1adoBOwWbLyHo831Q         +HEZyip5nljDQWKWMpHdvWGoOEJJUcibNNiESN+qPu6m8p8CI5RNCEqZ4v2E0LZhaKr9         xY5JRBmN2eiMNlpJte0jiJpda3EjijvWJYOJCAhyJJ2wG8o2s6KQpp+ChU8Y4BAKEJkk         fyvw==",
+    "ARC-Message-Signature": "i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;        h=mime-version:subject:message-id:to:reply-to:from:date         :dkim-signature:dkim-signature;        bh=oqf2YGLr05cWQnyG0fbrrGaflvt1y4PRrbefUWxqw1w=;        b=RUE805DsSywYtwV7oTwUqt6ZEKHagUS9RIEqlAv5k5KKPYPlH9K1WoPJxhxcsv5u05         ep7JvVu2j9FEu5KlDZ3H5Nm6iaeZzN8gnNTd1wRIssLx9EExwM+qYYS6vULGPZSTlSw9         ZBeRGpGncv5OWi4OPclj41as35IU/rW4K9oim2UnGwMrVbVxod514hRuwynLGF5TA1GB         5veZbm6swPaW3L7ltd7NDdIcZAP0kU5pwi9MmtkQOpVIsS240PBmYxtkl54Wodr4ToUB         ijO9oCowet4DdmaHhb2UIk+avbmecEDfUjxMdFO/fo0blgDM3JhVh7oSt2DphmyYYImr         A7RA==",
+    "ARC-Authentication-Results": "i=1; mx.google.com;       dkim=pass header.i=@a16z.com header.s=mkto header.b=R9W2y1V8;       dkim=pass header.i=@mktomail.com header.s=m1 header.b=YnyRpuik;       spf=pass (google.com: domain of 382-jzb-798.0.19519.0.0.15699.9.13586705-1@potomac1050.mktomail.com designates 192.28.150.229 as permitted sender) smtp.mailfrom=382-JZB-798.0.19519.0.0.15699.9.13586705-1@potomac1050.mktomail.com;       dmarc=pass (p=QUARANTINE sp=REJECT dis=NONE) header.from=a16z.com",
+    "Return-Path": "<382-JZB-798.0.19519.0.0.15699.9.13586705-1@potomac1050.mktomail.com>",
+    "Received-SPF": "pass (google.com: domain of 382-jzb-798.0.19519.0.0.15699.9.13586705-1@potomac1050.mktomail.com designates 192.28.150.229 as permitted sender) client-ip=192.28.150.229;",
+    "Authentication-Results": "mx.google.com;       dkim=pass header.i=@a16z.com header.s=mkto header.b=R9W2y1V8;       dkim=pass header.i=@mktomail.com header.s=m1 header.b=YnyRpuik;       spf=pass (google.com: domain of 382-jzb-798.0.19519.0.0.15699.9.13586705-1@potomac1050.mktomail.com designates 192.28.150.229 as permitted sender) smtp.mailfrom=382-JZB-798.0.19519.0.0.15699.9.13586705-1@potomac1050.mktomail.com;       dmarc=pass (p=QUARANTINE sp=REJECT dis=NONE) header.from=a16z.com",
+    "X-MSFBL": "L2enMXCq+5v5Un52b31/bnBto1wXhvlLjGl5P4YRVRM=|eyJiIjoiZHZwLTE5Mi0 yOC0xNTAtMjI5IiwiciI6ImFkaWxuYXV0QGdtYWlsLmNvbSIsInUiOiIzODItSlp CLTc5ODowOjEzMTE1OjQyMjY0OjA6MTU2OTk6OToxOTUxOToxMzU4NjcwNS0xIiw iZyI6ImJnLWFiLTAxIn0=",
+    "DKIM-Signature": "v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1674547754; s=m1; d=mktomail.com; i=@mktomail.com; h=Content-Type:MIME-Version:Subject:To:From:Date; bh=oqf2YGLr05cWQnyG0fbrrGaflvt1y4PRrbefUWxqw1w=; b=YnyRpuikag0qrTj0g5Og5I5PlqeMRH77+6B87MPlgSHpNTP6ycHLWZ/RWJKVBCr1 AtxN5ZdW/h10LR0X56ksqqJoyVQHeBXtUwz7J07sICxtUXb0TlwC9vlI9KbunozJSMa opDHxDogWenHeGKxI8R7NQRzCvEPd463uEwHWrn0=",
+    "Date": "Tue, 24 Jan 2023 02:09:14 -0600 (CST)",
+    "From": "a16z American Dynamism Team <ad-newsletter@a16z.com>",
+    "Reply-To": "ad-newsletter@a16z.com",
+    "To": "adilnaut@gmail.com",
+    "Message-ID": "<1523886765.3654501.1674547754025@abmktmail-trigger1i.marketo.org>",
+    "Subject": "Welcome to the American Dynamism Newsletter",
+    "MIME-Version": "1.0",
+    "Content-Type": "multipart/alternative; boundary=\"----=_Part_3654500_171889364.1674547754012\"",
+    "X-Binding": "bg-ab-01",
+    "X-MarketoID": "382-JZB-798:0:13115:42264:0:15699:9:19519:13586705-1",
+    "X-Mailfrom": "382-JZB-798.0.19519.0.0.15699.9.13586705-1@potomac1050.mktomail.com",
+    "X-MktArchive": "false",
+    "X-MSYS-API": "{\"options\":{\"open_tracking\":false,\"click_tracking\":false}}",
+    "X-MktMailDKIM": "true"
+}
+Snippet:
+A new quarterly update on the ideas, companies, and individuals promoting a more dynamic future. View Online Welcome to the American Dynamism Newsletter Welcome to the American Dynamism newsletter,
+Labels:
+['CATEGORY_UPDATES', 'INBOX']

@@ -1,0 +1,81 @@
+View Online <[[https://info.a16z.com/index.php/email/emailWebview?mkt_tok=MzgyLUpaQi03OTgAAAGJjBiYmpwG0Wi9rgXlxnMTymDtZKG9cQMQiyzszIV9oRLPS35oLpMaKl9CsoVw31FKALzJDnSiP1Kd2FQpOsUmaDJXm89aVdRsnfWEtuD3IhH8&md_id=16408&aliId=jEpYeMXJLgEM0TAXhpTwR9uI4lyhDPrEycofcJ6Oo7RGpiYdEI20Xw%3D%3D]]>
+Not a subscriber yet?
+Sign up
+here .
+Welcome to a16z!
+Thank you for signing up for the a16z newsletter and joining our community.
+Relationships are at the core of everything we do. We'd love to introduce you to folks on our team, keep you updated on portfolio company news, or otherwise plug you into the network.
+To do that, we need to learn a little more about you. Please take 2 minutes to answer a few questions, so we can connect you to the right people on our team.
+Take Survey: https://a16z.co1.qualtrics.com/jfe/form/SV_ezEngt2FvpRct2S
+Software Is eating the world
+MENLO PARK OFFICE
+2865 Sand Hill Road, Suite 101
+Menlo Park, CA 94025
+SAN FRANCISCO OFFICE
+180 Townsend Street
+San Francisco, CA 94107
+NEW YORK OFFICE
+11 Madison Avenue, 15th Floor
+New York, NY 10010
+©2022 Andreessen Horowitz. All rights reserved.
+Update email preferences
+Unsubscribe from list <[[https://info.a16z.com/UnsubscribePage.html?mkt_unsubscribe=1&mkt_tok=MzgyLUpaQi03OTgAAAGJjBiYmpwG0Wi9rgXlxnMTymDtZKG9cQMQiyzszIV9oRLPS35oLpMaKl9CsoVw31FKALzJDnSiP1Kd2FQpOsUmaDJXm89aVdRsnfWEtuD3IhH8]]>
+You've signed up for the newsletter; now please answer a few questions so we can get to know you better.
+View Online
+Not a subscriber yet?
+Sign up
+here.
+Welcome to a16z!
+Thank you for signing up for the a16z newsletter and joining our community.
+Relationships are at the core of everything we do. We'd love to introduce you to folks on our team, keep you updated on portfolio company news, or otherwise plug you into the network.
+To do that, we need to learn a little more about you. Please take 2 minutes to answer a few questions, so we can connect you to the right people on our team.
+Take Survey
+Software Is eating the world
+MENLO PARK OFFICE
+2865 Sand Hill Road, Suite 101
+Menlo Park, CA 94025
+SAN FRANCISCO OFFICE
+180 Townsend Street
+San Francisco, CA 94107
+NEW YORK OFFICE
+11 Madison Avenue, 15th Floor
+New York, NY 10010
+©2022 Andreessen Horowitz. All rights reserved.
+•
+Update email preferences
+•
+Unsubscribe from list
+
+{
+    "Delivered-To": "adilnaut@gmail.com",
+    "Received": "from potomac1228.mktomail.com (potomac1228.mktomail.com. [192.28.150.228])        by mx.google.com with ESMTPS id m2-20020ad44482000000b00534bff1c386si497008qvt.38.2023.01.26.00.09.29        for <adilnaut@gmail.com>        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);        Thu, 26 Jan 2023 00:09:29 -0800 (PST)",
+    "X-Google-Smtp-Source": "AK7set9+U114ImIWsU8g73iiPHPnTUSRl7atcvfDX+WfJE6QXOvT/BPmOLDRY88vYxpiA4MfI3qP",
+    "X-Received": "by 2002:a0c:e7c7:0:b0:532:2dc4:c5ce with SMTP id c7-20020a0ce7c7000000b005322dc4c5cemr1303451qvo.29.1674720569780;        Thu, 26 Jan 2023 00:09:29 -0800 (PST)",
+    "ARC-Seal": "i=1; a=rsa-sha256; t=1674720569; cv=none;        d=google.com; s=arc-20160816;        b=DKcwF3PFlygQbwhWbwqY36psCe23/kdv5Z0I9c+V/PwGpaB9oGarx/md+8NdTXqr7X         XvGVdylkU8i6FgmTwyF1xFkM2dHe8CtQ30owGv2LeRMhA1yhvKiQ28EESZMX5DS8HH8Z         8yF4HDyQd2xITuyh1+dPxmUFwobEchXwPNPJeXHJqUHuL1f3yxQFLaroviq1BWCDFstk         krTot04w4NJ7/5gI4ciBeMZJ7CCWoij/vtkIhTK8CDUilxvHNLOCeQeUy5pUPmAR7eA9         gheJH2coA5NOMIS/aX+cTJHm0LjX9jGAf1ZCPQSU+wGqPQnZXP7z/25VrHAeWMCKhkKn         0wsg==",
+    "ARC-Message-Signature": "i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;        h=list-unsubscribe:mime-version:subject:message-id:to:reply-to:from         :date:dkim-signature:dkim-signature;        bh=PI/W4Fe13wg+1IbguFb4laEPE96emO4MlCvM9rC0MEk=;        b=XddXojHNrYjXerPkyH2Qu8tJlkgZ5OlJ/jkq75ITACTNBmSXrSJ9Z3IsDxD+m7QKnb         yTdMjvAyDO+T03Jvuwo9OhlS5kX8zeZvtHo9tfJsb08PlErIsYqfDfCuRvl6NVZTz+pd         pnedVCVTToYO/njqP1o7utBreg4Uhe4cH9tc/1dyyUMoDDCBCmoBIgmfxRzzbhaaLcgY         qmIRkxdwkPI1V6J8h4tp8uNUMIa+m6ifam7T+omEDpks/Q+iXcW7u6csY8Oxl243mbOk         JoyzknzxSNXzd+6tJuFedInu8gHxysON1I7pX3QYMhbynxdtOyI1/TIcubj5WPh4spyA         9m7g==",
+    "ARC-Authentication-Results": "i=1; mx.google.com;       dkim=pass header.i=@a16z.com header.s=mkto header.b=AgIR1V7n;       dkim=pass header.i=@mktomail.com header.s=m1 header.b=UUE1nk2K;       spf=pass (google.com: domain of 382-jzb-798.0.20232.0.0.16408.9.13586705-1@potomac1050.mktomail.com designates 192.28.150.228 as permitted sender) smtp.mailfrom=382-JZB-798.0.20232.0.0.16408.9.13586705-1@potomac1050.mktomail.com;       dmarc=pass (p=QUARANTINE sp=REJECT dis=NONE) header.from=a16z.com",
+    "Return-Path": "<382-JZB-798.0.20232.0.0.16408.9.13586705-1@potomac1050.mktomail.com>",
+    "Received-SPF": "pass (google.com: domain of 382-jzb-798.0.20232.0.0.16408.9.13586705-1@potomac1050.mktomail.com designates 192.28.150.228 as permitted sender) client-ip=192.28.150.228;",
+    "Authentication-Results": "mx.google.com;       dkim=pass header.i=@a16z.com header.s=mkto header.b=AgIR1V7n;       dkim=pass header.i=@mktomail.com header.s=m1 header.b=UUE1nk2K;       spf=pass (google.com: domain of 382-jzb-798.0.20232.0.0.16408.9.13586705-1@potomac1050.mktomail.com designates 192.28.150.228 as permitted sender) smtp.mailfrom=382-JZB-798.0.20232.0.0.16408.9.13586705-1@potomac1050.mktomail.com;       dmarc=pass (p=QUARANTINE sp=REJECT dis=NONE) header.from=a16z.com",
+    "X-MSFBL": "30TRg7UJcAr1eKhWJlZNgFbOUm3DF6CdTOl8c75BkIE=|eyJyIjoiYWRpbG5hdXR AZ21haWwuY29tIiwiYiI6ImR2cC0xOTItMjgtMTUwLTIyOCIsImciOiJiZy1hYi0 wMSIsInUiOiIzODItSlpCLTc5ODowOjM2NzA6NDU0ODc6MDoxNjQwODo5OjIwMjM yOjEzNTg2NzA1LTEifQ==",
+    "DKIM-Signature": "v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1674720569; s=m1; d=mktomail.com; i=@mktomail.com; h=Content-Type:MIME-Version:Subject:To:From:Date; bh=PI/W4Fe13wg+1IbguFb4laEPE96emO4MlCvM9rC0MEk=; b=UUE1nk2KRcokYaVYsGnf9vewL3k7HstTw8sNmib4MThHl1kyq3/2ombN3+WCjGvu gDaRsWl8FZf3lGmgxqiJrt9qc4V4HmmWatxWa7gwLeEULsEEEZGQSRbQg5SvtPa9Jbg Wc5WRP4eEbJU9WdPw6kWpwFzPsPUgQAQmgpTSrco=",
+    "Date": "Thu, 26 Jan 2023 02:09:29 -0600 (CST)",
+    "From": "Andreessen Horowitz <newsletter@a16z.com>",
+    "Reply-To": "newsletter@reply.a16z.com",
+    "To": "adilnaut@gmail.com",
+    "Message-ID": "<1416007199.6813850.1674720569511@abmktmail-trigger1h.marketo.org>",
+    "Subject": "Welcome to a16z! How can we help you?",
+    "MIME-Version": "1.0",
+    "Content-Type": "multipart/alternative; boundary=\"----=_Part_6813849_79422363.1674720569501\"",
+    "X-Binding": "bg-ab-01",
+    "X-MarketoID": "382-JZB-798:0:3670:45487:0:16408:9:20232:13586705-1",
+    "X-Mailfrom": "382-JZB-798.0.20232.0.0.16408.9.13586705-1@potomac1050.mktomail.com",
+    "List-Unsubscribe": "<mailto:NJLXOUDTGJJFEU32PFHUUR2KNBNHSTZQMV3T2PI=.20232.16408.9@unsub-ab.mktomail.com>",
+    "X-MktArchive": "false",
+    "X-MSYS-API": "{\"options\":{\"open_tracking\":false,\"click_tracking\":false}}",
+    "X-MktMailDKIM": "true"
+}
+Snippet:
+You&#39;ve signed up for the newsletter; now please answer a few questions so we can get to know you better. View Online ANDREESSEN HOROWITZ Not a subscriber yet? Sign up here. Welcome to a16z! Thank
+Labels:
+['UNREAD', 'CATEGORY_UPDATES', 'INBOX']

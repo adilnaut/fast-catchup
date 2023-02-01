@@ -1,0 +1,649 @@
+View Online <[[https://info.a16z.com/index.php/email/emailWebview?mkt_tok=MzgyLUpaQi03OTgAAAGJgcvHpXZWJPUAGVCCA8PiYStL2rQP9hwSBnYiJ94PnxU_K00cOf87opVzmPPesWFUdPV7-us_Fs9bSW1tBWipXGwvbj6i9H5Tnw-Ec859&md_id=8656&aliId=jEpYeMXJLgEMyyQHgoHkW8OG7lCrH%2BjDyMoBdJaTtKNCvCcaH5u2Sw%3D%3D]]>
+
+Thanks for subscribing!
+Whether you are a Fortune 500 executive or building fast and furious at an early-stage startup, we created the a16z Enterprise newsletter to help you navigate the world of B2B technology — from AI and data, to cloud and SaaS, to security, open source, and more.
+
+Once a month, you’ll receive an email with technology and market breakdowns as well as resources for building and leading great companies. And to help you get started, here are five of our greatest hits from the a16z Enterprise archives.
+
+	- The New Business of AI (and How It’s Different from Traditional Software) <https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpcg_z8snLsYptLLoVjq2IZ5WM3mnDaU9KQmZN3Ucihrrr0z_GG7zoXrCDIEku354uig=>
+	- Fintech Scales Vertical SaaS <https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpSgM_LCMELzJh1JFUgNLg7U4G3Po4s3i5r9AT1Ths8p4cj5w3aOt6dOP1pW39_tXzHw=>
+	- Emerging Architectures for Modern Data Infrastructure <https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpDj5AjNLOYH3yAJvZRxQKzFmaUBjjDwYsHveZByVmp9-dXx90c0YkdFgP4B9TUbsNQs=>
+	- The “$20M to $500M” Question: Adding Top Down Sales <https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpO1yOI3jbqtOAUHrG7s4kGdxS-HIdMyEH58-_51_cYAiJEHL8lsd-srdMpLfvd8D8g8=>
+	- 16 Steps to Securing Your Data (and Life) <https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpcv8Vu8LYXIyju06qDfL8Rvnm1UE3VnVG-UQ5iySv2bag5lzSiGikxWlCIAMiLYex4s=>
+
+Happy reading,
+The a16z Enterprise team
+
+2865 Sand Hill Road, Suite 101 
+Menlo Park, CA 94025 
+11 Madison Avenue, 15th Floor 
+New York, NY, 10010
+Update email preferences <https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpOTzsu6ZiDxZWzLPu3i96TI8tMmDeE74-9qTpNEt8DUU3bxWEaq45GburpFFQS1NqMI=>
+Unsubscribe <[[https://info.a16z.com/UnsubscribePage.html?mkt_unsubscribe=1&mkt_tok=MzgyLUpaQi03OTgAAAGJgcvHpXZWJPUAGVCCA8PiYStL2rQP9hwSBnYiJ94PnxU_K00cOf87opVzmPPesWFUdPV7-us_Fs9bSW1tBWipXGwvbj6i9H5Tnw-Ec859]]>
+Software Is Eating the World
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head> 
+<!-- Marketo Variable Definitions -->                                    
+<!-- Background variables -->                                                                                                                                         
+<!-- Separator height variables -->                                                                  
+<!-- Other Meta Tags --> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+<meta content="telephone=no" name="format-detection" /> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+<style type="text/css">
+		@font-face {
+			font-family: 'Proxima Nova';
+			src: url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-Regular.woff2') format('woff2'),
+			url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-Regular.woff') format('woff');
+			font-weight: 400;
+			font-style: normal;
+		}
+		@font-face {
+			font-family: 'Proxima Nova';
+			src: url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-RegularIt--09-01-020.woff2') format('woff2'),
+			url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-RegularIt--09-01-020.woff') format('woff');
+			font-weight: 400;
+			font-style: italic;
+		}
+
+		@font-face {
+			font-family: 'Proxima Nova';
+			src: url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-Medium--09-01-020.woff2') format('woff2'),
+			url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-Medium--09-01-020.woff') format('woff');
+			font-weight: 500;
+			font-style: normal;
+		}
+
+		@font-face {
+			font-family: 'Proxima Nova';
+			src: url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-Semibold--09-01-020.woff2') format('woff2'),
+			url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-Semibold--09-01-020.woff') format('woff');
+			font-weight: 600;
+			font-style: normal;
+		}
+
+		@font-face {
+			font-family: 'Proxima Nova';
+			src: url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-Bold--09-01-020.woff2') format('woff2'),
+			url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-Bold--09-01-020.woff') format('woff');
+			font-weight: 700;
+			font-style: normal;
+		}
+		@font-face {
+			font-family: 'Proxima Nova';
+			src: url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-BoldIt--09-01-020.woff2') format('woff2'),
+			url('https://info.a16z.com/rs/382-JZB-798/images/ProximaNova-BoldIt--09-01-020.woff') format('woff');
+			font-weight: 700;
+			font-style: italic;
+		}
+		a{
+			outline:none;
+			text-decoration:underline;
+			-webkit-transition:all 0.2s ease;
+			-moz-transition:all 0.2s ease;
+			-ms-transition:all 0.2s ease;
+			transition:all 0.2s ease;
+			text-decoration: none;
+		}
+		a:hover,
+		a:focus { opacity: 0.8; }
+		a[x-apple-data-detectors]{color:inherit !important; text-decoration:none !important;}
+		a img{border:none;}
+		.long-word-td {
+			word-break: break-all;
+			overflow-wrap: break-word;
+			line-break: anywhere;
+			word-break:inherit !important;
+		}
+		.long-word a {
+			line-break: anywhere;
+			word-break: break-all;
+			word-wrap: break-word;
+			overflow-wrap: break-word;
+		}
+		.button {
+			-webkit-transition:all 0.3s ease;
+			-moz-transition:all 0.3s ease;
+			-ms-transition:all 0.3s ease;
+			transition:all 0.3s ease;
+			word-break: break-all;
+		}
+		.button:hover { opacity: 0.8; }
+		table td{mso-line-height-rule:exactly;}
+		.ExternalClass, .ExternalClass a, .ExternalClass span, .ExternalClass b, .ExternalClass br, .ExternalClass p, .ExternalClass div{line-height:inherit;}
+		.address,
+		.date { color: #35353a !important; background: none !important; text-decoration: none !important;}
+		.address span,
+		.address *,
+		.date span,
+		.date * { color: #35353a !important; text-decoration: none !important; border:none !important; background: none !important;}
+		img { max-width: 100%; height: auto; }
+		ul,
+		ol {
+			padding-left: 23px;
+			margin-top: 0;
+			padding-top: 13px;
+			padding-bottom: 0;
+		}
+		ul { list-style-type: disc; }
+		ul li,
+		ol li { margin-bottom: 6px; }
+
+		p { padding-top: 0 !important; padding-bottom: 0 !important; margin-top: 0 !important; margin-bottom: 0 !important; }
+		p + p { margin-top: 10px !important; }
+
+		img + div { display:none !important; width:0 !important; height:0 !important; padding:0 !important; font-size:0 !important; line-height:0 !important; }
+
+		.hide-everywhere { display:none !important; width:0 !important; height:0 !important; padding:0 !important; font-size:0 !important; line-height:0 !important; }
+
+		/* Styling for screen size 639 and less */
+		@media only screen and (max-width:639px) {
+			.py-md-10 { padding-top: 10px !important; padding-bottom: 10px !important; }
+			.px-md-0 { padding-left: 0 !important; padding-right: 0 !important; }
+			.px-md-30 { padding-left: 30px !important; padding-right: 30px !important; }
+			.pl-md-30 { padding-left: 30px !important; }
+			.pr-md-30 { padding-right: 30px !important; }
+		}
+
+		/* Styling for screen size 599 and less */
+		@media only screen and (max-width:599px) {
+			.flexible { width:100% !important; }
+			.table-center { float:none !important; margin:0 auto !important; }
+			.table-left { float:none !important; margin:0 auto 0 0 !important; }
+			.hide { display:none !important; width:0 !important; height:0 !important; padding:0 !important; font-size:0 !important; line-height:0 !important; }
+			.db { display:block !important; }
+			.image-m { display:table-cell !important; }
+			.image-m img { display:block !important; width:100% !important; height:auto !important; font: 10px/13px Arial,Helvetica,Verdana,Helvetica,sans-serif; }
+			.img-flex img { width:100% !important; height:auto !important; }
+			.img-flex { width:100% !important; height:auto !important; }
+			.aligncenter { text-align:center !important; }
+			.alignleft { text-align:left !important; }
+			.table-holder { display:table !important; width:100% !important; }
+			.tcap { display:table-caption !important; width:100% !important; }
+			.thead { display:table-header-group !important; width:100% !important; }
+			.trow { display:table-row !important; width:100% !important; }
+			.tfoot { display:table-footer-group !important; width:100% !important; }
+			.flex { display:block !important; width:100% !important; padding-left: 0 !important; padding-right: 0 !important; border-left: none !important; border-right: none !important; }
+			/* Custom */
+			.pl-0 { padding-left: 0 !important; }
+			.pr-0 { padding-right: 0 !important; }
+			.px-30 { padding-left: 30px !important; padding-right: 30px !important; }
+			.pt-30 { padding-top: 30px !important; }
+			.pb-20 { padding-bottom: 20px !important; }
+			.h-10 { height: 10px !important; }
+			.h-25 { height: 25px !important; }
+			.h-30 { height: 30px !important; }
+			.pt-15 { padding-top: 15px !important; }
+          
+         	 .px-15 { padding-left: 15px !important; padding-right: 15px !important; }
+			.pt-2 {padding-top: 2px !important;}
+            .pt-4 {padding-top: 4px !important;}
+			.pb-5 {padding-bottom: 5px !important;}
+			.pb-7 {padding-bottom: 7px !important;}
+			.pb-12 {padding-bottom: 12px !important;}
+			.pb-13 {padding-bottom: 13px !important;}
+			.pb-15 {padding-bottom: 15px !important;}
+			.fz-11 {font-size: 11px !important;}
+			.fz-12 {font-size: 12px !important;}
+			.fz-14 {font-size: 14px !important;}
+			.px-9 {padding-left: 9px !important; padding-right: 9px !important;}
+			.lh-116 {line-height: 116% !important;}
+			.w-148 {width: 148px !important;}
+			.w-auto {width: auto !important;}
+		}
+
+		/* Styling for screen size 499 and less */
+		@media only screen and (max-width:374px) {
+			.aligncenter-xs { text-align:center !important; }
+			.flex-xs { display:block !important; width:100% !important; padding-left: 0 !important; padding-right: 0 !important; border-left: none !important; border-right: none !important; }
+		}
+	</style> 
+<!--[if gte mso 9]><xml>
+		<o:OfficeDocumentSettings>
+			<o:AllowPNG/>
+			<o:PixelsPerInch>96</o:PixelsPerInch>
+		</o:OfficeDocumentSettings>
+	</xml><![endif]--> 
+<!--[if (gte mso 9)|(IE)]>
+		<style type="text/css">
+			table {
+				border-collapse: collapse;
+				border-spacing: 0; 
+				mso-line-height-rule: exactly; 
+				mso-margin-bottom-alt: 0; 
+				mso-margin-top-alt: 0; 
+				mso-table-lspace: 0pt;
+				mso-table-rspace: 0pt;
+			}
+			td {
+				mso-table-lspace: 0pt !important;
+				mso-table-rspace: 0pt !important;
+			}
+			p,
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6,
+			ol,
+			li,
+			ul,
+			td,
+			th {
+				font-family: Helvetica, Arial, sans-serif !important;
+			}
+
+			p {
+				margin-bottom: 10px !important;
+			}
+
+			p:last-child {
+				margin-bottom: 0 !important;
+			}
+
+			.ico-audio { padding-top: 0 !important; }
+		</style>
+	<![endif]--> 
+</head> 
+<body style="margin:0; padding:0; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;" bgcolor="#f0f0f0"><style type="text/css">div#emailPreHeader{ display: none !important; }</style><div id="emailPreHeader" style="mso-hide:all; visibility:hidden; opacity:0; color:transparent; mso-line-height-rule:exactly; line-height:0; font-size:0px; overflow:hidden; border-width:0; display:none !important;">Here’s some of what you may have missed from a16z enterprise. Whether you are a Fortune 500 executive or building fast and furious at an early-stage startup
+</div> 
+<table style="min-width:320px;" width="100%" cellspacing="0" cellpadding="0" bgcolor="#f0f0f0"> 
+<tbody>
+<tr> 
+<td style="line-height:0;">
+<div style="display:none; white-space:nowrap; font:15px/1px courier;">
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+</div></td> 
+</tr> 
+<tr> 
+<td> 
+<table width="100%" cellspacing="0" cellpadding="0"> 
+<tbody>
+<tr> 
+<td> 
+<center> 
+<div style="max-width: 640px; margin: auto;"> 
+<!--[if mso]>
+									<table role="presentation" style="width: 640px;" cellspacing="0" cellpadding="0" border="0" align="center">
+										<tr>
+											<td>
+											<![endif]--> 
+<table class="flexible" style="max-width: 640px; width: 100%; margin: 0 auto;" cellpadding="0" cellspacing="0" align="center"> 
+<tbody>
+<tr> 
+<td> 
+<!-- ||| Header ||| --> 
+<table width="100%" cellspacing="0" cellpadding="0"> 
+<tbody>
+<tr> 
+<td class="py-md-10" style="padding: 20px 10px 7px;"> 
+<table width="100%" cellspacing="0" cellpadding="0"> 
+<tbody>
+<tr> 
+<td style="font: 14px/120% Proxima Nova, Arial, Helvetica, sans-serif; color: #97999b;" valign="top"> 
+<div class="mktoText" id="preHeaderLeftContent"></div> </td> 
+<td style="width: 15px;" width="15"></td> 
+<td style="font: 14px/120% Proxima Nova, Arial, Helvetica, sans-serif; color: #97999b;" align="right" valign="top"> 
+<div class="mktoText" id="preHeaderRightContent">
+<a style="text-decoration: none; color: #97999b;" href="https://info.a16z.com/index.php/email/emailWebview?mkt_tok=MzgyLUpaQi03OTgAAAGJgcvHpXZWJPUAGVCCA8PiYStL2rQP9hwSBnYiJ94PnxU_K00cOf87opVzmPPesWFUdPV7-us_Fs9bSW1tBWipXGwvbj6i9H5Tnw-Ec859&md_id=8656&aliId=jEpYeMXJLgEMyyQHgoHkW8OG7lCrH%2BjDyMoBdJaTtKNCvCcaH5u2Sw%3D%3D" target="_blank">View Online</a>
+</div> </td> 
+</tr> 
+</tbody>
+</table> </td> 
+</tr> 
+</tbody>
+</table> 
+<!-- ||| Header end ||| --> </td> 
+</tr> 
+<tr> 
+<td class="mktoContainer" id="mkto-container" style="background-image: url('https://info.a16z.com/rs/382-JZB-798/images/bg-wave01--newsletter-09-29-020.png'); background-repeat: no-repeat; background-position: top left;" bgcolor="#ffffff">
+<table class="mktoModule" id="sep49" width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="font-size: 1px; line-height: 1px; height: 39px;" height="39">&nbsp;</td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="pageHeader" width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="padding-left: 30px; padding-right: 30px;" valign="middle"> 
+<table class="flexible" style="margin-right: auto;" width="100%" cellspacing="0" cellpadding="0" align="left"> 
+<tbody> 
+<tr> 
+<td class="aligncenter" style="padding: 0; text-align: center;" valign="middle" align="center"> 
+<div class="mktoImg" id="headerLogo" mktolockimgsize="false"> 
+<a style="text-decoration: none;" href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpPx2iGx8UphSzsdSe2dKgB0Dxg-Jh3CfavGi2RpK4CyzkSM6yxmVjtXwjuM-OMp4aGM=" target="_blank"
+><img style="vertical-align: top; max-width: 100%; height: auto;" src="https://info.a16z.com/rs/382-JZB-798/images/logo-new-black--01-26-021.png" width="190" alt="ANDREESSEN HOROWITZ" border="0" /></a> 
+</div> </td> 
+</tr> 
+</tbody> 
+</table> 
+<table class="hide-everywhere flexible" style="margin-left: auto;" width="30%" cellspacing="0" cellpadding="0" align="right"> 
+<tbody> 
+<tr class="hide-everywhere"> 
+<td class="aligncenter pt-15 hide-everywhere" style="padding: 5px 0 0; text-align: right; font: 14px/136% Proxima Nova, Arial, Helvetica, sans-serif; color: #97999b;" valign="middle"> 
+<div class="mktoText hide-everywhere" id="headerRightContent"></div> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="sep50" width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="font-size: 1px; line-height: 1px; height: 29px;" height="29">&nbsp;</td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="verticalLogo" width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="padding-left: 30px; padding-right: 30px;"> 
+<table width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td align="center"> <img style="vertical-align: top; max-width: 100%; height: auto;" src="https://info.a16z.com/rs/382-JZB-798/images/a16z-Enterprise--01-26-021.png" alt="a16z Bio" border="0" /> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="sep51" width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="font-size: 1px; line-height: 1px; height: 20px;" height="20">&nbsp;</td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="mainHeading" width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="padding-left: 30px; padding-right: 30px;"> 
+<table width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="font: 700 32px/120% Proxima Nova, Arial, Helvetica, sans-serif; color: #ed8b00;" align="center"> 
+<div class="mktoText" id="headerMainHeading">
+<p><span style="color: #0057b8;">Thanks for subscribing!</span></p>
+</div> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="sep47" width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="font-size: 1px; line-height: 1px; height: 22px;" height="22">&nbsp;</td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="txtBlock02" width="100%" cellspacing="0" cellpadding="0" bgcolor="#ffffff"> 
+<tbody> 
+<tr> 
+<td class="px-md-30" style="padding-left: 50px; padding-right: 50px;"> 
+<table width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="font: 16px/128% Proxima Nova, Arial, Helvetica, sans-serif; color: #4b4f54;"> 
+<div class="mktoText" id="txtBlock02Content"> 
+<p>Whether you are a Fortune 500 executive or building fast and furious at an early-stage startup, we created the a16z Enterprise newsletter to help <em>you</em> navigate the world of B2B technology&nbsp;— from AI and data, to cloud and SaaS, to security, open source, and more.</p> 
+<p>Once a month, you’ll receive an email with technology and market breakdowns as well as resources for building and leading great companies. And to help you get started, here are five of our greatest hits from the a16z Enterprise archives.</p> 
+<ol> 
+<li><span style="color: #00873e;"><a href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpQZqQqHip_817rHKGfmyZMG0Oae7klHxB2_FdacgByNt1xpNAsC-jygP7VzMhGpm5Yc=" target="_blank" style="color: #00873e;"
+>The New Business of AI (and How It’s Different from Traditional Software)</a></span></li> 
+<li><span style="color: #00873e;"><a href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpYfajF3wtZvHvjkEkHO6cv_RNU7BiwUiXMBmrEHDFs9U100cuhhhFexJpAoKCEn9q8w=" target="_blank" style="color: #00873e;"
+>Fintech Scales Vertical SaaS</a></span></li> 
+<li><span style="color: #00873e;"><a href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpI05PLAPckQQ9ek5p4lPMeiyqXy0e8GS0HoyK2OUIs-LPx6mVM4hcWwvA4flL0i3KW8=" target="_blank" style="color: #00873e;"
+>Emerging Architectures for Modern Data Infrastructure</a></span></li> 
+<li><span style="color: #00873e;"><a href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpOvcIKrXklqVkw1JZOfn-5AZF82NIS-EqmMoM4m493J6jnRfvKGYNrpV6ZUKelWjNxg=" target="_blank" style="color: #00873e;"
+>The “$20M to $500M” Question: Adding Top Down Sales</a></span></li> 
+<li><span style="color: #00873e;"><a href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpVEm0LcUvhl9Qme8RPJm2EAlaB-ttljqPCyrDwntsnPID80vV-krnfHe7kdliek6pF0=" target="_blank" style="color: #00873e;"
+>16 Steps to Securing Your Data (and Life)</a></span></li> 
+</ol> 
+<p>Happy reading, <br />The a16z Enterprise team<br /></p> 
+</div> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="sep31" width="100%" cellspacing="0" cellpadding="0" bgcolor="#ffffff"> 
+<tbody> 
+<tr> 
+<td style="font-size: 1px; line-height: 1px; height: 40px;" height="40">&nbsp;</td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="footerSep01" width="100%" cellspacing="0" cellpadding="0" bgcolor="#4c4f53"> 
+<tbody> 
+<tr> 
+<td style="font-size: 1px; line-height: 1px; height: 32px;" height="32">&nbsp;</td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="footerLogoBlock" width="100%" cellspacing="0" cellpadding="0" bgcolor="#4b4f54"> 
+<tbody> 
+<tr> 
+<td class="px-md-30" style="padding-left: 60px; padding-right: 60px;"> 
+<table class="table-center w-148" width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td align="center"> 
+<div class="mktoImg" id="footerLogoBlockLogo" mktolockimgsize="false"> 
+<a style="text-decoration: none;" href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpPx2iGx8UphSzsdSe2dKgB0Dxg-Jh3CfavGi2RpK4CyzkSM6yxmVjtXwjuM-OMp4aGM=" target="_blank"
+><img style="vertical-align: top; max-width: 100%; height: auto;" src="https://info.a16z.com/rs/382-JZB-798/images/a16z-logo-white-09-29-020.png" width="174" alt="ANDREESSEN HOROWITZ" border="0" /></a> 
+</div> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+</tr> 
+<tr> 
+<td class="fz-14 pb-7 pt-4" style="font: 16px/143% Proxima Nova, Arial, Helvetica, sans-serif; color: #a0a3a9; padding-top: 6px; padding-bottom: 8px;" valign="top" align="center"> 
+<div class="mktoText" id="footerLogoBlockSlogan">
+ Software Is eating the world 
+</div> </td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="socialNetworkingItems" width="100%" cellspacing="0" cellpadding="0" bgcolor="#4b4f54"> 
+<tbody> 
+<tr> 
+<td> 
+<table style="margin-left: auto; margin-right: auto;" cellspacing="0" cellpadding="0" align="center"> 
+<tbody> 
+<tr> 
+<td valign="middle"> 
+<div class="mktoImg" id="socialNetworkingItemsItem01" mktolockimgsize="false"> 
+<a style="text-decoration: none;" href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpSUNIHZnmPZFuxUpYCLvPSSA4Q4HrDN5BLDgS_yt-X9bbiLM-K85ZxODdTKA_kn-mjE=" target="_blank"
+> <img style="display: block; vertical-align: top; max-width: 100%; height: auto;" src="https://info.a16z.com/rs/382-JZB-798/images/twitter-white-ico@2x--newsletter-09-29-020.png" alt="twitter icon" width="12" border="0" /> </a> 
+</div> </td> 
+<td style="width: 16px;" width="16"></td> 
+<td valign="middle"> 
+<div class="mktoImg" id="socialNetworkingItemsItem02" mktolockimgsize="false"> 
+<a style="text-decoration: none;" href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpO-FQ-F4BwZb9fo4KLFxGPKwiBvUs10wexFCJVKK3t24VG48zoVK-97rkl0Hnudo2oU=" target="_blank"
+> <img style="display: block; vertical-align: top; max-width: 100%; height: auto;" src="https://info.a16z.com/rs/382-JZB-798/images/linkedin-white-ico@2x--newsletter-09-29-020.png" alt="linkedin icon" width="12" border="0" /> </a> 
+</div> </td> 
+<td style="width: 16px;" width="16"></td> 
+<td valign="middle"> 
+<div class="mktoImg" id="socialNetworkingItemsItem03" mktolockimgsize="false"> 
+<a style="text-decoration: none;" href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpKyPytk3ybHo5zObo08mmePhRpkfdV9yMTx1CahnBbC_IGKFpMa6arToLHzEGHE4jJ0=" target="_blank"
+> <img style="display: block; vertical-align: top; max-width: 100%; height: auto;" src="https://info.a16z.com/rs/382-JZB-798/images/podcast-white-ico@2x--newsletter-09-29-020.png" alt="podcast icon" width="12" border="0" /> </a> 
+</div> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="footerSep02" width="100%" cellspacing="0" cellpadding="0" bgcolor="#4c4f53"> 
+<tbody> 
+<tr> 
+<td style="font-size: 1px; line-height: 1px; height: 37px;" height="37">&nbsp;</td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="footerAddress" width="100%" cellspacing="0" cellpadding="0" bgcolor="#4b4f54"> 
+<tbody> 
+<tr> 
+<td style="padding: 0 33px; padding-top: 2px;"> 
+<table width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr align="center"> 
+<td class="flex pb-13" style="padding: 0 5px" valign="top"> 
+<table width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="font:700 10px/116% Proxima Nova, Arial, Helvetica, sans-serif; color: #a0a3a9; text-transform: uppercase; padding-bottom: 2px;" align="center"> 
+<div class="mktoText" id="footerAddressTitle">
+ MENLO PARK OFFICE 
+</div> </td> 
+</tr> 
+<tr> 
+<td class="lh-116" style="font:12px/116% Proxima Nova, Arial, Helvetica, sans-serif; color: #e5e6e5;" align="center"> 
+<div class="mktoText" id="footerAddress01">
+ 2865 Sand Hill Road, Suite 101 
+<br />Menlo Park, CA 94025 
+</div> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+<td class="flex pb-15" style="padding: 0 5px" valign="top"> 
+<table width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="font:700 10px/116% Proxima Nova, Arial, Helvetica, sans-serif; color: #a0a3a9; text-transform: uppercase; padding-bottom: 2px;" align="center"> 
+<div class="mktoText" id="footerAddressTitle02">
+ SAN FRANCISCO OFFICE 
+</div> </td> 
+</tr> 
+<tr> 
+<td class="lh-116" style="font:11px/127% Proxima Nova, Arial, Helvetica, sans-serif; color: #e5e6e5;" align="center"> 
+<div class="mktoText" id="footerAddress02">
+ 180 Townsend Street 
+<br />San Francisco, CA 94107 
+</div> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+<td class="flex pb-12" style="padding: 0 5px" valign="top"> 
+<table width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td style="font:700 10px/116% Proxima Nova, Arial, Helvetica, sans-serif; color: #a0a3a9; text-transform: uppercase; padding-bottom: 2px;" align="center"> 
+<div class="mktoText" id="footerAddressTitle03">
+ NEW YORK OFFICE 
+</div> </td> 
+</tr> 
+<tr> 
+<td class="lh-116" style="font:11px/127% Proxima Nova, Arial, Helvetica, sans-serif; color: #e5e6e5;" align="center"> 
+<div class="mktoText" id="footerAddress03">
+ 11 Madison Avenue, 15th Floor 
+<br />New York, NY 10010 
+</div> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="footerSep03" width="100%" cellspacing="0" cellpadding="0" bgcolor="#4c4f53"> 
+<tbody> 
+<tr> 
+<td style="font-size: 1px; line-height: 1px; height: 25px;" height="25">&nbsp;</td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="footerUnsubscribeBlock" width="100%" cellspacing="0" cellpadding="0" bgcolor="#4b4f54"> 
+<tbody> 
+<tr> 
+<td> 
+<table style="margin-left: auto; margin-right: auto;" cellspacing="0" cellpadding="0" align="center"> 
+<tbody> 
+<tr class="table-holder" align="center"> 
+<td class="tfoot"> 
+<table class="table-center w-auto" width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td class="fz-11" style="font: 9px/143% Proxima Nova, Arial, Helvetica, sans-serif; color: #e5e6e5;" valign="top"> 
+<div class="mktoText" id="footerCopyrights">
+ ©2022 Andreessen Horowitz. All rights reserved. 
+</div> </td> 
+<td class="hide" style="font: 9px/143% Proxima Nova, Arial, Helvetica, sans-serif; color: #e5e6e5; padding: 0 6px;" valign="top">•</td> 
+</tr> 
+</tbody> 
+</table> </td> 
+<td class="thead"> 
+<table class="table-center w-auto" width="100%" cellspacing="0" cellpadding="0"> 
+<tbody> 
+<tr> 
+<td class="fz-11 pb-5" style="font: 9px/143% Proxima Nova, Arial, Helvetica, sans-serif; color: #e5e6e5;" valign="top"> 
+<div class="mktoText" id="footerUpdateEmailPref"> 
+<a style="text-decoration: underline; color: #e5e6e5;" href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpOTzsu6ZiDxZWzLPu3i96TI8tMmDeE74-9qTpNEt8DUU3bxWEaq45GburpFFQS1NqMI=" target="_blank"
+>Update email preferences</a> 
+</div> </td> 
+<td class="fz-11 px-9" style="font: 9px/143% Proxima Nova, Arial, Helvetica, sans-serif; color: #e5e6e5; padding: 0 7px;" valign="top">•</td> 
+<td class="fz-11 pb-5" style="font: 9px/143% Proxima Nova, Arial, Helvetica, sans-serif; color: #e5e6e5;" valign="top"> 
+<div class="mktoText" id="footerUnsubscribe"> 
+<a style="text-decoration: underline; color: #e5e6e5;" href="https://info.a16z.com/UnsubscribePage.html?mkt_unsubscribe=1&mkt_tok=MzgyLUpaQi03OTgAAAGJgcvHpXZWJPUAGVCCA8PiYStL2rQP9hwSBnYiJ94PnxU_K00cOf87opVzmPPesWFUdPV7-us_Fs9bSW1tBWipXGwvbj6i9H5Tnw-Ec859" target="_blank">Unsubscribe from list</a> 
+</div> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+</tr> 
+</tbody> 
+</table> </td> 
+</tr> 
+</tbody> 
+</table>
+<table class="mktoModule" id="footerSep04" width="100%" cellspacing="0" cellpadding="0" bgcolor="#4c4f53"> 
+<tbody> 
+<tr> 
+<td style="font-size: 1px; line-height: 1px; height: 35px;" height="35">&nbsp;</td> 
+</tr> 
+</tbody> 
+</table></td> 
+</tr> 
+</tbody>
+</table> 
+<!--[if mso]>
+											</td>
+										</tr>
+									</table>
+									<![endif]--> 
+</div> 
+</center> </td> 
+</tr> 
+</tbody>
+</table> </td> 
+</tr> 
+</tbody>
+</table>  
+<a href=
+"https://go2.a16z.com/MzgyLUpaQi03OTgAAAGJgcvHpDv2e00ozq-6PX4WD1GlbDZmEPe0JvYnrUBKZO9eMSTIPKKlLSQv2IKDUX2U0lJ9hZE="
+></a>
+<img src="https://go2.a16z.com/trk?t=1&mid=MzgyLUpaQi03OTg6MDozNjcyOjE3MTg1OjA6ODY1Njo5OjQ4NToxMzU4NjcwNS0xOm51bGw%3D" width="1" height="1" style="display:none !important;" alt="" />
+</body>
+</html>

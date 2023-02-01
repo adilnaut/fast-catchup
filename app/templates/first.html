@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+	<head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <link rel="stylesheet"  type="text/css" href="{{url_for('.static', filename='mystyle.css')}}">
+        <title>{{ title }} - Fast-catchup</title>
+	</head>
+	<body>
+		<h2> Fast-catchup prototype </h2>
+
+        <p> Prompt: {{ gptin.prompt }} </p>
+
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Prompt:</span>
+          </div>
+          <textarea name="prompt" form="summary_form" class="form-control" aria-label="With textarea" >
+            {{gptin.prompt}}
+          </textarea>
+        </div>
+
+        <form action = "/generate_summary" id="summary_form" method = "post">
+
+            <!-- <input type="text"  placeholder="{{gptin.prompt}}" name="prompt" /> <br> -->
+
+            <input type="checkbox" id="slack_check" name="slack-checkbox" value="Slack-Check">
+            <label for="slack-checkbox"> Get slack unreads from cache </label> <br>
+
+            <input type="checkbox" id="gmail_check" name="gmail-checkbox" value="Gmail-Check">
+            <label for="gmail-checkbox"> Get gmail unreads from cache </label> <br>
+
+            <input type="submit" value="Generate">
+        </form>
+
+        <p> Slack input: </p>
+        {% for slack_obj in gptin.slack_list %}
+            <p> {{ slack_obj.text }} </p>
+        {% endfor %}
+
+        <p> Gmail input: </p>
+        {% for gmail_obj in gptin.gmail_list %}
+		    <p> {{ gmail_obj.subject }} </p>
+        {% endfor %}
+
+		<p> Summary: {{ gptout.summary }} </p>
+		<audio controls>
+      			<source src="/audio/file.wav" type="audio/wav">
+      			Your browser does not support the audio element.
+    	</audio>
+	</body>
+</html>

@@ -1,0 +1,670 @@
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml" style="background-color: #ffffff;">
+<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style>@media only screen and (max-width:640px) {
+  .v3-body {
+    min-width: 100vw !important;
+  }
+  .layout-body-content {
+    padding: 0 16px !important;
+  }
+  .layout-body-over {
+    padding-top: 6.3% !important;
+  }
+  .body-title {
+    line-height: 37.6px !important;
+  }
+  .hero-title-layout {
+    padding: 0 !important;
+  }
+  .body-signature {
+    width: 100% !important; max-width: 148px !important;
+  }
+  .space-section {
+    padding-top: 16% !important;
+  }
+  .hero-image {
+    background-size: contain !important; background-repeat: no-repeat !important; background-position: bottom !important; border-radius: 0 !important;
+  }
+  .footer-below {
+    padding: 20px 0 !important;
+  }
+  .space-footer {
+    padding: 30px !important; padding-top: 60px !important;
+  }
+  .layout-body-bellow {
+    padding-bottom: 5% !important;
+  }
+  .bg-mobile {
+    background-color: #F3EFE9 !important;
+  }
+}
+@media only screen and (min-width:641px) {
+  .background-content {
+    background-color: #F3EFE9 !important;
+  }
+  .background-over-footer {
+    background-color: #ffffff !important;
+  }
+  html {
+    background-color: #ffffff !important;
+  }
+  .hero-image {
+    border-top-left-radius: 8px !important; border-top-right-radius: 8px !important;
+  }
+  .layout-body-content {
+    padding-left: 5% !important; padding-right: 5% !important; margin: 0 auto;
+  }
+  .bg-mobile {
+    background-color: #F3EFE9 !important;
+  }
+  .space-footer {
+    padding-top: 0% !important;
+  }
+  .space-1 {
+    padding-top: 5% !important;
+  }
+  .space-hero-line {
+    padding: 4% 0 !important;
+  }
+}
+</style></head>
+<body class="background-content" style="font-family: helvetica,Neue; width: 100% !important; margin: 0; padding: 0;" width="100%" bgcolor="#ffffff">
+
+
+
+
+
+
+
+
+
+
+
+
+ <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><meta name="viewport" content="width=device-width" /><img src="http://clicks.meetup.com/wf/open?upn=mu8-2Bi6PugFIeiOCc4tnJCFhdvV-2FXQvUmgxtZrtv1M2PGBEEmyOk9JDQC0aON9IrjPtdcb2edw3rcVexnVuZ1LZEmD5dRUFMbfACr2cEj2iasyVtIYoYhn01qucx7NLO-2FduF-2BVMiL83Z3FV9b8mstQG-2FjpBTQfIMzdHP-2BQEXw8aZbepNIA8QWck-2BgJn6Yynzn-2BUas5OboubbTtlBq0UnV1DuDYSRYKFCmxqN-2BBvnlvTRWEtJY4vkMlf1VcNDz5o3Q-2FeneH0XK0P-2Ffg4LzmPlcU-2BQsGllOYlV79eOqt1S-2Flemw91gINbI-2BaJMthikp-2F0kiYtbk59sh-2FQuH2Qv0SYYIz-2B-2BgO6aVSx993dUJvZoQ8sht8enPUe-2FtBp-2FPJtduoYMbslzbKV3c0wkyWfgrjYhaP5-2F6EMxJifuO27xjWs-2FGQwWpVhnRc1Y8XEERAHVvJA3XHpVXHcRNvbefGAvhFJgrslrZQ2O5BCbmCmGQYt9A8CTXz4sXRoDQRMbstzAf4gWiTPalQOW1unm2g4Gp2-2BuHUpeRuj0Wvh4OoaYeNa6g8XN2M7yAKRgPs5sKy5hESaBOLsGiKeqjNGXh-2BQ5dmCRI22KJf2uz3cQVyZyB4G9Rx7zsOPMHHT32Z9W0-2FVjCQicU7rkstgjOSl9jxDq-2F-2FvZn-2FPWaP-2BRlUJBPNpcXqcSS3kBqNah2e0pKLlcACYsqm-2Fr6xY2R9xiLZBPosy1kuUDW3nk1E-2FufUP1pNKVWX4NIe6k-3D" alt="" width="1" height="1" border="0" style="height:1px !important;width:1px !important;border-width:0 !important;margin-top:0 !important;margin-bottom:0 !important;margin-right:0 !important;margin-left:0 !important;padding-top:0 !important;padding-bottom:0 !important;padding-right:0 !important;padding-left:0 !important;"/></body>
+</html>
+<html xmlns="http://www.w3.org/1999/xhtml" style="background-color: #ffffff;">
+<!--[if mso]>
+  <style>
+    .hero-title {
+      margin: 0 30px !important;
+      margin-top: 20px !important;
+    }
+
+    .hero-desc {
+      margin: 0 15px !important;
+    }
+  </style>
+  <![endif]--><!--[if (mso) | (IE)]>
+      <style type="text/css">
+        .img-logo {
+          height: 40px !important;
+          width: 109px !important;
+        }
+        .bg-mobile {
+          background-color: #F3EFE9 !important;
+        }
+
+        .layout-body-content {
+          padding-left: 60px !important;
+          padding-right: 60px !important;
+        }
+
+        .layout-body-over {
+          padding-top: 40px !important;
+        }
+
+        .layout-body-bellow {
+          padding-bottom: 5% !important;
+        }
+
+        .button-learn-more {
+          padding: 10px 31px !important;
+        }
+
+        .body-signature-layout {
+          padding-top: 15px;
+        }
+
+        .body-signature {
+          width: 128px !important;
+        }
+
+        .hero-layout {
+          padding: 45px !important;
+        }
+
+        .hero-text-layout {
+          padding-top: 20px !important;
+        }
+
+        .space {
+          padding-top: 60px !important;
+        }
+
+        .space-1 {
+          padding-top: 5% !important;
+        }
+
+        .space-2 {
+          padding-top: 20px !important;
+        }
+
+        .space-3 {
+          padding-top: 30px !important;
+        }
+        
+        .space-hero-line {
+          padding:  20px 0 !important;
+        }
+        
+        .space-footer {
+          padding-top: 10px !important;
+        }
+
+        .social {
+          padding: 60px 0 !important;
+        }
+
+        .footer-below {
+          padding: 50px 0 !important;
+        }
+
+        .space-header {
+          padding: 30px 0 !important;
+        }
+
+        .space-caption {
+          padding-top: 15px !important;
+        }
+
+        .space-button {
+          padding-top: 20px !important;
+        }
+
+        .space-quote {
+          padding: 40px 0 0 25px !important;
+        }
+
+        .space-quote-text {
+          padding-left: 25px !important;
+        }
+
+        .background-content {
+          background-color: #ffffff !important;
+        }
+      </style>
+  <![endif]--><!--[if mso]>
+    <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+  <![endif]-->
+<table class="background-content v3-body" style="height: 100%; width: 100%; text-align: center; border-spacing: none; border-collapse: collapse; margin: 0px 0 0; padding: 0; border: none;" width="100%" bgcolor="#ffffff">
+  <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+    <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+      <td align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+      <table align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;"><!-- START CONTENT LOGO BLOCK -->
+        <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+
+          <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+            <td style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;"><!--[if (mso) | (IE)]>
+              <center>
+              <table border="0" cellpadding="0" cellspacing="0">
+              <tr><td width="640">
+            <![endif]-->
+            <table align="center" bgcolor="#F3EFE9" class="container border-content" width="100%" style="border-spacing: none; border-collapse: collapse; max-width: 640px; width: 100%; border-radius: 8px; margin: 0; padding: 0; border: none;">
+              <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                </tr>
+                <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                  <td class="layout-body-content layout-body-over" style="border-spacing: none; border-collapse: collapse; margin: 0 auto; padding: 6.3% 16px 0; border: none;"><!-- START CONTENT HERO BLOCK --><!--[if (mso) | (IE)]>
+                        <center>
+                        <table border="0" cellpadding="0" cellspacing="0">
+                        <tr><td width="430">
+                      <![endif]-->
+                  <table width="100%" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                  <div style="display: none; max-height: 0px; overflow: hidden;">
+                  Startup Investor Accelerator invites you to a new event
+                  </div>
+                  <!-- Insert &zwnj;&nbsp; hack after hidden preview text -->
+                  <div style="display: none; max-height: 0px; overflow: hidden;">&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;
+                  </div>
+                  <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <table width="100%" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                          <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                                      <td style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;"><!--[if (mso) | (IE)]>
+                                          <center>
+                                          <table border="0" cellpadding="0" cellspacing="0" >
+                                          <tr><td width="640">
+                                        <![endif]-->
+                                      
+                                      
+                                      
+                                      
+                                      <table align="center" class="container" width="100%" style="border-spacing: none; border-collapse: collapse; max-width: 640px; width: 100%; margin: 0; padding: 0; border: none;">
+                                        <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                                          <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                                            <td align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                                            <a href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1kS7anyTJXBWfvig27ZGZbYP4df_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vm0nV-2FNbglH9x97EwWDilfsaz3k-2BXmjnDmlI5ZX9KEnoQAHb5dwofZWvvOOBZIV7YEo6K4OigLLRfkgoAysvaL4UtWRIkkWFRzPH9YIxkL-2FgJUsukaQ2pwNmFRiNlAVfmQLM-2FWU-2B-2FIQTIfpLN6NsjEU-3D" target="_blank">
+                                         <img alt="Meetup" border="0" class="img-logo" height="40" src="https://appboy-images.com/appboy/communication/assets/image_assets/images/5bac36071b0e4d72e30731b1/original.png?1538012679" style="height: 40px; width: 109px;" width="109" /></a>
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                      <!--[if (mso) | (IE)]>
+                                          </td></tr>
+                                          </table>
+                                          </center>
+                                        <![endif]-->
+
+
+
+
+
+
+
+                                      
+                                    
+                                    <!-- END CONTENT LOGO BLOCK --><!-- START CONTENT BODY BLOCK -->
+                            <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                              <td height="5px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                              </td>
+                            </tr>
+                            
+                          </tbody>
+                        </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <!--[if (mso) | (IE)]>
+                        </td></tr>
+                        </table>
+                        </center>
+                      <![endif]--><!-- END CONTENT HERO BLOCK --></td>
+                </tr>
+                <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                  <td class="layout-body-content layout-body-bellow" style="border-spacing: none; border-collapse: collapse; margin: 0 auto; padding: 0 16px 5%; border: none;">
+                  <div><!-- START CONTENT BLOCK  UPDATE--><!--[if (mso) | (IE)]>
+                          <center>
+                          <table border="0" cellpadding="0" cellspacing="0">
+                          <tr><td width="430">
+                        <![endif]-->
+                  <table width="100%" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td class="space-1" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 5% 0 0; border: none;">
+                          <h2 class="body-title" style="border-spacing: none; border-collapse: collapse; color: #2a414a; font-family: helvetica,Neue,Bold; font-size: 36px; line-height: 37px; margin: 0 0 20px; padding: 0; border: none;" align="center"><span style="font-size: 30px; text-align: left; font-weight: bold; color: #000000;"><a style="font-size: 30px; text-align: left; font-weight: bold; color: #000000; text-decoration: none;" href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1nBALwkLkNX64TXnGV-2BNqFKZpyOPb0t1A9f82se1T1cfwOmkfDMcez33N5Wn0PbohNaz8zMN1eOTop7DwhkkgfmDm-2FPLE6vVMB4QtAPJS5Vg5aYIKP4liWTmXGqx3YHptyKj-2BfRvQ3H-2BAEC9X79BMrvsbdIbCYmtip76L-2F-2FixOHeKv8bL9pC71hVByJiC-2FFQbMDgdejQ5XXs6HQL8a0bi5l3gxTu687jW-2B-2FiFUTDRXifA-3D-3DRggE_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vlGw1bn9sGYQOWN1ARr8AgAqRQrmO6p1B-2B3szpEHM2Ehcn4uBPMthRhhimSGj-2FbUz-2BB7cUCvcir3bgMt5sdztLH4CrOt4twcjb-2BULm8KLFGe9SgybT3MSM-2B-2FsTysPVBdraz2bT1whsRNThiWu2phXhQ-3D">Startup Investor Accelerator</a> scheduled a new event</span></h2>
+                      </td></tr>
+                      
+                      
+                    </tbody>
+                  </table>
+                  <!--[if (mso) | (IE)]>
+                          </td></tr>
+                          </table>
+                          </center>
+                        <![endif]--><!-- START CONTENT BLOCK  BUTTON--><!--[if (mso) | (IE)]>
+                          <center>
+                          <table border="0" cellpadding="0" cellspacing="0">
+                          <tr><td width="430">
+                        <![endif]-->
+                  <!--[if (mso) | (IE)]>
+                          </td></tr>
+                          </table>
+                          </center>
+                        <![endif]--><!-- END CONTENT BLOCK  BUTTON--><!-- END CONTENT BLOCK  UPDATE--></div>
+                  </td>
+                </tr>
+                <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                  <td class="layout-body-content layout-body-bellow" style="border-radius: 20px; border-spacing: none; border-collapse: collapse; margin: 0 auto; padding: 0 16px 5%; border: none;" bgcolor="#FFFFFF">
+                  <div><!-- START CONTENT BLOCK  UPDATE--><!--[if (mso) | (IE)]>
+                          <center>
+                          <table border="0" cellpadding="0" cellspacing="0">
+                          <tr><td width="430">
+                        <![endif]-->
+                  <table width="100%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="10px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                       <td align="left" class="space-1" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 5% 0 0; border: none;">
+                       <a href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1nBALwkLkNX64TXnGV-2BNqFKXABmgeKoFXcl3FdjBkRcuSCFz3G1T7WbdKPv0SZOxJG-2BwDWN6Xxmd4V1e6scKo-2Fvo3PBFSzVowWkvLILgv1f5OXnSoQPP2Bc5mHrKFVhOdw0Jx-2BdHfDVJIJqhUDk6d-2Fn1vFa14rLVtNue-2FrLfpumy6bBvR361yXAuzcp3QnSmcgmyyn6mMfdiIv0ujZQIaKgs0jhUqH-2Bx88l48n7AcxEjcg7n-2BVPv-2F670bh9k1l26Xs-3DpLBX_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vmprozkvXHmvAb-2FAIEq7jSno-2Fh3XZF3jHad-2F6neUath9EmMQsXIzO31lKUh7xVTAMrRaiA0WcRp6Dgsacq-2BVkYmNFhHFrzMAHUbPaQofnCJgI1M-2FyUjxH3IHqallEFhIh23sJVs4IcMS7VSxznkOG4I-3D">
+                        <img src="https://secure-content.meetupstatic.com/images/classic-events/510175495/600x337.jpg" style="width: 100%; border-radius: 6px;" /></a>
+                        </td>
+                      </tr>
+                      
+                    </tbody>
+                  </table>
+                  <table width="100%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="25px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                          <h2 style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" align="left"><span style="font-size: 18px; text-align: left; font-weight: bold; color: #000000;"><a style="font-size: 18px; text-align: left; font-weight: bold; color: #000000; text-decoration: none;" href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1nBALwkLkNX64TXnGV-2BNqFKXABmgeKoFXcl3FdjBkRcuSCFz3G1T7WbdKPv0SZOxJG-2BwDWN6Xxmd4V1e6scKo-2Fvo3PBFSzVowWkvLILgv1f5OXnSoQPP2Bc5mHrKFVhOdw0Jx-2BdHfDVJIJqhUDk6d-2Fn1vFa14rLVtNue-2FrLfpumy6bBvR361yXAuzcp3QnSmcgmyyn6mMfdiIv0ujZQIaKgs0jhUqH-2Bx88l48n7AcxEjcg7n-2BVPv-2F670bh9k1l26Xs-3DRpvB_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vvtR80Fx9DkcvznO3z2EHb7Ro4ivS4XD79k2pQhVT61Ftrla7MVXwLc4V3-2B1lx5km80l-2FlEz33Ga4-2BndI1K5Uq-2Fwqya7KvUvI2UAg7qhuq35lJQifafT0VXyjLRkt651NJDpAoisirn8cQA73fgHgBk-3D">Deal Terms: What are the Terms of your Investment Deal </a></span></h2>
+                          <p class="body-text" style="border-spacing: none; border-collapse: collapse; color: #697a80; font-family: helvetica,Neue,Medium; font-size: 16px; line-height: 28px; margin: 0; padding: 0; border: none;" align="left"><span class="body-text" style="text-align: left; color: #947F5F; font-family: helvetica,Neue,Medium; font-size: 16px; line-height: 28px;">Wednesday, February 22, 2023 6:00 PM to  7:30 PM</span>
+                          
+                          
+                          <br /><img src="https://secure.meetupstatic.com/s/img/2146086474073232506605/email/video_red--small.png" style="outline: none; text-decoration: none; width: 21px; max-width: 100%; clear: both; display: block; vertical-align: baseline; margin: 0; padding: 0; border: 0;" align="left" /> Online event
+                          
+                          
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table width="100%" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td align="left" class="space-1" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 5% 0 0; border: none;">
+                        <div><a class="button-learn-more" href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1nBALwkLkNX64TXnGV-2BNqFKXABmgeKoFXcl3FdjBkRcuf8ocJoFqa5GEK8EcYl8ZS0YlvCyLZAiP55z9wYfP1xVRVBsR1zMZuc0BWgzK6qC-2BPswpxwmcP4zEp01ZfjIAcLsXAJUIgIfAFhD0uKW6XEln5FN0oIgHWT9vENSa3XPLhm9LgcSBu78IcylJw079oQG8REWvrk7rUGxZ9FdFd73sNwt1ykMJ5JlR76uY9ZwEaxv0F5Nlo-2BWc1ehOUCRWmPV-2Fz7QUYXmqdM28Jd09fYNZ8sl_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vstOdjYBmBwEJS9aAZ2SomYZy5DTBtA0OOlNVynqmllpT8Z7I-2BDhQoFi7N7m8AEC1ak627vGru-2BaTttqHVQlalZNhE9zRaR8xrDsqRk2zuzO0q0dh4nm3WGBryp3ATbqtgvzjSKPtKU3KbcopKdtNVs-3D" style="background-color: #ff1154; border-radius: 6px; color: #ffffff; display: inline-block; font-family: helvetica, regular; font-size: 16px; line-height: 25px; width: 80%; text-align: center; text-decoration: none; -webkit-text-size-adjust: none; padding: 2% 10%;"><strong>RSVP now</strong></a></div>
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="15px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                          <p class="body-text" style="border-spacing: none; border-collapse: collapse; color: #697a80; font-family: helvetica,Neue,Medium; font-size: 16px; line-height: 28px; margin: 0; padding: 0; border: none;" align="left"><strong>Details:</strong>  What are deal terms in the world of startup investment?
+
+Deal terms refer to the specific terms and conditions associated with an investment in a startup. These terms may include the amount of money invested, the ownership stake in the company, the value of the companys shares, the rights and responsibilities of the investor, and any other cond...</p>
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="15px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                          <p class="body-text" style="border-spacing: none; border-collapse: collapse; color: #697a80; font-family: helvetica,Neue,Medium; font-size: 16px; line-height: 28px; margin: 0; padding: 0; border: none;" align="left"><strong>Hosted by:</strong></p>
+                          
+                          <div style="vertical-align: baseline; width: 70px; height: 70px; border-radius: 50%; background: url('https://secure.meetupstatic.com/photos/member/a/4/1/6/thumb_307722006.jpeg') top center / cover; margin: 0; padding: 0; border: 0;">
+                          </div>
+                          
+                          <p class="body-text" style="border-spacing: none; border-collapse: collapse; color: #697a80; font-family: helvetica,Neue,Medium; font-size: 16px; line-height: 28px; margin: 0; padding: 0; border: none;" align="left">Astghik Zakharyan</p>
+                          
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table width="100%" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="25px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <hr size="3px" width="100%" color="#D9D9D9" align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" />
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+
+                  
+                  <table width="100%" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <p class="body-text" style="border-spacing: none; border-collapse: collapse; color: #697a80; font-family: helvetica,Neue,Medium; font-size: 16px; line-height: 28px; margin: 0; padding: 1% 0; border: none;" align="left"><span style="font-size: 18px; text-align: left; font-weight: bold; color: #000000;"><br />More events recommended for you:</span></p>
+                        
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                  <table width="20%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="10px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                       <td align="left" class="space-1" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 5% 0 0; border: none;">
+                       <a href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1mLVprrFYuJiOoDrPmyZNMTL-2FV136fYbJIopOlRn019mZ8erq07P7Y0iRfoWnfAEtfVgpSpq1VG7slF0IzF6IUPpoH-2F7006nuUtDCdpp5UqVQ56Pj1LNLcCV-2B8f8o-2F0z88f1ERjkUjGWWB6DWih88vlE92rglMwBgEKRBMWydKL-2B919OxTJsbSQ4CJ7WoKUtXRHdohEP-2BbbExYZI34J4mSLo0sK7sYNhUmuKHf9xN6oHywihsUhmz0pmA4SDMEl1Nw-3DkpDB_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vjd1kJ2E2Eus8aZps6jIuSeKlWw5QJUbK2z8PetqiivJgqRyFdGb-2FpA146W2FSYlWM-2BYld5-2F-2FSYy3dSNpSxYkvlc1TJTiGVwwYOI-2Bd-2FKPBeCn695voNil775bwIEvsgLp5G8n7W2jYd9NzZEcNbdSLw-3D">
+                        
+                          <img src="https://secure-content.meetupstatic.com/images/classic-events/509078158/600x337.jpg" style="width: 100%; border-radius: 6px;" />
+                        
+                        </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table width="80%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="15px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0 0 0 10px; border: none;">
+                          <h2 style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" align="left"><a href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1mLVprrFYuJiOoDrPmyZNMTL-2FV136fYbJIopOlRn019mZ8erq07P7Y0iRfoWnfAEtfVgpSpq1VG7slF0IzF6IUPpoH-2F7006nuUtDCdpp5UqVQ56Pj1LNLcCV-2B8f8o-2F0z88f1ERjkUjGWWB6DWih88vlE92rglMwBgEKRBMWydKL-2B919OxTJsbSQ4CJ7WoKUtXRHdohEP-2BbbExYZI34J4mSLo0sK7sYNhUmuKHf9xN6oHywihsUhmz0pmA4SDMEl1Nw-3DK77P_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vtaL3Xo0orOFqhOJsSJz2TijhBqdNfd8q4kJWstH6MUHT5s4asZK6SOA84rWKk1vKctaHN-2FBDyU4uLBIMWsqxxVBmZPZQWsinSQK1Ibr7lfDjB3Rg8BXhjbrRUOEagkm4v87xlEOmctH68JXxOGASWc-3D" style="font-size: 18px; text-align: left; font-weight: bold; color: #000000; text-decoration: none;">Preloved clothing sale & ladies networking event </a></h2>
+                          <p class="body-text" style="border-spacing: none; border-collapse: collapse; color: #697a80; font-family: helvetica,Neue,Medium; font-size: 16px; line-height: 28px; margin: 0; padding: 0; border: none;" align="left">Fashion (Preloved, Reloved, Vintage, Designer )</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table width="100%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="15px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <hr size="3px" width="100%" color="#D9D9D9" align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                  <table width="20%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="10px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                       <td align="left" class="space-1" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 5% 0 0; border: none;">
+                       <a href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1nh2GIl0JHyRfvilGbR7foAQJDC23OK0Iipbms-2FXH-2BrbSrx9QV-2F2uk8XZFzMTRCBZt14v6jRM5l95-2BTHKNMzW3wcMdoQzrOVQqjrYLbMPk6VMrwqVAommfyt3EWHsWmlvTwamIzQtxMOOi00kKvyOSsx979MwiRS4xJUQCy2kRVdSacwJ2WdvUG0Ll5ynLF9nHe3AA4PCWVeTIHSvVuCtEMjQmzFXFqq9-2BIyXPRiypUeQ-3D-3Dm9K9_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vioWJ7x3ZcoE8ANHuohsP89Enqt1dRTIeg-2FkMDYizTu0T83qiaLDctYxNSpt3mfcThrQx99ptWac-2B5khUQRDEgUI0gkOCYaD2dsUNguM2IafbT8kgm8XQceiHIvBKHxgDo6Oxqg2Xq-2BlK1g6Ga0Ka18-3D">
+                        
+                          <img src="https://secure-content.meetupstatic.com/images/classic-events/510095325/600x337.jpg" style="width: 100%; border-radius: 6px;" />
+                        
+                        </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table width="80%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="15px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0 0 0 10px; border: none;">
+                          <h2 style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" align="left"><a href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1nh2GIl0JHyRfvilGbR7foAQJDC23OK0Iipbms-2FXH-2BrbSrx9QV-2F2uk8XZFzMTRCBZt14v6jRM5l95-2BTHKNMzW3wcMdoQzrOVQqjrYLbMPk6VMrwqVAommfyt3EWHsWmlvTwamIzQtxMOOi00kKvyOSsx979MwiRS4xJUQCy2kRVdSacwJ2WdvUG0Ll5ynLF9nHe3AA4PCWVeTIHSvVuCtEMjQmzFXFqq9-2BIyXPRiypUeQ-3D-3DFM2D_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vvpePe9UZn-2BftpHoxcYBBe5-2FN2WnaX85rXFuLYgTxAzQCkH0QMym7EPguPXi9mFZBj21-2F0vYSjsoKUfcRVKG9usww7oMnLR4CO0V-2BaBdMExyamOVe7DZygv5q06qZWSFputSxKCT0BBu7D3CMGPrYKg-3D" style="font-size: 18px; text-align: left; font-weight: bold; color: #000000; text-decoration: none;">Barcelona dbt Meetup (in-person) 2023</a></h2>
+                          <p class="body-text" style="border-spacing: none; border-collapse: collapse; color: #697a80; font-family: helvetica,Neue,Medium; font-size: 16px; line-height: 28px; margin: 0; padding: 0; border: none;" align="left">Barcelona dbt Meetup</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table width="100%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="15px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <hr size="3px" width="100%" color="#D9D9D9" align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                  <table width="20%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="10px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                       <td align="left" class="space-1" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 5% 0 0; border: none;">
+                       <a href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1n6YniePzHVeGjhvDDIyfFcfqn0hSopoyHmnfOAGyatfuHMVn7GpWfKiqqmCKgj2oRL4Ppzq7ccthGZ-2Bk8bgGrG8hIEPSzRc1sPfv5gmjnM-2FgIkDJ-2Bu-2BAvgM-2FAjPCOSc4SkTUxDEPvexPxSoU-2B0Nsr0UPtLPXwZEGCoMWmV0XlIINzafxeArMM5lXFzYLoX5Lv5N9AdSIjatGRs-2FbEiXVKpkrlJwcFPmz8CfNApx4s5mA-3D-3DhVVg_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147viRojhyvb6hb0IKE6K-2F-2F0LiOfiGR-2F-2F-2F-2FeTWjqIHcTljhaNrYuGooqzcGQ-2FVutqA7mcGKwToRPracBNwIW3YJ2vzQYU-2Fss4sh2YyfDSUZGSv6EJIO-2FWZl9dRgMZ3UkOjZb2w9R96XpZ12HKnbZA6N-2Bsk-3D">
+                        
+                          <img src="https://secure-content.meetupstatic.com/images/classic-events/507955421/600x337.jpg" style="width: 100%; border-radius: 6px;" />
+                        
+                        </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table width="80%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="15px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0 0 0 10px; border: none;">
+                          <h2 style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" align="left"><a href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1n6YniePzHVeGjhvDDIyfFcfqn0hSopoyHmnfOAGyatfuHMVn7GpWfKiqqmCKgj2oRL4Ppzq7ccthGZ-2Bk8bgGrG8hIEPSzRc1sPfv5gmjnM-2FgIkDJ-2Bu-2BAvgM-2FAjPCOSc4SkTUxDEPvexPxSoU-2B0Nsr0UPtLPXwZEGCoMWmV0XlIINzafxeArMM5lXFzYLoX5Lv5N9AdSIjatGRs-2FbEiXVKpkrlJwcFPmz8CfNApx4s5mA-3D-3DLuzy_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vk77V3wFteH6GO1dD8Rt3H2mduapaRKQWP4Jl73cbcrCiEWB5TMpiAs8DRpzfqCT04Xf2YeJEte1bzsfRh1XX3fqUWvQUloI6uvAQNb-2BS0t3beHgyENyiJMHAH4e8tlf968DFYy7p9KzqvxbhJNa8qM-3D" style="font-size: 18px; text-align: left; font-weight: bold; color: #000000; text-decoration: none;">ENTERING CANNABIS - LIVE - SHOW [SPAIN]</a></h2>
+                          <p class="body-text" style="border-spacing: none; border-collapse: collapse; color: #697a80; font-family: helvetica,Neue,Medium; font-size: 16px; line-height: 28px; margin: 0; padding: 0; border: none;" align="left">DAVINE BARCELONA</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table width="100%" align="left" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td height="15px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        </td>
+                      </tr>
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <hr size="3px" width="100%" color="#D9D9D9" align="center" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                  
+
+                  <!--[if (mso) | (IE)]>
+                          </td></tr>
+                          </table>
+                          </center>
+                        <![endif]--><!-- START CONTENT BLOCK  BUTTON--><!--[if (mso) | (IE)]>
+                          <center>
+                          <table border="0" cellpadding="0" cellspacing="0">
+                          <tr><td width="430">
+                        <![endif]-->
+                  <!--[if (mso) | (IE)]>
+                          </td></tr>
+                          </table>
+                          </center>
+                        <![endif]--><!-- END CONTENT BLOCK  BUTTON--><!-- END CONTENT BLOCK  UPDATE--></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!--[if (mso) | (IE)]>
+              </td></tr>
+              </table>
+              </center>
+            <![endif]--></td>
+          </tr>
+          <!-- END CONTENT BODY BLOCK --><!-- START OVER FOOTER BLOCK -->
+          <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+            <td style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;"><!--[if (mso) | (IE)]>
+              <center>
+              <table border="0" cellpadding="0" cellspacing="0">
+              <tr><td width="640">
+            <![endif]-->
+            <table align="center" class="bg-mobile" style="max-width: 640px; width: 100%; border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" bgcolor="#F3EFE9">
+              <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                  <td height="40px" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                  </td>
+                </tr>
+                <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                  <td align="center" class="space-footer" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0px 0 0; border: none;">
+                  <table align="center" width="100%" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                    <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                      <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <td style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                        <table align="center" class="footer-store" style="border-spacing: none; border-collapse: collapse; width: 94%; margin: 0 auto; padding: 0; border: none;">
+                          <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                            
+                            
+                            
+                            <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                              <td align="right" style="width: 50%; border-spacing: none; border-collapse: collapse; margin: 0; padding: 0 5px 0 0; border: none;"><a href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpZmev6DrQOwiRvxtl1pL63pg7JcqRG1951THm2xXWVG-2BaeaXGlWf4pr7L-2FopjdaRdA-3D-3DWCat_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vq3bFuml5HCq4UV5HBmyYbBRXDx-2BGyxvLVDCA5OYC9EfntZjkU4iqZZ04A-2FOSpbl8DNY1w0-2F5yZM9OuP2Yz0zYwt-2BwRwXdnH3A2SRYAWvAxPnFaS8S890Gi31jrkQIvVg-2BgdHYU1QYezLdo26zJWxqY-3D"><img alt="iPhone App Store" border="”0″" class="app-logo" src="https://secure.meetupstatic.com/s/img/app_download/ios/download.en.png" width="160" style="max-width: 160px; width: 95%;" /> </a></td>
+                              <td align="left" style="width: 50%; border-spacing: none; border-collapse: collapse; margin: 0; padding: 0 0 0 5px; border: none;"><a href="http://clicks.meetup.com/ls/click?upn=8Y2vsX5dSU9BIj3r0FDX3kuj5bdG4U9taHSR2QQEr421RrMdQB-2BqvlHbE0A456-2FNTj6weBkE4s-2BxJ0WK2LdJ0TkqUdFwNW-2BoBN3WjiF-2BcF0-3DToFM_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vqhDS9BANXgXUZjd5MGW4-2Ftxvfof40LVNknEF5-2FelmuKqclXIypYgg3n65DlbeaQA-2Bu10hQda1jeNtF28qIpIEczmzI7-2B-2FijQ-2FuQWOI-2Fn0sxMsiOVBoxglJhULZdqGkX9vfwad1EfS2mSdTkdBVJPlQ-3D"><img alt="Google Play" border="”0″" class="app-logo" src="https://secure.meetupstatic.com/s/img/app_download/android/download.en.png" width="160" style="max-width: 160px; width: 95%;" /> </a></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!--[if (mso) | (IE)]>
+              </td></tr>
+              </table>
+              </center>
+            <![endif]--></td>
+          </tr>
+          <!-- END OVER FOOTER BLOCK --><!-- START BELOW FOOTER BLOCK -->
+          <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+            <td align="center" class="bg-mobile" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" bgcolor="#F3EFE9">
+            <table class="bg-mobile" width="100%" style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;" bgcolor="#F3EFE9">
+              <tbody style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                
+                <tr style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+                  <td align="center" class="footer-below" style="max-width: 600px; border-spacing: none; border-collapse: collapse; margin: 0; padding: 7% 0; border: none;">
+                  <p class="footer-text" style="border-spacing: none; border-collapse: collapse; font-family: Helvetica,Neue,Regular; font-size: 10px; color: #697a80; line-height: 150%; margin: 0; padding: 0; border: none;">You received this message because you are a registered member of Meetup.<br />
+                  <a class="footer-link" href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1nZIVMC6XSDjU23nvMkXzP6eENSGhbL32uEYOr9aTKaPaw9aaA-2BtthxirRp9Ylur75mlg4DyGGFp4IXHW0bm5KzW5XY8McZP2d9o7FDS1qn5HKQhMFrbAwzzT0ivaoCAaPgdbejv8sWcB2JNRDouqciV-2Fxc407U6eX5B7rGPHNoUi-2BoY4CQL6-2FATWKOJdLMSd2BPS4CMwdFNVq0MH-2BWw267S49CmO-2FIFIDkXS-2FQ8wIWK5ysylfr8NUBD6uGWSqj5QSrx9cgWCj5khImF-2B5YTmJ7gPHnnX4MvxQsVlUNpcoz5fjgHoFwv8Olfaw1VsFBgYc-3DYioA_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vomC8fHx9JDEdyopGBOirNRER8ef5f6sF5M3db-2B2ZUyL1ueAtjiDk163kSMin5wovtw-2BmzoAEjHzo9WaQ-2Bc8AUUp9LFn7zvTbV7l3A8WAKg0XKoo4jQW9bFBmLygCN2VUByFPGIwSNDVyBk-2FLlE2ElU-3D" style="color: #2a414a; text-decoration: none;">Unsubscribe</a> from this type of email. <a class="footer-link" href="http://clicks.meetup.com/ls/click?upn=8Y2vsX5dSU9BIj3r0FDX3hKPTxoZ-2F4CoTjtrmZj9WRKKQ1pB0tDVZoJ57HL7uQTU2lFpStzBX-2B6qbgjjpecwQ0VSRss9lilkD4u0purum4zOwHD1Hji3CvePVrHHy4L5zUWl56piiYfB1-2FInI70aFrdf-2Bir62ZNqg5-2F4HaR7Jv5oFgxZRsOha-2F2E9CQNSZczMCIRG1yk6UQu6SLnsIIdZIAcE-2Bh7a7EJcThNcKkXncL-2BR12xXizlIbrIUPH-2FuOPs1xAu_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vkEmOJ1Jt3XlbzCrkwv1KqG5ErZio7lmbb-2BEydpJApRE9ZNDgtIL2nUcg6HOC4fQAC9PZMuv2OxqEqiRh3cPUi7aDRsyf4bjrY8rwtK4ACx-2B5kQwxsv39wbrVxCI-2BgQm19aIGIDgs7n9okY1N4iWsG4-3D" style="color: #2a414a; text-decoration: none;">Manage your settings </a> for all types of email updates.<br />
+                  Visit a <a class="footer-link" href="http://clicks.meetup.com/ls/click?upn=8Y2vsX5dSU9BIj3r0FDX3hKPTxoZ-2F4CoTjtrmZj9WRLwKZRAorXPNMZVwCIVN5rVR5S-2FriZ5VfraAjoH5-2FdTE-2Fcg-2Fd1VKL6k0PLPOHWrN7aN9RtHy-2FRWWuBpoT-2BpQP4GZpR4-2BOLVmsIsnEM0Tv7bqRIiyhDAdrbKntslhW94lBHhxAqb4BzaqhIeIc71C8ZWcbUuUnRd-2FLXA2lgQ0XF-2BZZ7aEvsJxIlDzkNGJHt-2F8I4-3Dyt9M_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vv-2B37HWjIioq6ZIlKtN5zO2lj9vzWGjOJ-2BD5hXhgb3eGxf0zgkSkJhQI6ibZ3wWAds7ROxj8ydze7dJcdnkh7KCUDS1cIXZ1g7WB4-2FsN1i-2FF1-2BhMOCp54lb4vIzqHvXMUuQVjQFo8QYdaMZQehNABas-3D" style="color: #2a414a; text-decoration: none;">your account page</a> to change your contact details, privacy settings, and other settings.<br />
+                  <a class="footer-link" href="http://clicks.meetup.com/ls/click?upn=8Y2vsX5dSU9BIj3r0FDX3lSPClZdoQRTM87Zc9pGBVv4IaI0DdWeyx54S6KDP8i-2BOSVZC175vkMReJkNBj5X8Prg7vFYRNWc70lXLMDjiw5v9Q5UaGw28FxozMcn5tECngr6m62UerNe-2BBSybT29HXAmC9ryjLfZ0ss6WHIr2Zq5Yf0L-2FOme7-2BcksDKMh2WFvZyRZVmwete7Zmbfsni3oWZiTlDz0N2JAdoixBHNf-2B4-3DwO-E_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vjZZShfNXYuFJmT3V1bmHwMGvUGiiyjWgUQ-2B1bYYyrWF9Yhs7BaM8raxhOr4QOTl8LLMLznVQ-2BI03-2Fx19uasaSxYGkLyKBHHpHIStLtLcEv03tzaiq3p-2FNtggZ2PaRltQrCSwzTHimonAyrszSRlyHQ-3D" style="color: #2a414a; text-decoration: none;">Meetup LLC</a>, POB 4668 #37895 NY NY USA 10163<br />
+                   Read our <a class="footer-link" href="http://clicks.meetup.com/ls/click?upn=XbaZ37larFA-2FuV5MohrYpdrra25MtI4CzodbRR1Rd1lhUUqAoqop-2FiYO7Df4o2hT-2FcFCBR08Iq5f5UuOkTBHBmKbla2vsR6PMPp2js-2BBaNaeISosCb-2Byhg1iLdCQ2dtHaGqqH-2BDPlcIei5dUxTbRF8TrZ0jPW2oT6HsyhNhQYvQluXzP7EoVJ70C6l-2BEzRE9So8f3lrcjF96t13zciLOC2z1totH1MYliS8bQFMKqPg-3DADeU_tU-2Fg5GXAH4ByCe7JOuf0srp-2BirvbiDdcHqnkNSzBLsqwtY-2BjC8Er-2FV7eIvql7-2Ftd0Ato5sfQRd3SWgTREVjwPpPH5RPBOnDw0sFqc0bBeKKexZlKuQhlMfToIUU-2B2KViQBMyRk-2BzMSN0sEDWtkXgKHc-2FwxfncCABAFOSV2AFJQhC1xvLOxv9D5NiQa3wolApLidQlCMnxwLtY9mgybCtSXOZlc5kOGsCRCbrNGuwJIakz3u-2Fif67aEXXw8WOVFvHDT8am7n3oAt0exivhQDy0ap4IpyyFOiPRWSEuFPvBLnY29WafTvbll6sWpRIuYGwlDTgp2AvlWetyYcsoXLy4Cck2SUywGCstaWBNY11WG6cLCU10eI5CE7ilCFs65AVPDMj7PmXCzHupzW9xoDdqoQ51yZHIkmpDVi8fuuX4xSz4cpak926DenqdF9FTBsu8FfPFGxDuBixR1ayyvySrHBa5C8yXxyADT0Whj-2FlExqW5p60Gg-2F9RfFb7YnpEbTAjQwpWA-2F7o4txcVXoAn-2B5aXkSWi3ngtGc4y0iCZybHIZUM2edHMaE-2F8ioA49pmjZQ-2BxWxrDYRDBjVKAT23147vu0yMcnrQbiOG18XS9BUoSurGaMGnlKY-2F2n90-2FEwslWCQiMhmrRycCx8jecwlSgSlOE-2Fq36az9DTC3zDc8vNo04mgOuW4I9rXShSss9pNGENUBluHHEkpTFabFjUn2hUg3YJeiF3oo53LOFd7rr5KBU-3D" style="color: #2a414a; text-decoration: none;">Privacy Policy</a>.</p>
+                  </td>
+                </tr>
+                
+              </tbody>
+            </table>
+            </td>
+          </tr>
+          <!-- END BELOW FOOTER BLOCK -->
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table><p style="border-spacing: none; border-collapse: collapse; margin: 0; padding: 0; border: none;">
+</p></html>
+
