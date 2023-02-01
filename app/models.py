@@ -100,7 +100,7 @@ class GmailMessageLabel(db.Model):
 class GmailMessageText(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'))
-    text = db.Column(db.UnocodeText())
+    text = db.Column(db.UnicodeText())
     is_primary = db.Column(db.Boolean())
     is_multipart = db.Column(db.Boolean())
     is_summary = db.Column(db.Boolean())
@@ -111,7 +111,7 @@ class GmailMessageText(db.Model):
         if self.is_multipart:
             return '<g-message-multipart {}>'.format(self.multipart_index)
         else:
-            return '<g-message-text {}>'.format(self.text[10:])
+            return '<g-message-text {}>'.format(self.text[:10])
 
 
 class GmailMessageListMetadata(db.Model):
@@ -144,7 +144,7 @@ class GmailMessage(db.Model):
     content_type = db.Column(db.Text())
     subject = db.Column(db.Text())
     is_multipart = db.Column(db.Boolean())
-    multupart_num = db.Column(db.Integer)
+    multipart_num = db.Column(db.Integer)
 
     def __repr__(self):
         return '<g-message by {} on {}>'.format(self.from_string, self.date)

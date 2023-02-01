@@ -7,7 +7,7 @@ import importlib
 from app import models
 
 def get_dict_from_file(filepath):
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         d = json.load(f)
         return d
 
