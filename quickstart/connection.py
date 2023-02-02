@@ -11,7 +11,7 @@ from app import models
 
 @contextmanager
 def db_ops(db_name='sqlite:///app.db', model_names=None):
-    # Figure out why this context push cause error 
+    # Figure out why this context push cause error
     # app.app_context().push()
     # db.session.rollback()
     from app import models

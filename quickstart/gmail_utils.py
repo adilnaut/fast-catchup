@@ -9,10 +9,35 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from connection import db_ops
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
+# todo parse with regex
+def get_guser_email(from_string):
+    return from_string.split(' ')[-1]
+def get_guser_name(from_string):
+    return from_string.replace(get_guser_email(from_string), '')
+
+# todo parse with regex
+def get_is_multipart(content_type):
+    return 'multipart' in content_type
+
+def get_initial_tags(from_string):
+    tags = set()
+
+    key_list = []
+    key_list.append(('newsletter', ['substack', 'morningbrew', 'ad-newsletter@a16z.com']))
+    key_list.append(('alert', ['gitlab', 'linkedin', 'slack']))
+    key_list.append(('social', ['meetup', 'twitter', 'facebook', 'instagram']))
+
+    for tag, klist in key_list:
+        for kword in klist
+            if kword in from_string:
+                tags.add(tag)
+
+    return list(tags)
 
 def etl_gmail(service):
 
@@ -23,73 +48,167 @@ def etl_gmail(service):
     if not messages:
         return None
     for message in messages[:20]:
-        m_data.append(message['id']) # id, threadId
+        id = message.get('id')
+        thread_id = message.get('thread_id')
+        # m_data.append(message['id']) # id, threadId
+        m_data.append(id)
+    with db_ops(model_names=['GmailMessage', 'GmailMessageText', \
+        'GmailMessageLabel', 'GmailMessageListMetadata', \
+        'GmailMessageTag', 'GmailUser']) \
+        as (db, GmailMessage, GmailMessageText, \
+            GmailMessageLabel, GmailMessageListMetadata, \
+            GmailMessageTag, GmailUser):
+        for id in m_data:
+            email_body = service.users().messages().get(userId='me', id=id, format='full').execute()
+            if not email_body:
+                continue
+            snippet = email_body.get('snippet', '')
+            size_estimate = email_body.get('sizeEstimate', '')
+            label_ids = email_body.get('labelIds', [])
+            internal_date = email_body.get('internalDate', '')
+            if "UNREAD" not in label_ids:
+                continue
 
-    for id in m_data:
-        email_body = service.users().messages().get(userId='me', id=id, format='full').execute()
-        if not email_body:
-            continue
-        snippet = email_body.get('snippet', '')
-        sizeEstimate = email_body.get('sizeEstimate', '')
-        labels = email_body.get('labelIds', [])
-        if "UNREAD" not in labels:
-            continue
+            payload = email_body.get('payload')
+            if not payload:
+                continue
+            mime_type = payload.get('mimeType', '')
+            content_type = payload.get('contentType', '')
+            part_id  = payload.get('partId', '')
+            filename = payload.get('filename', '')
 
-        payload = email_body.get('payload')
-        if not payload:
-            continue
-        mimeType = payload.get('mimeType', '')
-        contentType = payload.get('contentType', '')
+            body = payload.get('body')
+            if not body:
+                continue
+            data = body.get('data')
+            primary_text = None
+            if data:
+                primary_text =  base64.urlsafe_b64decode(data).decode()
 
-        body = payload.get('body')
-        if not body:
-            continue
-        data = body.get('data')
-        if data:
-            text =  base64.urlsafe_b64decode(data).decode()
-
-        show_parts = False
-        if show_parts:
-            parts = payload.get('parts', [])
-            i = 0
-            for part in parts:
-                body = part.get('body')
-                if not body:
-                    continue
-                data = body.get('data')
-                if not data:
-                    continue
-                text =  base64.urlsafe_b64decode(data).decode()
-                i += 1
+            show_parts = True
+            num_parts = 0
+            multiparts = []
+            if show_parts:
+                parts = payload.get('parts', [])
+                for part in parts:
+                    body = part.get('body')
+                    if not body:
+                        continue
+                    data = body.get('data')
+                    if not data:
+                        continue
+                    text =  base64.urlsafe_b64decode(data).decode()
+                    multiparts.append(text)
+                    num_parts += 1
 
 
-        # we will also need subject header
-        show_headers = True
+            # we will also need subject header
+            show_headers = True
 
-        if show_headers:
             headers_dict = {}
-            headers = payload.get('headers')
-            if headers:
-                for header in headers:
-                    name = header.get('name', '')
-                    value = header.get('value', '')
-                    if name and value:
-                        headers_dict[name] = value
-            else:
-                pass
-            date_string = headers_dict["Date"]
-            if is_day_old(date_string):
-                gmail_messages = {'id': id,
-                    'from': headers_dict['From'],
-                    'snippet':snippet,
-                    'subject':headers_dict['Subject'],
-                    'date':date_string}
+            if show_headers:
+                headers = payload.get('headers')
+                if headers:
+                    for header in headers:
+                        name = header.get('name', '')
+                        value = header.get('value', '')
+                        if name and value:
+                            headers_dict[name] = value
+                else:
+                    pass
+                    # , 'snippet': snippet
+            date_string = headers_dict.get('Date')
+            from_string = headers_dict.get('From')
+            gmail_user_email = get_guser_email(from_string)
+            subject = headers_dict.get('Subject')
+            is_multipart = get_is_multipart(content_type)
 
-        show_raw = False
-        if show_raw:
-            raw = email_body.get('raw')
-            if raw:
-                text = base64.urlsafe_b64decode(raw).decode('ascii')
+            list_id = headers_dict.get('List-Id')
+            message_id = headers_dict.get('Message-Id')
+            list_unsubscribe = headers_dict.get('List-Unsubscribe')
+            list_url = headers_dict.get('List-Url')
+
+            tags = get_intitial_tags(from_string)
+            gmail_user_name = get_guser_name(from_string)
+
+            show_raw = False
+            if show_raw:
+                raw = email_body.get('raw')
+                if raw:
+                    text = base64.urlsafe_b64decode(raw).decode('ascii')
+
+
+            gmail_message_kwargs = {'id': id
+                , 'date': date_string
+                , 'from_string': from_string
+                , 'gmail_user_email': gmail_user_email
+                , 'mime_version': mime_type
+                , 'content_type': content_type
+                , 'subject': subject
+                , 'is_multipart': is_multipart
+                , 'multipart_num': num_parts}
+
+
+            gmail_message = GmailMessage(**gmail_message_kwargs)
+            db.session.add(gmail_message)
+
+
+            text_kwargs = {'gmail_message_id': id
+                , 'text': snippet
+                , 'is_primary': False
+                , 'is_multipart': False
+                , 'is_summary': False
+                , 'is_snippet': True}
+            gmail_message_text = GmailMessageText(**text_kwargs)
+            db.session.add(gmail_message_text)
+
+
+            text_kwargs = {'gmail_message_id': id
+                , 'text': primary_text
+                , 'is_primary': True
+                , 'is_multipart': False
+                , 'is_summary': False
+                , 'is_snippet': True}
+            gmail_message_text = GmailMessageText(**text_kwargs)
+            db.session.add(gmail_message_text)
+
+            for i in range(len(multiparts)):
+                text_kwargs = {'gmail_message_id': id
+                    , 'text': multiparts[i]
+                    , 'is_primary': True
+                    , 'is_multipart': False
+                    , 'is_summary': False
+                    , 'is_snippet': True
+                    , 'multipart_index': i}
+                gmail_message_text = GmailMessageText(**text_kwargs)
+                db.session.add(gmail_message_text)
+
+            for label in label_ids:
+                label_kwargs = {'gmail_message_id': id
+                    , 'label': label}
+                gmail_message_label = GmailMessageLabel(**label_kwargs)
+                db.session.add(gmail_message_label)
+
+            if list_id:
+                list_metadata_kwargs = {'gmail_message_id': id
+                    , 'list_id': list_id
+                    , 'message_id': message_id
+                    , 'list_unsubscribe': list_unsubscribe
+                    , 'list_url': list_url}
+                list_metadata = GmailMessageListMetadata(**list_metadata_kwargss)
+                db.session.add(list_metadata)
+
+            for tag in tags:
+                tag_kwargs = {'gmail_message_id': id
+                    , 'tag': tag}
+                gmail_message_tag = GmailMessageTag(**tag_kwargs)
+                db.session.add(gmail_message_tag)
+
+            user_kwargs = {'email': gmail_user_email
+                , 'name': gmail_user_name}
+            gmail_user = GmailUser(**user_kwargs)
+            db.session.add(gmail_user)
+
 
     return gmail_messages
 

@@ -108,7 +108,7 @@ class GmailMessageText(db.Model):
     multipart_index = db.Column(db.Integer)
 
     def __repr__(self):
-        if self.is_multipart:
+        if bool(self.is_multipart) == True:
             return '<g-message-multipart {}>'.format(self.multipart_index)
         else:
             return '<g-message-text {}>'.format(self.text[:10])
