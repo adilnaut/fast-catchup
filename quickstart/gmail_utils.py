@@ -120,11 +120,15 @@ def etl_gmail(service, unread_only=True):
                         if name and value:
                             headers_dict[name] = value
 
+
+            h_mime_version = headers_dict.get('Mime-Version')
+            h_content_type = headers_dict.get('Content-Type')
+
             date_string = headers_dict.get('Date')
             from_string = headers_dict.get('From')
             gmail_user_email = get_guser_email(from_string)
             subject = headers_dict.get('Subject')
-            is_multipart = get_is_multipart(content_type)
+            is_multipart = get_is_multipart(h_content_type)
 
             list_id = headers_dict.get('List-Id')
             message_id = headers_dict.get('Message-Id')
@@ -134,8 +138,6 @@ def etl_gmail(service, unread_only=True):
             tags = get_initial_tags(from_string)
             gmail_user_name = get_guser_name(from_string)
 
-            h_mime_version = headers_dict.get('Mime-Version')
-            h_content_type = headers_dict.get('Content-Type')
 
             # better attempt to insert and on conflict do nothing
             in_user = GmailUser.query.filter_by(email=gmail_user_email).first()
