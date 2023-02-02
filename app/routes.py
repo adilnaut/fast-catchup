@@ -6,9 +6,25 @@ from app import app
 from quickstart.quickstart import generate_summary
 
 from quickstart.slack_utils import get_slack_comms
-from quickstart.gmail_utils import get_gmail_comms
+from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables, list_gtexts
+
+@app.route('/list_gmail_texts', methods=['GET'])
+def list_gmail_texts():
+    gtexts = list_gtexts()
+    # print(gtexts)
+    return render_template('gmail_texts.html', gtexts=gtexts)
 
 
+
+@app.route('/test_gmail_etl', methods=['GET'])
+def test_gmail_etl():
+    test_etl()
+    return "OK"
+
+@app.route('/test_clear_gmail_table', methods=['GET'])
+def test_clear_gmail_table():
+    clean_gmail_tables()
+    return "OK"
 
 @app.route('/first', methods=['GET'])
 def first():
