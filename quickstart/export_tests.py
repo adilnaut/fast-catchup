@@ -1,9 +1,13 @@
 import base64
 import json
+import codecs
+import hashlib
+import os
 
 from bs4 import BeautifulSoup
 
-from quickstart import auth_and_load_session_gmail, is_day_old
+
+from quickstart.gmail_utils import auth_and_load_session_gmail, is_day_old
 
 def get_text_from_html(html_text):
 
@@ -29,7 +33,7 @@ def get_text_from_html(html_text):
 #     return html_text
 
 
-def extract_messages_from_gmail_service(service):
+def extract_messages_from_gmail_service(service, num_messages=5):
 
     gmail_messages = []
 
@@ -39,7 +43,7 @@ def extract_messages_from_gmail_service(service):
 
     if not messages:
         return None
-    for message in messages[:20]:
+    for message in messages[:num_messages]:
         m_data.append(message['id']) # id, threadId
 
     for id in m_data:
@@ -71,18 +75,139 @@ def extract_messages_from_gmail_service(service):
         show_parts = True
         if show_parts:
             parts = payload.get('parts', [])
+
+
             i = 0
             for part in parts:
-                body = part.get('body')
-                if not body:
+                extract_text_from_mixed = False
+                handle_recursive = True
+                if handle_recursive and isinstance(part, list):
+                    # handle recursive parts(?):
+                    # parts_1 = parts.get('parts', [])
+                    for part_1 in part:
+                        part_id_1 = part_1.get('partId', '')
+                        mime_type_1 = part_1.get('mimeType', '')
+                        filename_1 = part_1.get('filename', '')
+                        headers_1 = part_1.get('headers', {})
+                        body_1 = part_1.get('body', {})
+                        if not body_1:
+                            continue
+                        data_1 = body_1.get('data', '')
+                        size_1 = body_1.get('size', '')
+                        text = None
+                        if mime_type_1 == 'text/plain':
+                            text = base64.urlsafe_b64decode(data_1).decode()
+                        elif mime_type_1 == 'text/html':
+                            if extract_text_from_mixed:
+                                text = base64.urlsafe_b64decode(data_1).decode()
+                                text = get_text_from_html(text) + '\n'
+                        else:
+                            # todo raise exception
+                            print('1 - This type of content %s is not supported yet' % mime_type_1)
+                        if text:
+                            email_content += text + '\n'
                     continue
-                data = body.get('data')
-                if not data:
-                    continue
-                text =  base64.urlsafe_b64decode(data).decode()
-                email_content += get_text_from_html(text) + '\n'
-                i += 1
+                part_id_0 = part.get('partId', '')
+                mime_type_0 = part.get('mimeType', '')
+                filename_0 = part.get('filename', '')
+                headers_0 = part.get('headers', {})
 
+                body_0 = part.get('body')
+                if not body_0:
+                    continue
+                text = None
+
+                if mime_type_0 == 'text/plain':
+                    data_0 = body_0.get('data')
+                    size_0 = body_0.get('size')
+                    if not data_0:
+                        continue
+                    text = base64.urlsafe_b64decode(data_0).decode()
+                elif mime_type_0 == 'text/html':
+                    data_0 = body_0.get('data')
+                    size_0 = body_0.get('size')
+                    if not data_0:
+                        continue
+                    if extract_text_from_mixed:
+                        text = base64.urlsafe_b64decode(data_0).decode()
+                        text = get_text_from_html(text) + '\n'
+                elif mime_type_0 == 'application/pdf':
+                    size_0 = body_0.get('size')
+                    attachment_id_0 = body_0.get('attachmentId')
+
+                    print("We have a file with filename-%s" % filename_0)
+                    # handle attachment here:
+                    # messageId is id
+                    # attachmentID is attachment_id_0
+                    # userId is me
+
+                    # now get attachment from api
+                    file_response = service.users().messages().attachments().get(
+                        userId='me', messageId=id, id=attachment_id_0).execute()
+                    # If successful, the response body contains an instance of MessagePartBody.
+                    # print(file_response)
+                    file_data = file_response.get('data', '')
+                    file_size = file_response.get('size', '')
+
+                    # todo - parse more cautiously
+                    file_extension = mime_type_0.split('/')[1]
+
+                    print('file size: %s' % file_size)
+                    file_attachment_id = file_response.get('attachmentId', '')
+                    while file_attachment_id:
+                        # handle more chunks of file
+                        raise Exception('Multiple file chunks not implemented!')
+                    file_content = base64.urlsafe_b64decode(file_data)
+
+                    # generate hash for filename
+                    file_hash = hashlib.md5(file_content).hexdigest()
+
+                    workdir_ = 'file_store'
+                    filepath_ = os.path.join(workdir_, '%s.%s' % (file_hash, file_extension))
+                    # check if hash isn't on fileserver yet
+                    is_file_exist = os.path.exists(filepath_)
+
+                    # if not upload to server
+                    if not is_file_exist:
+                        datafile = open(filepath_, 'wb')
+                        datafile.write(file_content)
+                        datafile.close()
+
+                    # load to database model GmailAttachment
+                    # data to store:
+                    #  attachment_id attachment_id_0
+                    #  file size size_0
+                    #  md5 hash file_hash
+                    #  messageId is id
+                    #  original file name filename_0
+                    #  part id part_id_0
+                    #  mime type (file extension) mime_type_0
+                    #  file extension file_extension
+                    #  filepath filepath_
+                    gmail_attachment_kwargs = {'md5': file_hash
+                        , 'attachment_id': attachment_id_0
+                        , 'file_size': size_0
+                        , 'gmail_message_id': id
+                        , 'original_filename': filename_0
+                        , 'part_id': part_id_0
+                        , 'mime_type': mime_type_0
+                        , 'file_extension': file_extension
+                        , 'filepath': filepath_
+                    }
+                    f = open('samples\\gmail_attachment\\attachment-1', 'w')
+                    json.dump(gmail_attachment_kwargs, f, indent=4)
+                    f.close()
+
+                # todo handle general attachment case
+                elif mime_type_0 == 'application/*':
+                    print("Not implemented!")
+                    pass
+                else:
+                    print('This type of content %s is not supported yet' % mime_type_0)
+                    pass
+
+                email_content += text + '\n' if text else ''
+                i += 1
 
         # we will also need subject header
         show_headers = True
@@ -104,6 +229,7 @@ def extract_messages_from_gmail_service(service):
             #         'snippet':snippet,
             #         'subject':headers_dict["Subject"],
             #         'date':date_string}
+        email_content += '\n%s' % json.dumps(email_body, indent=4)
         email_content += '\n%s' % json.dumps(headers_dict, indent=4)
         email_content += '\nSnippet:\n%s' % snippet
         email_content += '\nLabels:\n%s' % labels
@@ -117,11 +243,21 @@ def extract_messages_from_gmail_service(service):
 
     return gmail_messages
 
+
+def write_tests():
+    service = auth_and_load_session_gmail()
+    gmail_messages = extract_messages_from_gmail_service(service)
+    i = 0
+    for gmessage in gmail_messages:
+        with open('quickstart/tests/attachment/gmail-test-%s' % i, 'w', encoding="utf-8") as f:
+            f.write(gmessage)
+        i += 1
+
 if __name__ == '__main__':
     service = auth_and_load_session_gmail()
     gmail_messages = extract_messages_from_gmail_service(service)
     i = 0
     for gmessage in gmail_messages:
-        with open('quickstart/tests/souped/gmail-test-%s' % i, 'w', encoding="utf-8") as f:
+        with open('quickstart/tests/attachment/gmail-test-%s' % i, 'w', encoding="utf-8") as f:
             f.write(gmessage)
         i += 1

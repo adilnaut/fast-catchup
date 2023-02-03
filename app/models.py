@@ -161,3 +161,18 @@ class GmailUser(db.Model):
 
     def __repr__(self):
         return '<g-user{} with email {}>'.format(self.name, self.email)
+
+
+class GmailAttachment(db.Model):
+    md5 = db.Column(db.Text(), primary_key=True)
+    attachment_id = db.Column(db.Text())
+    file_size = db.Column(db.Integer)
+    gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'))
+    original_filename = db.Column(db.Text())
+    part_id = db.Column(db.Text())
+    mime_type = db.Column(db.Text())
+    file_extension = db.Column(db.Text())
+    filepath = db.Column(db.Text())
+
+    def __repr__(self):
+        return '<g-attachment with filename {}>'.format(self.original_filename)

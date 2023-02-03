@@ -4,3 +4,5 @@
 app.db
 quickstart/credentials.json
 quickstart/token.json
+quickstart/tests/
+file_store/

@@ -11,7 +11,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from quickstart.connection import db_ops
+# from quickstart.connection import db_ops
 # from connection import db_ops
 
 # If modifying these scopes, delete the file token.json.
