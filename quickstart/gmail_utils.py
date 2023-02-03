@@ -147,73 +147,77 @@ def etl_gmail(service, unread_only=True):
                 gmail_user = GmailUser(**user_kwargs)
                 db.session.add(gmail_user)
 
-            gmail_message_kwargs = {'id': id
-                , 'date': date_string
-                , 'from_string': from_string
-                , 'gmail_user_email': gmail_user_email
-                , 'mime_type': mime_type
-                , 'mime_version': h_mime_version
-                , 'content_type': h_content_type
-                , 'subject': subject
-                , 'is_multipart': is_multipart
-                , 'multipart_num': num_parts}
+
+            # better attempt to insert and on conflict do nothing
+            is_message = GmailMessage.query.filter_by(id=id).first()
+
+            if not is_message:
+                gmail_message_kwargs = {'id': id
+                    , 'date': date_string
+                    , 'from_string': from_string
+                    , 'gmail_user_email': gmail_user_email
+                    , 'mime_type': mime_type
+                    , 'mime_version': h_mime_version
+                    , 'content_type': h_content_type
+                    , 'subject': subject
+                    , 'is_multipart': is_multipart
+                    , 'multipart_num': num_parts}
+
+                gmail_message = GmailMessage(**gmail_message_kwargs)
+                db.session.add(gmail_message)
+
+                if snippet:
+                    text_kwargs = {'gmail_message_id': id
+                        , 'text': snippet
+                        , 'is_primary': False
+                        , 'is_multipart': False
+                        , 'is_summary': False
+                        , 'is_snippet': True}
+                    gmail_message_text = GmailMessageText(**text_kwargs)
+                    db.session.add(gmail_message_text)
 
 
-            gmail_message = GmailMessage(**gmail_message_kwargs)
-            db.session.add(gmail_message)
+                if primary_text:
+                    text_kwargs = {'gmail_message_id': id
+                        , 'text': primary_text
+                        , 'is_primary': True
+                        , 'is_multipart': False
+                        , 'is_summary': False
+                        , 'is_snippet': False}
+                    gmail_message_text = GmailMessageText(**text_kwargs)
+                    db.session.add(gmail_message_text)
 
-            if snippet:
-                text_kwargs = {'gmail_message_id': id
-                    , 'text': snippet
-                    , 'is_primary': False
-                    , 'is_multipart': False
-                    , 'is_summary': False
-                    , 'is_snippet': True}
-                gmail_message_text = GmailMessageText(**text_kwargs)
-                db.session.add(gmail_message_text)
+                for i in range(len(multiparts)):
+                    text_kwargs = {'gmail_message_id': id
+                        , 'text': multiparts[i]
+                        , 'is_primary': False
+                        , 'is_multipart': True
+                        , 'is_summary': False
+                        , 'is_snippet': False
+                        , 'multipart_index': i}
+                    gmail_message_text = GmailMessageText(**text_kwargs)
+                    db.session.add(gmail_message_text)
 
+                for label in label_ids:
+                    label_kwargs = {'gmail_message_id': id
+                        , 'label': label}
+                    gmail_message_label = GmailMessageLabel(**label_kwargs)
+                    db.session.add(gmail_message_label)
 
-            if primary_text:
-                text_kwargs = {'gmail_message_id': id
-                    , 'text': primary_text
-                    , 'is_primary': True
-                    , 'is_multipart': False
-                    , 'is_summary': False
-                    , 'is_snippet': False}
-                gmail_message_text = GmailMessageText(**text_kwargs)
-                db.session.add(gmail_message_text)
+                if list_id:
+                    list_metadata_kwargs = {'gmail_message_id': id
+                        , 'list_id': list_id
+                        , 'message_id': message_id
+                        , 'list_unsubscribe': list_unsubscribe
+                        , 'list_url': list_url}
+                    list_metadata = GmailMessageListMetadata(**list_metadata_kwargs)
+                    db.session.add(list_metadata)
 
-            for i in range(len(multiparts)):
-                text_kwargs = {'gmail_message_id': id
-                    , 'text': multiparts[i]
-                    , 'is_primary': False
-                    , 'is_multipart': True
-                    , 'is_summary': False
-                    , 'is_snippet': False
-                    , 'multipart_index': i}
-                gmail_message_text = GmailMessageText(**text_kwargs)
-                db.session.add(gmail_message_text)
-
-            for label in label_ids:
-                label_kwargs = {'gmail_message_id': id
-                    , 'label': label}
-                gmail_message_label = GmailMessageLabel(**label_kwargs)
-                db.session.add(gmail_message_label)
-
-            if list_id:
-                list_metadata_kwargs = {'gmail_message_id': id
-                    , 'list_id': list_id
-                    , 'message_id': message_id
-                    , 'list_unsubscribe': list_unsubscribe
-                    , 'list_url': list_url}
-                list_metadata = GmailMessageListMetadata(**list_metadata_kwargs)
-                db.session.add(list_metadata)
-
-            for tag in tags:
-                tag_kwargs = {'gmail_message_id': id
-                    , 'tag': tag}
-                gmail_message_tag = GmailMessageTag(**tag_kwargs)
-                db.session.add(gmail_message_tag)
+                for tag in tags:
+                    tag_kwargs = {'gmail_message_id': id
+                        , 'tag': tag}
+                    gmail_message_tag = GmailMessageTag(**tag_kwargs)
+                    db.session.add(gmail_message_tag)
 
 
 
@@ -253,14 +257,54 @@ def auth_and_load_session_gmail():
 def dumps_emails(gmail_messages):
     result_text = ""
 
-    for k,v in gmail_messages.items():
-        from_item = v.get('from')
-        snippet_item = v.get('snippet')
-        subject_item = v.get('subject')
-        date_item = v.get('date')
-        result_text += "%s emailed you %s with subject %s on %s\n" % (from_item, snippet_item, subject_item, date_item)
+    for row in gmail_messages:
+        id_ = row.id
+        email_ = row.gmail_user_email
+        name_ = None
+        snippet_ = None
+        with db_ops(model_names=['GmailUser', 'GmailMessageText']) as \
+            (db, GmailUser, GmailMessageText):
+            gmail_user = GmailUser.query.filter_by(email=email_).one()
+            gm_snippet = GmailMessageText.query.filter_by(gmail_message_id=id_) \
+                .filter_by(is_snippet=True).one()
+            name_ = gmail_user.name
+            snippet_ = gm_snippet.text
+        subject_ = row.subject
+        date_ = row.date
+        date_ = convert_to_utc(date_).strftime('%m%d')
+        result_text += "%s emailed you %s with subject %s on %s\n" % (name_, snippet_, subject_, date_)
 
     return result_text
+
+
+def get_gmail_comms(use_last_cached_emails=True, return_list=False):
+    if not use_last_cached_emails:
+        service = auth_and_load_session_gmail()
+        etl_gmail(service)
+
+    gmail_messages = None
+    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel']) as \
+        (db, GmailMessage, GmailMessageLabel):
+
+        gmail_messages = db.session.query(GmailMessage) \
+            .join(GmailMessageLabel) \
+            .filter(GmailMessageLabel.label == 'UNREAD').all()
+
+    if return_list:
+        return gmail_messages
+    result_text = dumps_emails(gmail_messages)
+    return result_text
+
+def convert_to_utc(date_string):
+    dt = parser.parse(date_string)
+    dt = dt.astimezone(pytz.UTC)
+    return dt
+
+def is_day_old(date_string):
+    date_object = convert_to_utc(date_string)
+    now = datetime.now(pytz.UTC)
+    return (now - date_object) < timedelta(days=1)
+
 def test_etl():
     service = auth_and_load_session_gmail()
     etl_gmail(service)
@@ -296,36 +340,3 @@ def clean_gmail_tables():
             db.session.delete(m)
         for u in GmailUser.query.all():
             db.session.delete(u)
-
-
-
-def get_gmail_comms(use_last_cached_emails=True, return_list=False):
-    if not use_last_cached_emails:
-        service = auth_and_load_session_gmail()
-        etl_gmail(service)
-
-    gmail_messages = None
-    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailMessageText']) as \
-        (db, GmailMessage, GmailMessageLabel, GmailMessageText):
-
-        gmail_messages = db.session.query(GmailMessage, GmailMessageText) \
-            .join(GmailMessageLabel) \
-            .join(GmailMessageText) \
-            .filter_by(GmailMessageLabel.label == 'UNREAD').all()
-
-
-
-    if return_list:
-        return gmail_messages
-    result_text = dumps_emails(gmail_messages)
-    return result_text
-
-def convert_to_utc(date_string):
-    dt = parser.parse(date_string)
-    dt = dt.astimezone(pytz.UTC)
-    return dt
-
-def is_day_old(date_string):
-    date_object = convert_to_utc(date_string)
-    now = datetime.now(pytz.UTC)
-    return (now - date_object) < timedelta(days=1)

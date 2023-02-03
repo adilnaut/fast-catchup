@@ -25,9 +25,10 @@ def db_ops(db_name='sqlite:///app.db', model_names=None):
     return_list.append(db)
     return_list.extend(Models)
     yield tuple(return_list)
-    try:
-        db.session.commit()
-    except exc.IntegrityError:
-        db.session.rollback()
+    db.session.commit()
+    # try:
+    #     db.session.commit()
+    # except exc.IntegrityError:
+    #     db.session.rollback()
     # finally:
         # db.session.close()

@@ -28,11 +28,7 @@ def test_clear_gmail_table():
 
 @app.route('/first', methods=['GET'])
 def first():
-    # unread_slack = list(get_slack_comms(return_dict=True).values())
     unread_slack = get_slack_comms(return_list=True)
-
-    # print(unread_slack)
-
     unread_gmail = get_gmail_comms(return_list=True)
 
     gptin = {'slack_list': unread_slack,
@@ -48,8 +44,8 @@ def gen_summary():
     gptout = {}
     prompt = '''I\'ve got the following slack messages and emails today please give me a quick summary
         of only important messages with urgent matters first.:'''
-    unread_slack = list(get_slack_comms(return_dict=True).values())
-    unread_gmail = list(get_gmail_comms(return_dict=True).values())
+    unread_slack = get_slack_comms(return_list=True)
+    unread_gmail = get_gmail_comms(return_list=True)
 
 
     # get prompt from post form
@@ -79,7 +75,7 @@ def gen_summary():
 
     # todo provide filepath to index.html template and adjust returnAudioFile method accordingly
 
-    return render_template('first.html',title='Home', gptin=gptin, gptout=gptout)
+    return render_template('first.html', title='Home', gptin=gptin, gptout=gptout)
 
 @app.route('/', methods=['POST', 'GET'])
 @app.route('/index')

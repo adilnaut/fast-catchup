@@ -2,10 +2,68 @@ import os
 from datetime import datetime, timedelta
 from dateutil import parser
 import pytz
+import time
+
 
 from slack_bolt import App
 
 from quickstart.connection import db_ops
+
+
+def etl_messages(app, days_ago=1, max_pages=1,  verbose=False):
+    # don't overwhelm API rate
+    slack_channels = None
+
+    with db_ops(model_names=['SlackChannel']) as (db, SlackChannel):
+        slack_channels = SlackChannel.query.all()
+
+    yesterday = datetime.utcnow() - timedelta(days=days_ago)
+    unix_time = time.mktime(yesterday.timetuple())
+
+    for channel in slack_channels:
+        next_cursor = None
+        for i in range(max_pages):
+            # don't overwhelm API rate
+            time.sleep(0.2)
+            if verbose:
+                print("channel %s, id %s, request number %s" % (channel.name,
+                    channel.id, i))
+            if next_cursor:
+                response = app.client.conversations_history(channel=channel.id, oldest=unix_time,
+                    limit=100, cursor=next_cursor)
+            else:
+                response = app.client.conversations_history(channel=channel.id,
+                    oldest=unix_time, include_all_metadata='true', limit=100)
+            status = response.get('ok')
+            response_metadata = response.get('response_metadata')
+            if response_metadata:
+                next_cursor = response_metadata.get('next_cursor')
+            has_more = response.get('has_more')
+
+            messages = response.get('messages')
+            if verbose:
+                print("Has more %s, messages %s" % (has_more, len(messages)))
+            if status and messages:
+                for message in messages:
+                    type = message.get('type')
+                    user = message.get('user')
+                    text = message.get('text')
+                    channel_id = message.get('channel')
+                    ts = message.get('ts')
+                    with db_ops(model_names=['SlackMessage']) as (db, SlackMessage):
+                        is_message = SlackMessage.query.filter_by(ts=ts).first()
+                        if not is_message:
+                            slack_message_kwargs = {'ts': ts
+                                , 'type': type
+                                , 'slack_user_id': user
+                                , 'text': text
+                                , 'slack_channel_id': channel_id
+                                , 'is_unread': True
+                                }
+                            s_message = SlackMessage(**slack_message_kwargs)
+                            db.session.add(s_message)
+            if not has_more:
+                break;
 
 
 def ts_to_formatted_date(ts):
@@ -122,28 +180,20 @@ def row2dict(row):
     return d
 
 #  todo handle rate limited exception
-def get_slack_comms(return_list=False):
-
-    app = auth_and_load_session_slack()
+def get_slack_comms(use_last_cached_emails=True, return_list=False):
+    if not use_last_cached_emails:
+        app = auth_and_load_session_slack()
+        etl_messages(app)
 
     slack_messages = None
     with db_ops(model_names=['SlackMessage']) as (db, SlackMessage):
         slack_messages = SlackMessage.query.filter_by(is_unread=True).all()
 
-    # new_list = []
-    # for m in slack_messages:
-        # print(m.text)
-        # new_list.append(row2dict(m))
-    if return_list:
 
-        # test if that works out of box
+    if return_list:
         return slack_messages
-        # return new_list
 
     result = ''
-    # print(new_list)
-    # now return text string with all formatted messages
-    # for message in new_list:
     for message in slack_messages:
         formatted_message = format_slack_message(message)
         result += '%s\n' % formatted_message

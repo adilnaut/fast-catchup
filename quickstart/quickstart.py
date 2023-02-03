@@ -4,7 +4,6 @@ import os
 import os.path
 
 import json
-import time
 
 import openai
 
@@ -99,7 +98,7 @@ def generate_summary(prompt=None, cache_slack=False, cache_gmail=False):
     unread_emails = get_gmail_comms(use_last_cached_emails=cache_gmail)
 
     # from db
-    unread_slack = get_slack_comms()
+    unread_slack = get_slack_comms(use_last_cached_emails=cache_slack)
 
     gpt_summary = get_gpt_summary(prompt, unread_emails, unread_slack)
 

@@ -1,5 +1,7 @@
 from connection import db_ops
 from bolt import app
+import time
+
 
 
 def etl_channels(app):
@@ -140,13 +142,12 @@ def etl_users(app):
                 slack_user = SlackUser(**slack_users_kwargs)
                 db.session.add(slack_user)
 
-def etl_messages(app, days_ago=1, max_pages=10,  verbose=False):
+
+def etl_messages(app, days_ago=1, max_pages=1,  verbose=False):
     # don't overwhelm API rate
     slack_channels = None
 
-    db_context = False
-    if db_context:
-        channel_ids = slack_conversations.keys()
+    with db_ops(model_names=['SlackChannel']) as (db, SlackChannel):
         slack_channels = SlackChannel.query.all()
 
     yesterday = datetime.utcnow() - timedelta(days=days_ago)
@@ -182,13 +183,18 @@ def etl_messages(app, days_ago=1, max_pages=10,  verbose=False):
                     text = message.get('text')
                     channel_id = message.get('channel')
                     ts = message.get('ts')
-                    slack_messages = {'ts': ts
-                        , 'type': type
-                        , 'slack_user_id': user
-                        , 'text': text
-                        , 'slack_channel_id': channel_id
-                        , 'is_unread': True
-                        }
+                    with db_ops(model_names=['SlackMessage']) as (db, SlackMessage):
+                        is_message = SlackMessage.query.filter_by(ts=ts).first()
+                        if not is_message:
+                            slack_message_kwargs = {'ts': ts
+                                , 'type': type
+                                , 'slack_user_id': user
+                                , 'text': text
+                                , 'slack_channel_id': channel_id
+                                , 'is_unread': True
+                                }
+                            s_message = SlackMessage(**slack_message_kwargs)
+                            db.session.add(s_message)
             if not has_more:
                 break;
 

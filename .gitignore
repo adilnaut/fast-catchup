@@ -2,3 +2,5 @@
 .flaskenv
 *.pyc
 app.db
+quickstart/credentials.json
+quickstart/token.json
