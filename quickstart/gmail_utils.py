@@ -42,7 +42,109 @@ def get_initial_tags(from_string):
 
     return list(tags)
 
-def etl_gmail(service, unread_only=True):
+def parse_email_part(part, id, service, db, GmailAttachment, handle_subparts=False \
+    ,extract_text_from_mixed = False, verbose=False):
+    part_id_0 = part.get('partId', '')
+    mime_type_0 = part.get('mimeType', '')
+    filename_0 = part.get('filename', '')
+    headers_0 = part.get('headers', {})
+
+    body_0 = part.get('body')
+
+    text = None
+    text_parts = []
+    num_processed = 0
+
+    # todo handle 'multipart/alternative'
+    if mime_type_0 == 'multipart/alternative':
+        if not handle_subparts:
+            raise Exception('Only 1 step depth recursion permitted!')
+        part_parts = part.get('parts', [])
+        for part_1 in part_parts:
+            # only go 1 way deeper
+            text_parts_in, num_processed_in = parse_email_part(part_1, id, service, db, GmailAttachment)
+            text_parts.extend(text_parts_in)
+            num_processed += num_processed_in
+    if mime_type_0 == 'text/plain':
+        data_0 = body_0.get('data')
+        size_0 = body_0.get('size')
+        if not data_0:
+            return [], 0
+        text = base64.urlsafe_b64decode(data_0).decode()
+    elif mime_type_0 == 'text/html':
+        data_0 = body_0.get('data')
+        size_0 = body_0.get('size')
+        if not data_0:
+            return [], 0
+        if extract_text_from_mixed:
+            text = base64.urlsafe_b64decode(data_0).decode()
+            text = get_text_from_html(text) + '\n'
+
+    # todo handle general attachment case
+    elif 'application/' in mime_type_0:
+        size_0 = body_0.get('size')
+        attachment_id_0 = body_0.get('attachmentId')
+        if verbose:
+            print("We have a file with filename-%s" % filename_0)
+        # handle attachment here:
+        # messageId is id
+        # attachmentID is attachment_id_0
+        # userId is me
+
+        # now get attachment from api
+        file_response = service.users().messages().attachments().get(
+            userId='me', messageId=id, id=attachment_id_0).execute()
+        # If successful, the response body contains an instance of MessagePartBody.
+        # print(file_response)
+        file_data = file_response.get('data', '')
+        file_size = file_response.get('size', '')
+
+        # todo - parse more cautiously
+        file_extension = mime_type_0.split('/')[1]
+
+        if verbose:
+            print('file size: %s' % file_size)
+        file_attachment_id = file_response.get('attachmentId', '')
+        while file_attachment_id:
+            # handle more chunks of file
+            raise Exception('Multiple file chunks not implemented!')
+        file_content = base64.urlsafe_b64decode(file_data)
+
+        # generate hash for filename
+        file_hash = hashlib.md5(file_content).hexdigest()
+
+        workdir_ = 'file_store'
+        filepath_ = os.path.join(workdir_, '%s.%s' % (file_hash, file_extension))
+        # check if hash isn't on fileserver yet
+        is_file_exist = os.path.exists(filepath_)
+
+        # if not upload to server
+        if not is_file_exist:
+            datafile = open(filepath_, 'wb')
+            datafile.write(file_content)
+            datafile.close()
+
+        gmail_attachment_kwargs = {'md5': file_hash
+            , 'attachment_id': attachment_id_0
+            , 'file_size': size_0
+            , 'gmail_message_id': id
+            , 'original_filename': filename_0
+            , 'part_id': part_id_0
+            , 'mime_type': mime_type_0
+            , 'file_extension': file_extension
+            , 'filepath': filepath_
+        }
+        gmail_attachment = GmailAttachment(**gmail_attachment_kwargs)
+        db.session.add(gmail_attachment)
+    else:
+        if verbose:
+            print('This type of content %s is not supported yet' % mime_type_0)
+    if text:
+        text_parts.append(text)
+        num_processed += 1
+    return text_parts, num_processed
+
+def etl_gmail(service, max_messages=20, unread_only=True):
 
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
@@ -50,17 +152,17 @@ def etl_gmail(service, unread_only=True):
 
     if not messages:
         return None
-    for message in messages[:20]:
+    for message in messages[:max_messages]:
         id = message.get('id')
         thread_id = message.get('thread_id')
         # m_data.append(message['id']) # id, threadId
         m_data.append(id)
     with db_ops(model_names=['GmailMessage', 'GmailMessageText', \
         'GmailMessageLabel', 'GmailMessageListMetadata', \
-        'GmailMessageTag', 'GmailUser']) \
+        'GmailMessageTag', 'GmailUser', 'GmailAttachment']) \
         as (db, GmailMessage, GmailMessageText, \
             GmailMessageLabel, GmailMessageListMetadata, \
-            GmailMessageTag, GmailUser):
+            GmailMessageTag, GmailUser, GmailAttachment):
         for id in m_data:
             email_body = service.users().messages().get(userId='me', id=id, format='full').execute()
             if not email_body:
@@ -78,9 +180,7 @@ def etl_gmail(service, unread_only=True):
             if not payload:
                 continue
             mime_type = payload.get('mimeType', '')
-            # content_type = payload.get('contentType', '')
-            part_id  = payload.get('partId', '')
-            filename = payload.get('filename', '')
+
 
             body = payload.get('body')
             if not body:
@@ -96,16 +196,14 @@ def etl_gmail(service, unread_only=True):
             if show_parts:
                 parts = payload.get('parts', [])
                 for part in parts:
-                    body = part.get('body')
-                    if not body:
-                        continue
-                    data = body.get('data')
-                    if not data:
-                        continue
-                    text =  base64.urlsafe_b64decode(data).decode()
-                    multiparts.append(text)
-                    num_parts += 1
 
+                    extract_text_from_mixed = False
+                    handle_subparts = True
+
+                    multiparts_in, num_processed_in = parse_email_part(part, id, service, db, GmailAttachment,
+                        handle_subparts=handle_subparts, extract_text_from_mixed=extract_text_from_mixed)
+                    multiparts.extend(multiparts_in)
+                    num_parts += num_processed_in
 
             # we will also need subject header
             show_headers = True
@@ -324,10 +422,10 @@ def list_gtexts():
 def clean_gmail_tables():
     with db_ops(model_names=['GmailMessage', 'GmailMessageText', \
         'GmailMessageLabel', 'GmailMessageListMetadata', \
-        'GmailMessageTag', 'GmailUser']) \
+        'GmailMessageTag', 'GmailUser', 'GmailAttachment']) \
         as (db, GmailMessage, GmailMessageText, \
         GmailMessageLabel, GmailMessageListMetadata, \
-        GmailMessageTag, GmailUser):
+        GmailMessageTag, GmailUser, GmailAttachment):
         for m in GmailMessageLabel.query.all():
             db.session.delete(m)
         for m in GmailMessageTag.query.all():
@@ -340,3 +438,5 @@ def clean_gmail_tables():
             db.session.delete(m)
         for u in GmailUser.query.all():
             db.session.delete(u)
+        for m in GmailAttachment.query.all():
+            db.session.delete(m)

@@ -33,7 +33,7 @@ def get_text_from_html(html_text):
 #     return html_text
 
 
-def extract_messages_from_gmail_service(service, num_messages=5):
+def extract_messages_from_gmail_service(service, num_messages=10):
 
     gmail_messages = []
 
@@ -81,10 +81,11 @@ def extract_messages_from_gmail_service(service, num_messages=5):
             for part in parts:
                 extract_text_from_mixed = False
                 handle_recursive = True
-                if handle_recursive and isinstance(part, list):
+                if handle_recursive:
                     # handle recursive parts(?):
                     # parts_1 = parts.get('parts', [])
-                    for part_1 in part:
+                    part_parts = part.get('parts', [])
+                    for part_1 in part_parts:
                         part_id_1 = part_1.get('partId', '')
                         mime_type_1 = part_1.get('mimeType', '')
                         filename_1 = part_1.get('filename', '')
@@ -116,6 +117,8 @@ def extract_messages_from_gmail_service(service, num_messages=5):
                 if not body_0:
                     continue
                 text = None
+                extract_text_from_mixed = False
+
 
                 if mime_type_0 == 'text/plain':
                     data_0 = body_0.get('data')
@@ -173,17 +176,6 @@ def extract_messages_from_gmail_service(service, num_messages=5):
                         datafile.write(file_content)
                         datafile.close()
 
-                    # load to database model GmailAttachment
-                    # data to store:
-                    #  attachment_id attachment_id_0
-                    #  file size size_0
-                    #  md5 hash file_hash
-                    #  messageId is id
-                    #  original file name filename_0
-                    #  part id part_id_0
-                    #  mime type (file extension) mime_type_0
-                    #  file extension file_extension
-                    #  filepath filepath_
                     gmail_attachment_kwargs = {'md5': file_hash
                         , 'attachment_id': attachment_id_0
                         , 'file_size': size_0
@@ -194,9 +186,7 @@ def extract_messages_from_gmail_service(service, num_messages=5):
                         , 'file_extension': file_extension
                         , 'filepath': filepath_
                     }
-                    f = open('samples\\gmail_attachment\\attachment-1', 'w')
-                    json.dump(gmail_attachment_kwargs, f, indent=4)
-                    f.close()
+
 
                 # todo handle general attachment case
                 elif mime_type_0 == 'application/*':
