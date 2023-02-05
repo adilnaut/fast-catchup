@@ -234,12 +234,12 @@ def extract_messages_from_gmail_service(service, num_messages=10):
     return gmail_messages
 
 
-def write_tests():
+def write_tests(foldername='random'):
     service = auth_and_load_session_gmail()
     gmail_messages = extract_messages_from_gmail_service(service)
     i = 0
     for gmessage in gmail_messages:
-        with open('quickstart/tests/attachment/gmail-test-%s' % i, 'w', encoding="utf-8") as f:
+        with open('quickstart/tests/%s/gmail-test-%s' % (foldername, i), 'w', encoding="utf-8") as f:
             f.write(gmessage)
         i += 1
 
