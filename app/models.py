@@ -176,3 +176,12 @@ class GmailAttachment(db.Model):
 
     def __repr__(self):
         return '<g-attachment with filename {}>'.format(self.original_filename)
+
+class GmailLink(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'))
+    link = db.Column(db.Text())
+    domain = db.Column(db.Text())
+
+    def __repr__(self):
+        return '<g-link {}>'.format(self.id)
