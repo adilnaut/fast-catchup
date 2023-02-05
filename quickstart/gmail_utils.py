@@ -4,6 +4,10 @@ from dateutil import parser
 import pytz
 import os
 import base64
+import hashlib
+
+from urlextract import URLExtract
+from urllib.parse import urlparse
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -12,8 +16,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.auth.exceptions import RefreshError
 
-# from quickstart.connection import db_ops
-# from connection import db_ops
+from quickstart.connection import db_ops
+## from connection import db_ops
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -23,6 +27,15 @@ def get_guser_email(from_string):
     return from_string.split(' ')[-1].replace('<', '').replace('>', '')
 def get_guser_name(from_string):
     return from_string.replace(get_guser_email(from_string), '')
+
+def extract_links(text):
+    extractor = URLExtract()
+    urls = extractor.find_urls(text)
+    return urls
+
+def extract_domain(link):
+    t = urlparse(link).netloc
+    return '.'.join(t.split('.')[-2:])
 
 # todo parse with regex
 def get_is_multipart(content_type):
@@ -43,7 +56,7 @@ def get_initial_tags(from_string):
 
     return list(tags)
 
-def parse_email_part(part, id, service, db, GmailAttachment, handle_subparts=False \
+def parse_email_part(part, id, service, db, GmailAttachment, GmailLink, handle_subparts=False \
     ,extract_text_from_mixed = False, verbose=False):
     part_id_0 = part.get('partId', '')
     mime_type_0 = part.get('mimeType', '')
@@ -63,7 +76,8 @@ def parse_email_part(part, id, service, db, GmailAttachment, handle_subparts=Fal
         part_parts = part.get('parts', [])
         for part_1 in part_parts:
             # only go 1 way deeper
-            text_parts_in, num_processed_in = parse_email_part(part_1, id, service, db, GmailAttachment)
+            text_parts_in, num_processed_in = parse_email_part(part_1, id, service, db, GmailAttachment,
+                GmailLink)
             text_parts.extend(text_parts_in)
             num_processed += num_processed_in
     if mime_type_0 == 'text/plain':
@@ -125,24 +139,36 @@ def parse_email_part(part, id, service, db, GmailAttachment, handle_subparts=Fal
             datafile.write(file_content)
             datafile.close()
 
-        gmail_attachment_kwargs = {'md5': file_hash
-            , 'attachment_id': attachment_id_0
-            , 'file_size': size_0
-            , 'gmail_message_id': id
-            , 'original_filename': filename_0
-            , 'part_id': part_id_0
-            , 'mime_type': mime_type_0
-            , 'file_extension': file_extension
-            , 'filepath': filepath_
-        }
-        gmail_attachment = GmailAttachment(**gmail_attachment_kwargs)
-        db.session.add(gmail_attachment)
+        gm_att_test = GmailAttachment.query.filter_by(md5=file_hash, gmail_message_id=id).first()
+        if not gm_att_test:
+            gmail_attachment_kwargs = {'md5': file_hash
+                , 'attachment_id': attachment_id_0
+                , 'file_size': size_0
+                , 'gmail_message_id': id
+                , 'original_filename': filename_0
+                , 'part_id': part_id_0
+                , 'mime_type': mime_type_0
+                , 'file_extension': file_extension
+                , 'filepath': filepath_
+            }
+            gmail_attachment = GmailAttachment(**gmail_attachment_kwargs)
+            db.session.add(gmail_attachment)
     else:
         if verbose:
             print('This type of content %s is not supported yet' % mime_type_0)
     if text:
         text_parts.append(text)
         num_processed += 1
+        gm_link_test = GmailLink.query.filter_by(gmail_message_id=id).first()
+        if not gm_link_test:
+            links = extract_links(text)
+            for link_ in links:
+                gmail_link_kwaargs = {'gmail_message_id': id,
+                    'link': link_,
+                    'domain': extract_domain(link_)
+                }
+                gmail_link = GmailLink(**gmail_link_kwaargs)
+                db.session.add(gmail_link)
     return text_parts, num_processed
 
 def etl_gmail(service, max_messages=20, unread_only=True):
@@ -160,10 +186,10 @@ def etl_gmail(service, max_messages=20, unread_only=True):
         m_data.append(id)
     with db_ops(model_names=['GmailMessage', 'GmailMessageText', \
         'GmailMessageLabel', 'GmailMessageListMetadata', \
-        'GmailMessageTag', 'GmailUser', 'GmailAttachment']) \
+        'GmailMessageTag', 'GmailUser', 'GmailAttachment', 'GmailLink']) \
         as (db, GmailMessage, GmailMessageText, \
             GmailMessageLabel, GmailMessageListMetadata, \
-            GmailMessageTag, GmailUser, GmailAttachment):
+            GmailMessageTag, GmailUser, GmailAttachment, GmailLink):
         for id in m_data:
             email_body = service.users().messages().get(userId='me', id=id, format='full').execute()
             if not email_body:
@@ -202,7 +228,7 @@ def etl_gmail(service, max_messages=20, unread_only=True):
                     handle_subparts = True
 
                     multiparts_in, num_processed_in = parse_email_part(part, id, service, db, GmailAttachment,
-                        handle_subparts=handle_subparts, extract_text_from_mixed=extract_text_from_mixed)
+                        GmailLink, handle_subparts=handle_subparts, extract_text_from_mixed=extract_text_from_mixed)
                     multiparts.extend(multiparts_in)
                     num_parts += num_processed_in
 
@@ -429,10 +455,10 @@ def list_gtexts():
 def clean_gmail_tables():
     with db_ops(model_names=['GmailMessage', 'GmailMessageText', \
         'GmailMessageLabel', 'GmailMessageListMetadata', \
-        'GmailMessageTag', 'GmailUser', 'GmailAttachment']) \
+        'GmailMessageTag', 'GmailUser', 'GmailAttachment', 'GmailLink']) \
         as (db, GmailMessage, GmailMessageText, \
         GmailMessageLabel, GmailMessageListMetadata, \
-        GmailMessageTag, GmailUser, GmailAttachment):
+        GmailMessageTag, GmailUser, GmailAttachment, GmailLink):
         for m in GmailMessageLabel.query.all():
             db.session.delete(m)
         for m in GmailMessageTag.query.all():
@@ -446,4 +472,6 @@ def clean_gmail_tables():
         for u in GmailUser.query.all():
             db.session.delete(u)
         for m in GmailAttachment.query.all():
+            db.session.delete(m)
+        for m in GmailLink.query.all():
             db.session.delete(m)

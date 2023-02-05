@@ -165,9 +165,9 @@ class GmailUser(db.Model):
 
 class GmailAttachment(db.Model):
     md5 = db.Column(db.Text(), primary_key=True)
+    gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'), primary_key=True)
     attachment_id = db.Column(db.Text())
     file_size = db.Column(db.Integer)
-    gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'))
     original_filename = db.Column(db.Text())
     part_id = db.Column(db.Text())
     mime_type = db.Column(db.Text())
