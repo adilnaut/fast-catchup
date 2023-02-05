@@ -452,6 +452,30 @@ def list_gtexts():
 
     return gmail_messages
 
+def list_gfiles():
+    gmail_messages = None
+    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailAttachment']) as \
+        (db, GmailMessage, GmailMessageLabel, GmailAttachment):
+
+        gmail_messages = db.session.query(GmailMessage, GmailAttachment) \
+            .join(GmailMessageLabel) \
+            .join(GmailAttachment) \
+            .filter(GmailMessageLabel.label == 'UNREAD').all()
+
+    return gmail_messages
+
+def list_glinks():
+    gmail_messages = None
+    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailLink']) as \
+        (db, GmailMessage, GmailMessageLabel, GmailLink):
+
+        gmail_messages = db.session.query(GmailMessage, GmailLink) \
+            .join(GmailMessageLabel) \
+            .join(GmailLink) \
+            .filter(GmailMessageLabel.label == 'UNREAD').all()
+
+    return gmail_messages
+
 def clean_gmail_tables():
     with db_ops(model_names=['GmailMessage', 'GmailMessageText', \
         'GmailMessageLabel', 'GmailMessageListMetadata', \
