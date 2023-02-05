@@ -5,6 +5,8 @@ import hashlib
 import os
 
 from bs4 import BeautifulSoup
+from urlextract import URLExtract
+
 
 
 from quickstart.gmail_utils import auth_and_load_session_gmail, is_day_old
@@ -31,6 +33,12 @@ def get_text_from_html(html_text):
 # def get_text_from_html(html_text):
 #
 #     return html_text
+
+
+def extract_links(text):
+    extractor = URLExtract()
+    urls = extractor.find_urls(text)
+    return urls
 
 
 def extract_messages_from_gmail_service(service, num_messages=10):
@@ -73,6 +81,7 @@ def extract_messages_from_gmail_service(service, num_messages=10):
             text =  base64.urlsafe_b64decode(data).decode()
             email_content += get_text_from_html(text) + '\n'
         show_parts = True
+        links = None
         if show_parts:
             parts = payload.get('parts', [])
 
@@ -98,6 +107,7 @@ def extract_messages_from_gmail_service(service, num_messages=10):
                         text = None
                         if mime_type_1 == 'text/plain':
                             text = base64.urlsafe_b64decode(data_1).decode()
+                            links = extract_links(text)
                         elif mime_type_1 == 'text/html':
                             if extract_text_from_mixed:
                                 text = base64.urlsafe_b64decode(data_1).decode()
@@ -188,6 +198,7 @@ def extract_messages_from_gmail_service(service, num_messages=10):
                     }
 
 
+
                 # todo handle general attachment case
                 elif mime_type_0 == 'application/*':
                     print("Not implemented!")
@@ -219,6 +230,8 @@ def extract_messages_from_gmail_service(service, num_messages=10):
             #         'snippet':snippet,
             #         'subject':headers_dict["Subject"],
             #         'date':date_string}
+        if links:
+            email_content += '\nLinks: [%s]' % ','.join(links)
         email_content += '\n%s' % json.dumps(email_body, indent=4)
         email_content += '\n%s' % json.dumps(headers_dict, indent=4)
         email_content += '\nSnippet:\n%s' % snippet
@@ -238,6 +251,9 @@ def write_tests(foldername='random'):
     service = auth_and_load_session_gmail()
     gmail_messages = extract_messages_from_gmail_service(service)
     i = 0
+    folderpath = 'quickstart/tests/%s' % foldername
+    if not os.path.exists(folderpath):
+        os.mkdir(folderpath)
     for gmessage in gmail_messages:
         with open('quickstart/tests/%s/gmail-test-%s' % (foldername, i), 'w', encoding="utf-8") as f:
             f.write(gmessage)
