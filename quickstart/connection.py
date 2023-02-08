@@ -16,7 +16,7 @@ def db_ops(db_name='sqlite:///app.db', model_names=None):
     # Figure out why this context push cause error
     # app.app_context().push()
     # db.session.rollback()
-    from app import models
+
     Models = []
     for m_name in model_names:
         Model = getattr(models, m_name)
