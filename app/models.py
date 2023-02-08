@@ -185,3 +185,53 @@ class GmailLink(db.Model):
 
     def __repr__(self):
         return '<g-link {}>'.format(self.id)
+
+class SlackAttachment(db.Model):
+    md5 = db.Column(db.Text(), primary_key=True)
+    slack_message_ts = db.Column(db.String(40), db.ForeignKey('slack_message.ts'), primary_key=True)
+    slack_user_id = db.Column(db.String(20))
+    size = db.Column(db.Integer)
+    created = db.Column(db.Integer)
+    timestamp = db.Column(db.Integer)
+    id = db.Column(db.String(20))
+    filename = db.Column(db.Text())
+    filepath = db.Column(db.Text())
+    title = db.Column(db.Text())
+    mimetype = db.Column(db.Text())
+    filetype = db.Column(db.Text())
+    pretty_type = db.Column(db.Text())
+    user_team = db.Column(db.String(20))
+    editable = db.Column(db.Boolean())
+    mode = db.Column(db.Text())
+    is_external = db.Column(db.Boolean())
+    external_type = db.Column(db.Text())
+    is_public = db.Column(db.Boolean())
+    public_url_shared = db.Column(db.Boolean())
+    display_as_bot = db.Column(db.Boolean())
+    username = db.Column(db.Text())
+    url_private = db.Column(db.Text())
+    url_private_download = db.Column(db.Text())
+    media_display_type = db.Column(db.Text())
+    thumb_pdf = db.Column(db.Text())
+    thumb_pdf_w = db.Column(db.Integer)
+    thumb_pdf_h = db.Column(db.Integer)
+    permalink = db.Column(db.Text())
+    permalink_public = db.Column(db.Text())
+    is_starred = db.Column(db.Boolean())
+    has_rich_preview = db.Column(db.Boolean())
+    file_access = db.Column(db.Text())
+
+    def __repr__(self):
+        return '<s-attachment with filename {}>'.format(self.filename)
+
+class SlackLink(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    slack_message_ts = db.Column(db.String(40), db.ForeignKey('slack_message.ts'))
+    has_text = db.Column(db.Text())
+    url = db.Column(db.Text())
+    text = db.Column(db.UnicodeText())
+    domain = db.Column(db.Text())
+    content = db.Column(db.Text())
+
+    def __repr__(self):
+        return '<s-link with domain {}>'.format(self.domain)

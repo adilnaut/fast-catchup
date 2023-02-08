@@ -5,8 +5,10 @@ from flask import render_template, send_file, request
 from app import app
 from quickstart.quickstart import generate_summary
 
-from quickstart.slack_utils import get_slack_comms
+from quickstart.slack_utils import get_slack_comms, list_sfiles, clear_slack_tables, slack_test_etl, list_slinks
 from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables, list_gtexts, list_gfiles, list_glinks
+
+
 
 @app.route('/list_gmail_texts', methods=['GET'])
 def list_gmail_texts():
@@ -26,16 +28,34 @@ def list_gmail_links():
     # print(gtexts)
     return render_template('gmail_links.html', glinks=glinks)
 
+@app.route('/list_slack_files', methods=['GET'])
+def list_slack_files():
+    sfiles = list_sfiles()
+    return render_template('slack_files.html', sfiles=sfiles)
 
+@app.route('/list_slack_links', methods=['GET'])
+def list_slack_links():
+    slinks = list_slinks()
+    return render_template('slack_links.html', slinks=slinks)
 
 @app.route('/test_gmail_etl', methods=['GET'])
 def test_gmail_etl():
     test_etl()
     return "OK"
 
+@app.route('/test_slack_etl', methods=['GET'])
+def test_slack_etl():
+    slack_test_etl()
+    return "OK"
+
 @app.route('/test_clear_gmail_table', methods=['GET'])
 def test_clear_gmail_table():
     clean_gmail_tables()
+    return "OK"
+
+@app.route('/clear_slack_table', methods=['GET'])
+def test_clear_slack_table():
+    clear_slack_tables()
     return "OK"
 
 @app.route('/first', methods=['GET'])
