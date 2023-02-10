@@ -1,8 +1,11 @@
 .venv
 .flaskenv
+.vs
 *.pyc
 app.db
 quickstart/credentials.json
 quickstart/token.json
 quickstart/tests/
 file_store/
+distilbert/
+models/
