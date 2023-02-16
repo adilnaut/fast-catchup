@@ -1,23 +1,8 @@
-<!doctype html>
-<html>
-	<head>
-		<title>{{ title }} - Fast-catchup</title>
-	</head>
-	<body>
-		<h2> Fast-catchup prototype </h2>
+{% extends "base.html" %}
 
-        <p> Prompt: {{ gptin.prompt }} </p>
-        <form action = "http://localhost:5000/" method = "post">
-            <input type="text"  placeholder="{{gptin.prompt}}" name="prompt" />
-            <input type="submit" value="Generate">
-        </form>
-
-        <p> Slack input {{ gptin.slack_text }} </p>
-		<p> Emails input {{ gptin.email_text }} </p>
-		<p> Summary: {{ gptout.summary }} </p>
-		<audio controls>
-      			<source src="/audio/file.wav" type="audio/wav">
-      			Your browser does not support the audio element.
-    	</audio>
-	</body>
-</html>
+{% block content %}
+    <h1>Hi, {{ current_user.username }}!</h1>
+    {% for post in posts %}
+    <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
+    {% endfor %}
+{% endblock %}

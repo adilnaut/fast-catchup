@@ -1,12 +1,55 @@
 import os
 
 
-from flask import render_template, send_file, request
-from app import app
-from quickstart.quickstart import generate_summary
+from flask import render_template, send_file, request, flash, redirect, url_for
+from flask_login import current_user, login_user, logout_user, login_required
+from app import app, db
+from app.models import User
+from app.forms import LoginForm, RegistrationForm
 
+from werkzeug.urls import url_parse
+
+from quickstart.quickstart import generate_summary
 from quickstart.slack_utils import get_slack_comms, list_sfiles, clear_slack_tables, slack_test_etl, list_slinks
 from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables, list_gtexts, list_gfiles, list_glinks
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember_me.data)
+        next_page = request.args.get('next')
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('index')
+        return redirect(next_page)
+    return render_template('login.html', title='Sign In', form=form)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Register', form=form)
 
 
 
@@ -109,38 +152,12 @@ def gen_summary():
 
     return render_template('first.html', title='Home', gptin=gptin, gptout=gptout)
 
+
 @app.route('/', methods=['POST', 'GET'])
 @app.route('/index')
+@login_required
 def index():
-    gptin = {}
-    gptout = {}
-    prompt = '''I\'ve got the following slack messages and emails today please give me a quick summary
-        of only important messages with urgent matters first.:'''
-    # get prompt from post form
-    if request.method == 'POST':
-        prompt = request.form['prompt']
-
-    try:
-        unread_emails, unread_slack, prompt, gpt_summary, filepath = generate_summary(prompt, cache_slack=cache_slack)
-
-        gptin['slack_text'] = unread_slack
-        gptin['email_text'] = unread_emails
-        gptin['prompt'] = prompt
-
-        gptout['summary'] = gpt_summary
-    # todo: throw meaningful exception in generate_summary and import exception class here
-    except:
-        print('[Error] There was an error in generate summary!')
-        gptin = {'slack_text': 'slack text 1, slack text 2',
-                 'email_text': 'email_text 1, email text 2',
-                 'prompt': 'Here are my slack and email texts could you summarize them?'}
-        gptout = {'summary': 'You\'ve got slack text 1 and 2 and email 1 and 2'}
-
-    # todo provide filepath to index.html template and adjust returnAudioFile method accordingly
-
-
-
-    return render_template('index.html',title='Home', gptin=gptin, gptout=gptout)
+    return render_template('index.html',title='Home')
 
 
 
