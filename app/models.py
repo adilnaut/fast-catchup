@@ -22,9 +22,34 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<user {}>'.format(self.username)
 
+class Workspace(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    created = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __repr__(self):
+        return '<workspace {}>'.format(self.id)
+
+class Platform(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text())
+    workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
+    auth_method = db.Column(db.Text())
+
+class AuthData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
+    name = db.Column(db.Text())
+    is_data = db.Column(db.Boolean())
+    is_blob = db.Column(db.Boolean())
+    is_path = db.Column(db.Boolean())
+    file_data = db.Column(db.Text())
+    file_blob = db.Column(db.Text())
+    file_path = db.Column(db.Text())
+
 class SlackUser(db.Model):
-    # id = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.String(20), primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'), primary_key=True)
     name = db.Column(db.String(120), index=True)
     team_id = db.Column(db.String(20), index=True)
     deleted = db.Column(db.Boolean())
@@ -63,8 +88,8 @@ class SlackUser(db.Model):
 
 
 class SlackChannel(db.Model):
-    # id = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.String(20), primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'), primary_key=True)
     name = db.Column(db.String(120), index=True)
     is_channel = db.Column(db.Boolean())
     is_group = db.Column(db.Boolean())
@@ -167,6 +192,7 @@ class GmailMessage(db.Model):
 
 class GmailUser(db.Model):
     email = db.Column(db.String(240), primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'), primary_key=True)
     name = db.Column(db.Text())
     is_newsletter = db.Column(db.Boolean())
     type = db.Column(db.String(120))

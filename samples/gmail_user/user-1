@@ -1,5 +1,6 @@
 {
     "email": "info@email.meetup.com",
+    "platform_id": 0,
     "name": "Startup Investor Accelerator",
     "type": "social-alert"
 }
