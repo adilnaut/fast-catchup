@@ -140,15 +140,6 @@ def gen_summary():
     gptin['prompt'] = prompt
 
     gptout['summary'] = gpt_summary
-    # todo: throw meaningful exception in generate_summary and import exception class here
-    # except:
-    #     print('[Error] There was an error in generate summary!')
-    #     gptin = {'slack_text': 'slack text 1, slack text 2',
-    #              'email_text': 'email_text 1, email text 2',
-    #              'prompt': 'Here are my slack and email texts could you summarize them?'}
-    #     gptout = {'summary': 'You\'ve got slack text 1 and 2 and email 1 and 2'}
-
-    # todo provide filepath to index.html template and adjust returnAudioFile method accordingly
 
     return render_template('first.html', title='Home', gptin=gptin, gptout=gptout)
 

@@ -10,6 +10,7 @@ sys.path.append(str(Path(sys.path[0]).parent))
 from app import app, db
 from app import models
 
+from flask_login import current_user
 
 @contextmanager
 def db_ops(db_name='sqlite:///app.db', model_names=None):
@@ -32,3 +33,5 @@ def db_ops(db_name='sqlite:///app.db', model_names=None):
     #     db.session.rollback()
     # finally:
         # db.session.close()
+def get_current_user():
+    return current_user

@@ -5,6 +5,9 @@ import pytz
 import os
 import base64
 import hashlib
+import tempfile
+import shutil
+import uuid
 
 from urlextract import URLExtract
 from urllib.parse import urlparse
@@ -16,7 +19,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.auth.exceptions import RefreshError
 
-from quickstart.connection import db_ops
+from quickstart.connection import db_ops, get_current_user
 ## from connection import db_ops
 
 # If modifying these scopes, delete the file token.json.
@@ -171,6 +174,31 @@ def parse_email_part(part, id, service, db, GmailAttachment, GmailLink, handle_s
                 db.session.add(gmail_link)
     return text_parts, num_processed
 
+def get_platform_id():
+    # get platform id for slack for current user
+    # get current user id
+    # get workspace id from user id
+    # get platform_id by platform name/hardcoded codename
+
+    current_user = get_current_user()
+    if current_user.is_authenticated():
+        user_id = current_user.get_id()
+    else:
+        return None
+    # handle case when user is not is_authenticated or put decorator for authcheck
+    with db_ops(model_names=['Workspace', 'Platform']) as (db, Workspace, Platform):
+        # also may replace this by one sql query
+        workspace = Workspace.query.filter_by(user_id=user_id).first()
+        if not workspace:
+            return None
+        platform = Platform.query.filter_by(workspace_id=workspace.id) \
+            .filter_by(name='gmail') \
+            .first()
+        if not platform:
+            return None
+        return platform.id
+
+
 def etl_gmail(service, max_messages=20, unread_only=True):
 
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
@@ -263,9 +291,13 @@ def etl_gmail(service, max_messages=20, unread_only=True):
             tags = get_initial_tags(from_string)
             gmail_user_name = get_guser_name(from_string)
 
-
-            # better attempt to insert and on conflict do nothing
-            in_user = GmailUser.query.filter_by(email=gmail_user_email).first()
+            in_user = None
+            platform_id = get_platform_id()
+            if platform_id:
+                #  better attempt to insert and on conflict do nothing
+                in_user = GmailUser.query.filter_by(email=gmail_user_email) \
+                    .filter_by(platform_id=platform_id)
+                    .first()
             if not in_user:
                 user_kwargs = {'email': gmail_user_email
                     , 'name': gmail_user_name}
@@ -347,6 +379,10 @@ def etl_gmail(service, max_messages=20, unread_only=True):
 
 
 
+#  todo handle cases:
+#  when  tokens don't exist in database
+#  when cred don't exist in database
+#  when shutil couldn't find or copy file
 def auth_and_load_session_gmail():
     """Shows basic usage of the Gmail API.
     Lists the user's Gmail labels.
@@ -356,8 +392,44 @@ def auth_and_load_session_gmail():
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('quickstart/token.json'):
-        creds = Credentials.from_authorized_user_file('quickstart/token.json', SCOPES)
+
+    # the task is to fetch 2 auth data files
+    # that would have data in file_store
+    # and move them to temp folder and give unique name
+    # and after both tokenpath and credpath would be assigned
+    # accessible filepaths on the local store - script should work
+
+    platform_id = get_platform_id()
+    tokenpath = None
+    credpath = None
+
+    with db_ops(model_names=['AuthData']) as (db, AuthData):
+        token_row = AuthData.query \
+            .filter_by(platform_id=platform_id) \
+            .filter_by(name='token.json') \
+            .filter_by(is_path=True) \
+            .first()
+
+        cred_row = AuthData.query \
+            .filter_by(platform_id=platform_id) \
+            .filter_by(name='credentials.json') \
+            .filter_by(is_path=True) \
+            .first()
+
+        tempdir = tempfile.gettempdir()
+
+        if token_row:
+            tokenpath = os.path.join(tempdir, token_row.name)
+            shutil.copyfile(token_row.file_path, tokenpath)
+        else:
+            tokenpath = os.path.join(tempdir, 'token.json')
+        if cred_row:
+            credpath = os.path.join(tempdir, cred_row.name)
+            shutil.copyfile(cred_row.file_path, credpath)
+
+
+    if os.path.exists(tokenpath):
+        creds = Credentials.from_authorized_user_file(tokenpath, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -369,11 +441,33 @@ def auth_and_load_session_gmail():
                 exit()
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'quickstart/credentials.json', SCOPES)
+                credpath, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('quickstart/token.json', 'w') as token:
+
+        filename = uuid.uuid4().hex
+        new_tokenpath = os.path.join('file_store', filename)
+        with open(new_tokenpath, 'w') as token:
             token.write(creds.to_json())
+            with db_ops(model_names=['AuthData']) as (db, AuthData):
+                token_row = AuthData.query \
+                    .filter_by(platform_id=platform_id) \
+                    .filter_by(name='token.json') \
+                    .filter_by(is_path=True) \
+                    .first()
+                if token_row:
+                    db.session.delete(token_row)
+                    if os.path.exists(tokenpath):
+                        os.remove(tokenpath)
+                authdata_kwargs = {'platform_id': platform_id
+                    , 'name': 'token.json'
+                    , 'is_data': False
+                    , 'is_blob': False
+                    , 'is_path': True
+                    , 'file_path': new_tokenpath}
+                auth_data = AuthData(**authdata_kwargs)
+                db.session.add(auth_data)
+
 
     try:
         # Call the Gmail API
@@ -395,7 +489,11 @@ def dumps_emails(gmail_messages):
         snippet_ = None
         with db_ops(model_names=['GmailUser', 'GmailMessageText']) as \
             (db, GmailUser, GmailMessageText):
-            gmail_user = GmailUser.query.filter_by(email=email_).one()
+            platform_id = get_platform_id()
+            if platform_id:
+                gmail_user = GmailUser.query.filter_by(email=email_) \
+                    .filter_by(platform_id=platform_id) \
+                    .one()
             gm_snippet = GmailMessageText.query.filter_by(gmail_message_id=id_) \
                 .filter_by(is_snippet=True).one()
             name_ = gmail_user.name
@@ -414,12 +512,16 @@ def get_gmail_comms(use_last_cached_emails=True, return_list=False):
         etl_gmail(service)
 
     gmail_messages = None
-    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel']) as \
-        (db, GmailMessage, GmailMessageLabel):
+    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailUser']) as \
+        (db, GmailMessage, GmailMessageLabel, GmailUser):
 
-        gmail_messages = db.session.query(GmailMessage) \
-            .join(GmailMessageLabel) \
-            .filter(GmailMessageLabel.label == 'UNREAD').all()
+        platform_id = get_platform_id()
+        if platform_id:
+            gmail_messages = db.session.query(GmailMessage) \
+                .join(GmailMessageLabel, GmailMessageLabel.gmail_message_id == GmailMessage.id) \
+                .join(GmailUser, GmailUser.email == GmailMessage.gmail_user_email) \
+                .filter(GmailUser.platform_id == platform_id) \
+                .filter(GmailMessageLabel.label == 'UNREAD').all()
 
     if return_list:
         return gmail_messages
@@ -442,39 +544,50 @@ def test_etl():
 
 def list_gtexts():
     gmail_messages = None
-    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailMessageText']) as \
-        (db, GmailMessage, GmailMessageLabel, GmailMessageText):
+    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailMessageText', 'GmailUser']) as \
+        (db, GmailMessage, GmailMessageLabel, GmailMessageText, GmailUser):
 
         gmail_messages = db.session.query(GmailMessage, GmailMessageText) \
-            .join(GmailMessageLabel) \
-            .join(GmailMessageText) \
-            .filter(GmailMessageLabel.label == 'UNREAD').all()
+            .join(GmailMessageLabel, GmailMessageLabel.gmail_message_id == GmailMessage.id) \
+            .join(GmailMessageText, GmailMessageText.gmail_message_id == GmailMessage.id) \
+            .join(GmailUser, GmailUser.email == GmailMessage.gmail_user_email) \
+            .filter(GmailMessageLabel.label == 'UNREAD') \
+            .filter(GmailUser.platform_id == platform_id) \
+            .all()
 
     return gmail_messages
 
 def list_gfiles():
     gmail_messages = None
-    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailAttachment']) as \
-        (db, GmailMessage, GmailMessageLabel, GmailAttachment):
+    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailAttachment', 'GmailUser']) as \
+        (db, GmailMessage, GmailMessageLabel, GmailAttachment, GmailUser):
 
         gmail_messages = db.session.query(GmailMessage, GmailAttachment) \
-            .join(GmailMessageLabel) \
-            .join(GmailAttachment) \
-            .filter(GmailMessageLabel.label == 'UNREAD').all()
+            .join(GmailMessageLabel, GmailMessageLabel.gmail_message_id == GmailMessage.id) \
+            .join(GmailAttachment, GmailAttachment.gmail_message_id == GmailMessage.id) \
+            .join(GmailUser, GmailUser.email == GmailMessage.gmail_user_email) \
+            .filter(GmailMessageLabel.label == 'UNREAD') \
+            .filter(GmailUser.platform_id == platform_id) \
+            .all()
 
     return gmail_messages
 
 def list_glinks():
     gmail_messages = None
-    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailLink']) as \
-        (db, GmailMessage, GmailMessageLabel, GmailLink):
+    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailLink', 'GmailUser']) as \
+        (db, GmailMessage, GmailMessageLabel, GmailLink, GmailUser):
 
         gmail_messages = db.session.query(GmailMessage, GmailLink) \
-            .join(GmailMessageLabel) \
-            .join(GmailLink) \
-            .filter(GmailMessageLabel.label == 'UNREAD').all()
+            .join(GmailMessageLabel, GmailMessageLabel.gmail_message_id == GmailMessage.id) \
+            .join(GmailLink, GmailLink.gmail_message_id == GmailMessage.id) \
+            .join(GmailUser, GmailUser.email == GmailMessage.gmail_user_email) \
+            .filter(GmailMessageLabel.label == 'UNREAD') \
+            .filter(GmailUser.platform_id == platform_id) \
+            .all()
 
     return gmail_messages
+
+
 
 def clean_gmail_tables():
     with db_ops(model_names=['GmailMessage', 'GmailMessageText', \

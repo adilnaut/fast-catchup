@@ -27,3 +27,9 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
+
+class AuthDataForm(FlaskForm):
+    slack_app_token = StringField('Slack App Token', validators=[DataRequired()])
+    slack_signing_secret = PasswordField('Slack Signing Secret', validators=[DataRequired()])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Sign In')

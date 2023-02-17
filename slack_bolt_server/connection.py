@@ -9,11 +9,12 @@ from app import app, db
 from app import models
 # from app.models import SlackUser, SlackChannel, SlackMessage
 
+from flask_login import current_user
 
 @contextmanager
 def db_ops(db_name='sqlite:///app.db', model_names=None):
     app.app_context().push()
-    db.session.rollback() 
+    db.session.rollback()
     Models = []
     for m_name in model_names:
         Model = getattr(models, m_name)
@@ -24,3 +25,6 @@ def db_ops(db_name='sqlite:///app.db', model_names=None):
     yield tuple(return_list)
     db.session.commit()
     db.session.close()
+
+def get_current_user():
+    return current_user

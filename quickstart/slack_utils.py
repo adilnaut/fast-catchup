@@ -11,7 +11,8 @@ import hashlib
 from slack_sdk.errors import SlackApiError
 from slack_bolt import App
 
-from quickstart.connection import db_ops
+
+from quickstart.connection import db_ops, get_current_user
 from quickstart.gmail_utils import extract_domain
 
 
@@ -159,7 +160,9 @@ def etl_messages(app, days_ago=1, max_pages=1,  verbose=False):
     slack_channels = None
 
     with db_ops(model_names=['SlackChannel']) as (db, SlackChannel):
-        slack_channels = SlackChannel.query.all()
+        platform_id = get_platform_id()
+        if platform_id:
+            slack_channels = SlackChannel.query.filter_by(platform_id=platform_id).all()
 
     yesterday = datetime.utcnow() - timedelta(days=days_ago)
     unix_time = time.mktime(yesterday.timetuple())
@@ -341,12 +344,60 @@ def ts_to_formatted_date(ts):
     return datetime.fromtimestamp(int(ts.split('.')[0])).strftime('%c')
 
 
+# todo handle if there are no slack token data in db
 def auth_and_load_session_slack():
+    platform_id = get_platform_id()
+    app_token = None
+    # os.environ.get("SLACK_BOT_TOKEN")
+    app_secret = None
+    # os.environ.get("SLACK_SIGNING_SECRET")
+
+    with db_ops(model_names=['AuthData']) as (db, AuthData):
+        token_row = AuthData.query \
+            .filter_by(platform_id=platform_id) \
+            .filter_by(name='SLACK_BOT_TOKEN') \
+            .filter_by(is_data=True) \
+            .first()
+
+        secret_row = AuthData.query \
+            .filter_by(platform_id=platform_id) \
+            .filter_by(name='SLACK_SIGNING_SECRET') \
+            .filter_by(is_data=True) \
+            .first()
+
+        app_token = token_row.file_data
+        app_secret = secret_row.file_data
+
     app = App(
-        token=os.environ.get("SLACK_BOT_TOKEN"),
-        signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+        token=app_token,
+        signing_secret=app_secret
     )
     return app
+
+def get_platform_id():
+    # get platform id for slack for current user
+    # get current user id
+    # get workspace id from user id
+    # get platform_id by platform name/hardcoded codename
+
+    current_user = get_current_user()
+    if current_user.is_authenticated():
+        user_id = current_user.get_id()
+    else:
+        return None
+    # handle case when user is not is_authenticated or put decorator for authcheck
+    with db_ops(model_names=['Workspace', 'Platform']) as (db, Workspace, Platform):
+        # also may replace this by one sql query
+        workspace = Workspace.query.filter_by(user_id=user_id).first()
+        if not workspace:
+            return None
+        platform = Platform.query.filter_by(workspace_id=workspace.id) \
+            .filter_by(name='slack') \
+            .first()
+        if not platform:
+            return None
+        return platform.id
+
 
 
 # Opportunity(to learn): make it sqllite defined function?
@@ -356,7 +407,12 @@ def encapsulate_names_by_ids(text):
         middle = left.split('<@')[1]
         user_data = None
         with db_ops(model_names=['SlackUser']) as (db, SlackUser):
-            user_data = SlackUser.query.filter_by(id=middle).first()
+
+            platform_id = get_platform_id()
+            if platform_id:
+                user_data = SlackUser.query.filter_by(id=middle)  \
+                    .filter_by(platform_id=platform_id)
+                    .first()
         if user_data:
             # user_data = slack_users.get(middle)
             user_name = user_data.name
@@ -380,8 +436,12 @@ def format_slack_message(slack_message):
     # get user name
     # user_data = slack_users.get(user_id)
     user_data = None
+    platform_id = get_platform_id()
     with db_ops(model_names=['SlackUser']) as (db, SlackUser):
-        user_data = SlackUser.query.filter_by(id=user_id).first()
+        if platform_id:
+            user_data = SlackUser.query.filter_by(id=middle)  \
+                .filter_by(platform_id=platform_id) \
+                .first()
 
     if user_data:
         user_name = user_data.name
@@ -394,7 +454,10 @@ def format_slack_message(slack_message):
     # channel_data = slack_conversations.get(channel_id)
     channel_data = None
     with db_ops(model_names=['SlackChannel']) as (db, SlackChannel):
-        channel_data = SlackChannel.query.filter_by(id=channel_id).first()
+        if platform_id:
+            channel_data = SlackChannel.query.filter_by(id=channel_id) \
+                .filter_by(platform_id=platform_id) \
+                .first()
 
     if channel_data:
         channel_name = channel_data.name
@@ -471,9 +534,17 @@ def get_slack_comms(use_last_cached_emails=True, return_list=False):
         etl_messages(app)
 
     slack_messages = None
-    with db_ops(model_names=['SlackMessage']) as (db, SlackMessage):
-        slack_messages = SlackMessage.query.filter_by(is_unread=True).all()
+    with db_ops(model_names=['SlackMessage', 'SlackChannel']) as (db, SlackMessage, SlackChannel):
+        # slack_messages = SlackMessage.query.filter_by(is_unread=True).all()
+        platform_id = get_platform_id()
 
+        # option: replace by
+        if platform_id:
+            slack_messages = db.session.query(SlackMessage) \
+                .join(SlackChannel, SlackMessage.slack_channel_id == SlackChannel.id) \
+                .filter(SlackChannel.platform_id == platform_id) \
+                .filter(SlackMessage.is_unread == True) \
+                .all()
 
     if return_list:
         return slack_messages
@@ -490,13 +561,14 @@ def list_sfiles():
     slack_messages = None
     with db_ops(model_names=['SlackMessage', 'SlackAttachment', 'SlackUser', 'SlackChannel']) as \
         (db, SlackMessage, SlackAttachment, SlackUser, SlackChannel):
-
+        platform_id = get_platform_id()
 
         sm_query = db.session.query(SlackMessage, SlackAttachment, SlackUser, SlackChannel) \
             .select_from(SlackMessage) \
             .join(SlackAttachment, SlackMessage.ts == SlackAttachment.slack_message_ts) \
             .join(SlackUser, SlackMessage.slack_user_id == SlackUser.id) \
-            .join(SlackChannel, SlackChannel.id == SlackMessage.slack_channel_id)
+            .join(SlackChannel, SlackChannel.id == SlackMessage.slack_channel_id) \
+            .filter(SlackUser.platform_id == platform_id)
 
 
         slack_messages = sm_query.all()
@@ -514,7 +586,8 @@ def list_slinks():
             .select_from(SlackMessage) \
             .join(SlackLink, SlackMessage.ts == SlackLink.slack_message_ts) \
             .join(SlackUser, SlackMessage.slack_user_id == SlackUser.id) \
-            .join(SlackChannel, SlackChannel.id == SlackMessage.slack_channel_id)
+            .join(SlackChannel, SlackChannel.id == SlackMessage.slack_channel_id) \
+            .filter(SlackUser.platform_id == platform_id)
 
         slack_messages = sm_query.all()
 
