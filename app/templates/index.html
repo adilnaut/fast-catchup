@@ -2,7 +2,11 @@
 
 {% block content %}
     <h1>Hi, {{ current_user.username }}!</h1>
-    {% for post in posts %}
-    <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
-    {% endfor %}
+    {% for auth_obj in auth_data %}
+        <p> {{ auth_obj.name }} </p>
+    {% endfor  %}
+
+    <p>Add Slack Authentication <a href="{{ url_for('upload_slack_auth') }}">Click to Add!</a></p>
+    <p>Add Gmail Authentication <a href="{{ url_for('upload_gmail_auth') }}">Click to Add!</a></p>
+
 {% endblock %}

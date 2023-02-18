@@ -142,6 +142,8 @@ def parse_email_part(part, id, service, db, GmailAttachment, GmailLink, handle_s
             datafile.write(file_content)
             datafile.close()
 
+
+
         gm_att_test = GmailAttachment.query.filter_by(md5=file_hash, gmail_message_id=id).first()
         if not gm_att_test:
             gmail_attachment_kwargs = {'md5': file_hash
@@ -181,10 +183,8 @@ def get_platform_id():
     # get platform_id by platform name/hardcoded codename
 
     current_user = get_current_user()
-    if current_user.is_authenticated():
-        user_id = current_user.get_id()
-    else:
-        return None
+    user_id = current_user.get_id()
+    
     # handle case when user is not is_authenticated or put decorator for authcheck
     with db_ops(model_names=['Workspace', 'Platform']) as (db, Workspace, Platform):
         # also may replace this by one sql query

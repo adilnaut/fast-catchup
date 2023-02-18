@@ -260,9 +260,18 @@ def etl_messages(app, days_ago=1, max_pages=1,  verbose=False):
                     files_data = message.get('files')
                     if not files_data:
                         continue
-                    with db_ops(model_names=['SlackAttachment']) as (db, SlackAttachment):
+                    with db_ops(model_names=['SlackAttachment', 'AuthData']) as (db, SlackAttachment, AuthData):
                         for one_file_data in files_data:
-                            token = os.environ.get("SLACK_BOT_TOKEN")
+
+                            token_row = AuthData.query \
+                                .filter_by(platform_id=platform_id) \
+                                .filter_by(name='SLACK_BOT_TOKEN') \
+                                .filter_by(is_data=True) \
+                                .first()
+
+                            app_token = token_row.file_data
+
+                            token = app_token
                             file_id = one_file_data.get('id')
 
                             file_name = one_file_data.get('name')
@@ -381,10 +390,8 @@ def get_platform_id():
     # get platform_id by platform name/hardcoded codename
 
     current_user = get_current_user()
-    if current_user.is_authenticated():
-        user_id = current_user.get_id()
-    else:
-        return None
+    user_id = current_user.get_id()
+
     # handle case when user is not is_authenticated or put decorator for authcheck
     with db_ops(model_names=['Workspace', 'Platform']) as (db, Workspace, Platform):
         # also may replace this by one sql query

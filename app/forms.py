@@ -37,5 +37,5 @@ class SlackAuthDataForm(FlaskForm):
 
 
 class GmailAuthDataForm(FlaskForm):
-    gmail_cred_file = FileField('Credentials File')
+    file = FileField('Credentials File')
     submit = SubmitField('Submit')

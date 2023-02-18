@@ -1,12 +1,12 @@
 import os
 from datetime import datetime
-
+from sqlalchemy.sql import text
 
 from flask import render_template, send_file, request, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
-from app.models import User, Workspace, AudioFile
-from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm
+from app.models import User, Workspace, AudioFile, Platform, AuthData
+from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthDataForm
 
 
 from werkzeug.utils import secure_filename
@@ -40,9 +40,15 @@ def upload_gmail_auth():
         # platform auth methods: cookie, oauth,
         platform_kwargs = {'name': 'gmail'
             , 'workspace_id': workspace_id
-            , 'auth_methods': 'oauth'}
+            , 'auth_method': 'oauth'}
 
-        platform_row = db.session.execute(platform_query, token_kwargs).fetchall()
+        platform_row = db.session.execute(text(platform_query), platform_kwargs).fetchall()
+        if not platform_row:
+            platform_row = Platform.query \
+                .filter_by(name='slack') \
+                .filter_by(workspace_id=workspace_id) \
+                .filter_by(auth_method='slack_bot') \
+                .one()
         platform_id = platform_row.id
 
         credfile_query = '''INSERT INTO auth_data (platform_id, name, is_path, is_blob, is_data, file_data)
@@ -57,7 +63,7 @@ def upload_gmail_auth():
             , 'is_data': False
             , 'file_path': filepath}
 
-        db.session.execute(credfile_query, credfile_kwargs)
+        db.session.execute(text(credfile_query), credfile_kwargs)
         db.session.commit()
 
         # todo save filepath to database
@@ -81,12 +87,19 @@ def upload_slack_auth():
         platform_query = '''INSERT OR IGNORE INTO platform (name, workspace_id, auth_method)
                 VALUES(:name, :workspace_id, :auth_method) returning id;'''
 
+
         # platform auth methods: slack_bot, cookie
         platform_kwargs = {'name': 'slack'
             , 'workspace_id': workspace_id
-            , 'auth_methods': 'slack_bot'}
+            , 'auth_method': 'slack_bot'}
 
-        platform_row = db.session.execute(platform_query, token_kwargs).fetchall()
+        platform_row = db.session.execute(text(platform_query), platform_kwargs).fetchone()
+        if not platform_row:
+            platform_row = Platform.query \
+                .filter_by(name='slack') \
+                .filter_by(workspace_id=workspace_id) \
+                .filter_by(auth_method='slack_bot') \
+                .one()
         platform_id = platform_row.id
 
         token_query = '''INSERT INTO auth_data (platform_id, name, is_data, is_path, is_blob, file_data)
@@ -101,7 +114,7 @@ def upload_slack_auth():
             , 'is_blob': False
             , 'file_data': app_token}
 
-        db.session.execute(token_query, token_kwargs)
+        db.session.execute(text(token_query), token_kwargs)
 
         secret_query = '''INSERT INTO auth_data (platform_id, name, is_data, is_path, is_blob, file_data)
             VALUES(:platform_id, :name, :is_data, :is_path, :is_blob, :file_data)
@@ -109,13 +122,13 @@ def upload_slack_auth():
             DO UPDATE SET file_data=excluded.file_data;'''
 
         secret_kwargs = {'platform_id': platform_id
-            , 'name': 'SLACK_BOT_TOKEN'
+            , 'name': 'SLACK_SIGNING_SECRET'
             , 'is_data': True
             , 'is_path': False
             , 'is_blob': False
             , 'file_data': signing_secret}
 
-        db.session.execute(secret_query, secret_kwargs)
+        db.session.execute(text(secret_query), secret_kwargs)
         db.session.commit()
 
         return redirect(url_for('index'))
@@ -168,7 +181,7 @@ def register():
         workspace_kwargs = {'created': timestamp
             ,'user_id': user.id}
 
-        db.session.execute(workspace_query, token_kwargs)
+        db.session.execute(text(workspace_query), workspace_kwargs)
         db.session.commit()
 
 
@@ -176,6 +189,13 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
+@app.route('/remove_users', methods=['GET'])
+def remove_users():
+    users = User.query.all()
+    for user in users:
+        db.session.delete(user)
+    db.session.commit()
+    return redirect(url_for('index'))
 
 @app.route('/list_gmail_texts', methods=['GET'])
 def list_gmail_texts():
@@ -235,7 +255,7 @@ def first():
              'prompt': 'Here are my slack and email texts could you summarize them?'}
     gptout = {'summary': 'Press Generate to generate summary'}
 
-    return render_template('first.html', title='Home', gptin=gptin, gptout=gptout)
+    return render_template('first.html', title='Summary', gptin=gptin, gptout=gptout)
 
 @app.route('/generate_summary', methods=['POST'])
 def gen_summary():
@@ -281,14 +301,19 @@ def gen_summary():
     gptout['summary'] = gpt_summary
 
 
-    return render_template('first.html', title='Home', gptin=gptin, gptout=gptout)
+    return render_template('first.html', title='Summary', gptin=gptin, gptout=gptout)
 
 
 @app.route('/', methods=['POST', 'GET'])
 @app.route('/index')
 @login_required
 def index():
-    return render_template('index.html',title='Home')
+    auth_data = db.session.query(AuthData) \
+        .join(Platform) \
+        .join(Workspace) \
+        .filter(Workspace.user_id == current_user.get_id()).all()
+    # auth_data = AuthData.query.filter_by(platform_id=platform_id).all()
+    return render_template('index.html',title='Home', auth_data=auth_data)
 
 
 @app.route('/audio/<filepath>')
