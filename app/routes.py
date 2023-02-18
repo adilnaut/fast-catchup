@@ -1,18 +1,126 @@
 import os
+from datetime import datetime
 
 
 from flask import render_template, send_file, request, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
-from app.models import User
-from app.forms import LoginForm, RegistrationForm
+from app.models import User, Workspace
+from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm
 
+
+from werkzeug.utils import secure_filename
 from werkzeug.urls import url_parse
 
 from quickstart.quickstart import generate_summary
 from quickstart.slack_utils import get_slack_comms, list_sfiles, clear_slack_tables, slack_test_etl, list_slinks
 from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables, list_gtexts, list_gfiles, list_glinks
 
+
+@app.route('/upload_gmail_auth', methods=['GET', 'POST'])
+def upload_gmail_auth():
+    form = GmailAuthDataForm()
+
+    if form.validate_on_submit():
+        filename = secure_filename(form.file.data.filename)
+        # todo when transition to azure file store, save to tempdir, upload to cloud
+        #  and persist file url
+        filepath = os.path.join('file_store', filename)
+        form.file.data.save(filepath)
+
+        user_id = current_user.get_id()
+
+        workspace = Workspace.query.filter_by(user_id=user_id).one()
+        workspace_id = workspace.id
+
+        #  not an upsert cause no need to update values on conflict
+        platform_query = '''INSERT OR IGNORE INTO platform (name, workspace_id, auth_method)
+                VALUES(:name, :workspace_id, :auth_method) returning id;'''
+
+        # platform auth methods: cookie, oauth,
+        platform_kwargs = {'name': 'gmail'
+            , 'workspace_id': workspace_id
+            , 'auth_methods': 'oauth'}
+
+        platform_row = db.session.execute(platform_query, token_kwargs).fetchall()
+        platform_id = platform_row.id
+
+        credfile_query = '''INSERT INTO auth_data (platform_id, name, is_path, is_blob, is_data, file_data)
+            VALUES(:platform_id, :name, :is_path, :is_blob, :is_data, :file_path)
+            ON CONFLICT(platform_id, name)
+            DO UPDATE SET file_path=excluded.file_path;'''
+
+        credfile_kwargs = {'platform_id': platform_id
+            , 'name': 'credentials.json'
+            , 'is_path': True
+            , 'is_blob': False
+            , 'is_data': False
+            , 'file_path': filepath}
+
+        db.session.execute(credfile_query, credfile_kwargs)
+        db.session.commit()
+
+        # todo save filepath to database
+        return redirect(url_for('index'))
+
+    return render_template('upload_gmail_auth.html', form=form)
+
+@app.route('/upload_slack_auth', methods=['GET', 'POST'])
+@login_required
+def upload_slack_auth():
+    form = SlackAuthDataForm()
+    if form.validate_on_submit():
+        app_token = form.slack_app_token.data
+        signing_secret = form.slack_signing_secret.data
+
+        user_id = current_user.get_id()
+
+        workspace = Workspace.query.filter_by(user_id=user_id).one()
+        workspace_id = workspace.id
+        #  not an upsert cause no need to update values on conflict
+        platform_query = '''INSERT OR IGNORE INTO platform (name, workspace_id, auth_method)
+                VALUES(:name, :workspace_id, :auth_method) returning id;'''
+
+        # platform auth methods: slack_bot, cookie
+        platform_kwargs = {'name': 'slack'
+            , 'workspace_id': workspace_id
+            , 'auth_methods': 'slack_bot'}
+
+        platform_row = db.session.execute(platform_query, token_kwargs).fetchall()
+        platform_id = platform_row.id
+
+        token_query = '''INSERT INTO auth_data (platform_id, name, is_data, is_path, is_blob, file_data)
+            VALUES(:platform_id, :name, :is_data, :is_path, :is_blob, :file_data)
+            ON CONFLICT(platform_id, name)
+            DO UPDATE SET file_data=excluded.file_data;'''
+
+        token_kwargs = {'platform_id': platform_id
+            , 'name': 'SLACK_BOT_TOKEN'
+            , 'is_data': True
+            , 'is_path': False
+            , 'is_blob': False
+            , 'file_data': app_token}
+
+        db.session.execute(token_query, token_kwargs)
+
+        secret_query = '''INSERT INTO auth_data (platform_id, name, is_data, is_path, is_blob, file_data)
+            VALUES(:platform_id, :name, :is_data, :is_path, :is_blob, :file_data)
+            ON CONFLICT(platform_id, name)
+            DO UPDATE SET file_data=excluded.file_data;'''
+
+        secret_kwargs = {'platform_id': platform_id
+            , 'name': 'SLACK_BOT_TOKEN'
+            , 'is_data': True
+            , 'is_path': False
+            , 'is_blob': False
+            , 'file_data': signing_secret}
+
+        db.session.execute(secret_query, secret_kwargs)
+        db.session.commit()
+
+        return redirect(url_for('index'))
+
+    return render_template('upload_slack_auth.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -48,6 +156,22 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
+
+        #  not an upsert cause no need to update values on conflict
+        workspace_query = ''' INSERT OR IGNORE INTO workspace (created, user_id)
+            VALUES(:created, :user_id);'''
+
+
+        timestamp = int(round(datetime.now().timestamp()))
+
+        # platform auth methods: slack_bot, cookie
+        workspace_kwargs = {'created': timestamp
+            ,'user_id': user.id}
+
+        db.session.execute(workspace_query, token_kwargs)
+        db.session.commit()
+
+
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 

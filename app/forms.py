@@ -1,4 +1,6 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField
+
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 
@@ -28,8 +30,12 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
-class AuthDataForm(FlaskForm):
+class SlackAuthDataForm(FlaskForm):
     slack_app_token = StringField('Slack App Token', validators=[DataRequired()])
     slack_signing_secret = PasswordField('Slack Signing Secret', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Sign In')
+    submit = SubmitField('Submit')
+
+
+class GmailAuthDataForm(FlaskForm):
+    gmail_cred_file = FileField('Credentials File')
+    submit = SubmitField('Submit')

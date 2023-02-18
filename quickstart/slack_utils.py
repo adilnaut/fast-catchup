@@ -400,7 +400,7 @@ def get_platform_id():
 
 
 
-# Opportunity(to learn): make it sqllite defined function?
+# Opportunity: make it sqllite defined function?
 def encapsulate_names_by_ids(text):
     if '<@' in text.split('>')[0]:
         left = text.split('>')[0]
@@ -411,7 +411,7 @@ def encapsulate_names_by_ids(text):
             platform_id = get_platform_id()
             if platform_id:
                 user_data = SlackUser.query.filter_by(id=middle)  \
-                    .filter_by(platform_id=platform_id)
+                    .filter_by(platform_id=platform_id) \
                     .first()
         if user_data:
             # user_data = slack_users.get(middle)

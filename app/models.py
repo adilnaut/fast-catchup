@@ -25,7 +25,7 @@ class User(UserMixin, db.Model):
 class Workspace(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
 
     def __repr__(self):
         return '<workspace {}>'.format(self.id)
@@ -35,6 +35,8 @@ class Platform(db.Model):
     name = db.Column(db.Text())
     workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
     auth_method = db.Column(db.Text())
+    __table_args__ = (db.UniqueConstraint('workspace_id', 'name', name='_unique_constraint_uc'),
+        )
 
 class AuthData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,6 +48,9 @@ class AuthData(db.Model):
     file_data = db.Column(db.Text())
     file_blob = db.Column(db.Text())
     file_path = db.Column(db.Text())
+    __table_args__ = (db.UniqueConstraint('platform_id', 'name', name='_unique_constraint_uc'),
+        )
+
 
 class SlackUser(db.Model):
     id = db.Column(db.String(20), primary_key=True)

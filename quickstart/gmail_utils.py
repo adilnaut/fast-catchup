@@ -296,7 +296,7 @@ def etl_gmail(service, max_messages=20, unread_only=True):
             if platform_id:
                 #  better attempt to insert and on conflict do nothing
                 in_user = GmailUser.query.filter_by(email=gmail_user_email) \
-                    .filter_by(platform_id=platform_id)
+                    .filter_by(platform_id=platform_id) \
                     .first()
             if not in_user:
                 user_kwargs = {'email': gmail_user_email
