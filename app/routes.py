@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import render_template, send_file, request, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
-from app.models import User, Workspace
+from app.models import User, Workspace, AudioFile
 from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm
 
 
@@ -255,7 +255,7 @@ def gen_summary():
     cache_slack = request.form.get("slack-checkbox") != None
     cache_gmail = request.form.get("gmail-checkbox") != None
 
-    # try:
+
     prompt, gpt_summary, filepath = generate_summary(prompt=prompt,
         cache_slack=cache_slack, cache_gmail=cache_gmail)
 
@@ -263,7 +263,23 @@ def gen_summary():
     gptin['gmail_list'] = unread_gmail
     gptin['prompt'] = prompt
 
+    user_id = current_user.get_id()
+
+    workspace = Workspace.query.filter_by(user_id=user_id).one()
+    workspace_id = workspace.id
+    timestamp = int(round(datetime.now().timestamp()))
+
+    audio_kwargs = {'workspace_id': workspace_id
+        , 'created': timestamp
+        , 'file_path': filepath}
+
+    audio_row = AudioFile(**audio_kwargs)
+    db.session.add(audio_row)
+    db.session.commit()
+
+    gptout['filepath'] = filepath
     gptout['summary'] = gpt_summary
+
 
     return render_template('first.html', title='Home', gptin=gptin, gptout=gptout)
 
@@ -275,12 +291,11 @@ def index():
     return render_template('index.html',title='Home')
 
 
-
-@app.route('/audio/file.wav')
-def returnAudioFile():
-    path_to_audio_file = os.getcwd()+'\/app\/audio\/file.wav'
+@app.route('/audio/<filepath>')
+def returnAudioFile(filepath):
+    path_to_audio_file = os.path.join(os.getcwd, filepath)
     return send_file(
             path_to_audio_file,
             mimetype='audio/wav',
             as_attachment=True,
-            download_name='file.wav')
+            download_name='audio.wav')

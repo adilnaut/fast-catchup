@@ -4,7 +4,7 @@ import os
 import os.path
 
 import json
-
+import uuid
 import openai
 
 
@@ -62,7 +62,9 @@ def generate_voice_file(text_response, verbose=False):
     speech_config.speech_synthesis_voice_name = "en-US-JennyNeural"
     # speech_config.speech_synthesis_voice_name = "en-US-AIGenerate2Neural"
 
-    filepath = './app/audio/file.wav'
+    filename = uuid.uuid4().hex
+    filepath = os.path.join('file_store', filename)
+
     audio_config = speechsdk.audio.AudioOutputConfig(filename=filepath)
     # audio_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
     # Receives a text from console input.

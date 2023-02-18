@@ -1,36 +1,30 @@
-<!doctype html>
-<html>
-	<head>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <link rel="stylesheet"  type="text/css" href="{{url_for('.static', filename='mystyle.css')}}">
-        <title>Fast-catchup</title>
-	</head>
-	<body>
-		<h2> Gmail Message Files </h2>
+{% extends "base.html" %}
 
-        <p> Message files: </p>
-        {% for message_obj, file_obj in gfiles %}
-            md5: {{ file_obj.md5 }} <br>
-            GmID: {{ file_obj.gmail_message_id }} <br>
-            attachmentId: {{ file_obj.attachment_id }} <br>
-            fileSize: {{ file_obj.file_size }} <br>
-            OGFilename: {{file_obj.original_filename}} <br>
-            PartId: {{file_obj.part_id}} <br>
-            MimeType: {{file_obj.mime_type}} <br>
-            File Extension: {{file_obj.file_extension}} <br>
-            Filepath: {{ file_obj.filepath }} <br>
+{% block content %}
+	<h2> Gmail Message Files </h2>
 
-            Date: {{ message_obj.date }}  <br>
-            From: {{ message_obj.from_string }}  <br>
-            Email: {{ message_obj.gmail_user_email }}  <br>
-            Mime Version: {{ message_obj.mime_version }}  <br>
-            Content Type: {{ message_obj.content_type }}  <br>
-            Subject: {{ message_obj.subject }}  <br>
+    <p> Message files: </p>
+    {% for message_obj, file_obj in gfiles %}
+        md5: {{ file_obj.md5 }} <br>
+        GmID: {{ file_obj.gmail_message_id }} <br>
+        attachmentId: {{ file_obj.attachment_id }} <br>
+        fileSize: {{ file_obj.file_size }} <br>
+        OGFilename: {{file_obj.original_filename}} <br>
+        PartId: {{file_obj.part_id}} <br>
+        MimeType: {{file_obj.mime_type}} <br>
+        File Extension: {{file_obj.file_extension}} <br>
+        Filepath: {{ file_obj.filepath }} <br>
+
+        Date: {{ message_obj.date }}  <br>
+        From: {{ message_obj.from_string }}  <br>
+        Email: {{ message_obj.gmail_user_email }}  <br>
+        Mime Version: {{ message_obj.mime_version }}  <br>
+        Content Type: {{ message_obj.content_type }}  <br>
+        Subject: {{ message_obj.subject }}  <br>
 
 
-            <br>
-            <hr>
-        {% endfor %}
+        <br>
+        <hr>
+    {% endfor %}
 
-	</body>
-</html>
+{% endblock %}

@@ -7,6 +7,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 def load_user(id):
     return User.query.get(int(id))
 
+class AudioFile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
+    created = db.Column(db.Integer)
+    file_path = db.Column(db.Text())
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), index=True, unique=True)

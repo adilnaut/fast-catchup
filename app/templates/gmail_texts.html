@@ -1,38 +1,31 @@
-<!doctype html>
-<html>
-	<head>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <link rel="stylesheet"  type="text/css" href="{{url_for('.static', filename='mystyle.css')}}">
-        <title>{{ title }} - Fast-catchup</title>
-	</head>
-	<body>
-		<h2> Gmail Message Texts </h2>
+{% extends "base.html" %}
+
+{% block content %}
+	<h2> Gmail Message Texts </h2>
 
 
 
-        <p> Message texts: </p>
-        {% for message_obj, text_obj in gtexts %}
-            Id: {{ text_obj.id }} <br>
-            GmID{{ text_obj.gmail_message_id }} <br>
-            Is primary: {{ text_obj.is_primary}} <br>
-            Is multipart: {{ text_obj.is_multipart}} <br>
-            Is summary: {{ text_obj.is_summary}} <br>
-            Is snippet: {{ text_obj.is_snippet}} <br>
-            Multipart Index: {{ text_obj.multipart_index}} <br>
+    <p> Message texts: </p>
+    {% for message_obj, text_obj in gtexts %}
+        Id: {{ text_obj.id }} <br>
+        GmID{{ text_obj.gmail_message_id }} <br>
+        Is primary: {{ text_obj.is_primary}} <br>
+        Is multipart: {{ text_obj.is_multipart}} <br>
+        Is summary: {{ text_obj.is_summary}} <br>
+        Is snippet: {{ text_obj.is_snippet}} <br>
+        Multipart Index: {{ text_obj.multipart_index}} <br>
 
-            Date: {{ message_obj.date }}  <br>
-            From: {{ message_obj.from_string }}  <br>
-            Email: {{ message_obj.gmail_user_email }}  <br>
-            Mime Version: {{ message_obj.mime_version }}  <br>
-            Content Type: {{ message_obj.content_type }}  <br>
-            Subject: {{ message_obj.subject }}  <br>
+        Date: {{ message_obj.date }}  <br>
+        From: {{ message_obj.from_string }}  <br>
+        Email: {{ message_obj.gmail_user_email }}  <br>
+        Mime Version: {{ message_obj.mime_version }}  <br>
+        Content Type: {{ message_obj.content_type }}  <br>
+        Subject: {{ message_obj.subject }}  <br>
 
-            <textarea aria-label="With textarea" rows="10" cols="150" >
-                 {{ text_obj.text }}
-            </textarea>
-            <br>
-            <hr>
-        {% endfor %}
-
-	</body>
-</html>
+        <textarea aria-label="With textarea" rows="10" cols="150" >
+             {{ text_obj.text }}
+        </textarea>
+        <br>
+        <hr>
+    {% endfor %}
+{% endblock %}
