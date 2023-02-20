@@ -232,22 +232,22 @@ def list_slack_links():
 @app.route('/test_gmail_etl', methods=['GET'])
 def test_gmail_etl():
     test_etl()
-    return "OK"
+    return redirect(url_for('index'))
 
 @app.route('/test_slack_etl', methods=['GET'])
 def test_slack_etl():
     slack_test_etl()
-    return "OK"
+    return redirect(url_for('index'))
 
 @app.route('/test_clear_gmail_table', methods=['GET'])
 def test_clear_gmail_table():
     clean_gmail_tables()
-    return "OK"
+    return redirect(url_for('index'))
 
 @app.route('/clear_slack_table', methods=['GET'])
 def test_clear_slack_table():
     clear_slack_tables()
-    return "OK"
+    return redirect(url_for('index'))
 
 @app.route('/first', methods=['GET'])
 @login_required

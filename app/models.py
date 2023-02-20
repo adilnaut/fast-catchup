@@ -7,6 +7,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 def load_user(id):
     return User.query.get(int(id))
 
+class PriorityMixin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    
+
 class AudioFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
