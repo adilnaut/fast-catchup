@@ -2,6 +2,7 @@
 
 {% block content %}
     <h1>Hi, {{ current_user.username }}!</h1>
+    <h3>Credentials:</h3>
     {% for auth_obj in auth_data %}
         <p> {{ auth_obj.name }} </p>
     {% endfor  %}

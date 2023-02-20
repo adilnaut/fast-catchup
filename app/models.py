@@ -127,7 +127,6 @@ class SlackChannel(db.Model):
 
 
 class SlackMessage(db.Model):
-    # id = db.Column(db.Integer, primary_key=True)
     ts = db.Column(db.String(40), primary_key=True)
     type = db.Column(db.String(60))
     slack_user_id = db.Column(db.String(20), db.ForeignKey('slack_user.id'))
@@ -144,10 +143,13 @@ class GmailMessageLabel(db.Model):
     label = db.Column(db.String(240))
     def __repr__(self):
         return '<g-label {}>'.format(self.label)
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'label', name='_unique_constraint_gl'),
+        )
 
 class GmailMessageText(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'))
+    text_hash = db.Column(db.Text())
     text = db.Column(db.UnicodeText())
     is_primary = db.Column(db.Boolean())
     is_multipart = db.Column(db.Boolean())
@@ -162,6 +164,8 @@ class GmailMessageText(db.Model):
             return '<g-message-text {}>'.format(self.text[:10].replace('\n', ''))
         else:
             return '<g-message-text {}>'.format(self.gmail_message_id)
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'text_hash', name='_unique_constraint_gt'),
+        )
 
 
 class GmailMessageListMetadata(db.Model):
@@ -176,6 +180,8 @@ class GmailMessageListMetadata(db.Model):
     def __repr__(self):
         return '<g-message-list mdata {}>'.format(self.list_id)
 
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'list_id', name='_unique_constraint_gmlm_list_id'),
+        )
 
 class GmailMessageTag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -184,6 +190,9 @@ class GmailMessageTag(db.Model):
 
     def __repr__(self):
         return '<g-tag {}>'.format(self.tag)
+
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'tag', name='_unique_constraint_gm_tag'),
+        )
 
 class GmailMessage(db.Model):
     id = db.Column(db.String(240), primary_key=True)
@@ -235,6 +244,10 @@ class GmailLink(db.Model):
     def __repr__(self):
         return '<g-link {}>'.format(self.id)
 
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'link', name='_unique_constraint_gl'),
+        )
+
+
 class SlackAttachment(db.Model):
     md5 = db.Column(db.Text(), primary_key=True)
     slack_message_ts = db.Column(db.String(40), db.ForeignKey('slack_message.ts'), primary_key=True)
@@ -284,3 +297,7 @@ class SlackLink(db.Model):
 
     def __repr__(self):
         return '<s-link with domain {}>'.format(self.domain)
+
+
+    __table_args__ = (db.UniqueConstraint('slack_message_ts', 'url', name='_unique_constraint_su'),
+        )

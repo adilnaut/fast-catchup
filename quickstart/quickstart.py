@@ -62,7 +62,7 @@ def generate_voice_file(text_response, verbose=False):
     speech_config.speech_synthesis_voice_name = "en-US-JennyNeural"
     # speech_config.speech_synthesis_voice_name = "en-US-AIGenerate2Neural"
 
-    filename = uuid.uuid4().hex
+    filename = '%s-%s' % (uuid.uuid4().hex, 'audio.wav')
     filepath = os.path.join('file_store', filename)
 
     audio_config = speechsdk.audio.AudioOutputConfig(filename=filepath)

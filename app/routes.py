@@ -1,4 +1,5 @@
 import os
+import uuid
 from datetime import datetime
 from sqlalchemy.sql import text
 
@@ -23,10 +24,13 @@ def upload_gmail_auth():
 
     if form.validate_on_submit():
         filename = secure_filename(form.file.data.filename)
+        print("Filename gmail auth: %s" % filename)
+        filename = '%s-%s' % (uuid.uuid4().hex, filename)
         # todo when transition to azure file store, save to tempdir, upload to cloud
         #  and persist file url
         filepath = os.path.join('file_store', filename)
         form.file.data.save(filepath)
+        print("Filepath gmail auth: %s" % filepath)
 
         user_id = current_user.get_id()
 
@@ -42,16 +46,16 @@ def upload_gmail_auth():
             , 'workspace_id': workspace_id
             , 'auth_method': 'oauth'}
 
-        platform_row = db.session.execute(text(platform_query), platform_kwargs).fetchall()
+        platform_row = db.session.execute(text(platform_query), platform_kwargs).fetchone()
         if not platform_row:
             platform_row = Platform.query \
-                .filter_by(name='slack') \
+                .filter_by(name='gmail') \
                 .filter_by(workspace_id=workspace_id) \
-                .filter_by(auth_method='slack_bot') \
+                .filter_by(auth_method='oauth') \
                 .one()
         platform_id = platform_row.id
 
-        credfile_query = '''INSERT INTO auth_data (platform_id, name, is_path, is_blob, is_data, file_data)
+        credfile_query = '''INSERT INTO auth_data (platform_id, name, is_path, is_blob, is_data, file_path)
             VALUES(:platform_id, :name, :is_path, :is_blob, :is_data, :file_path)
             ON CONFLICT(platform_id, name)
             DO UPDATE SET file_path=excluded.file_path;'''
@@ -246,6 +250,7 @@ def test_clear_slack_table():
     return "OK"
 
 @app.route('/first', methods=['GET'])
+@login_required
 def first():
     unread_slack = get_slack_comms(return_list=True)
     unread_gmail = get_gmail_comms(return_list=True)
@@ -258,6 +263,7 @@ def first():
     return render_template('first.html', title='Summary', gptin=gptin, gptout=gptout)
 
 @app.route('/generate_summary', methods=['POST'])
+@login_required
 def gen_summary():
     gptin = {}
     gptout = {}
@@ -318,7 +324,7 @@ def index():
 
 @app.route('/audio/<filepath>')
 def returnAudioFile(filepath):
-    path_to_audio_file = os.path.join(os.getcwd, filepath)
+    path_to_audio_file = os.path.join(os.getcwd(), filepath)
     return send_file(
             path_to_audio_file,
             mimetype='audio/wav',

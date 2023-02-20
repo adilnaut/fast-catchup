@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField
+from flask_wtf.file import FileField, FileRequired
 
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
@@ -37,5 +37,6 @@ class SlackAuthDataForm(FlaskForm):
 
 
 class GmailAuthDataForm(FlaskForm):
-    file = FileField('Credentials File')
+    file = FileField('Credentials File', validators=[FileRequired()])
+
     submit = SubmitField('Submit')
