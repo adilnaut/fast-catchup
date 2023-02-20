@@ -1,5 +1,6 @@
 {
     "id": "C04KZ5NCTNX",
+    "platform_id": 1,
     "name": "general",
     "is_channel": true,
     "is_group": false,

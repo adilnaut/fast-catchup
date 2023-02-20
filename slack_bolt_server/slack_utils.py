@@ -1,4 +1,4 @@
-from connection import db_ops
+from connection import db_ops, get_current_user
 from bolt import app
 import time
 
@@ -148,7 +148,9 @@ def etl_messages(app, days_ago=1, max_pages=1,  verbose=False):
     slack_channels = None
 
     with db_ops(model_names=['SlackChannel']) as (db, SlackChannel):
-        slack_channels = SlackChannel.query.all()
+        platform_id = get_platform_id()
+        if platform_id:
+            slack_channels = SlackChannel.query.filter_by(platform_id=platform_id).all()
 
     yesterday = datetime.utcnow() - timedelta(days=days_ago)
     unix_time = time.mktime(yesterday.timetuple())

@@ -3,6 +3,7 @@ from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy import MetaData
+from flask_login import LoginManager
 
 convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -15,8 +16,11 @@ convention = {
 app = Flask(__name__)
 app.config.from_object(Config)
 
+
 metadata = MetaData(naming_convention=convention)
 db = SQLAlchemy(app, metadata=metadata)
 migrate = Migrate(app, db)
+login = LoginManager(app)
+login.login_view = 'login'
 
 from app import routes, models

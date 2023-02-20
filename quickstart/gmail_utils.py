@@ -5,6 +5,11 @@ import pytz
 import os
 import base64
 import hashlib
+import tempfile
+import shutil
+import uuid
+
+from collections import OrderedDict
 
 from urlextract import URLExtract
 from urllib.parse import urlparse
@@ -16,8 +21,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.auth.exceptions import RefreshError
 
-from quickstart.connection import db_ops
-## from connection import db_ops
+from quickstart.connection import db_ops, get_current_user, get_platform_id
+from quickstart.sqlite_utils import get_upsert_query, get_insert_query
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -56,8 +61,7 @@ def get_initial_tags(from_string):
 
     return list(tags)
 
-def parse_email_part(part, id, service, db, GmailAttachment, GmailLink, handle_subparts=False \
-    ,extract_text_from_mixed = False, verbose=False):
+def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_from_mixed = False, verbose=False):
     part_id_0 = part.get('partId', '')
     mime_type_0 = part.get('mimeType', '')
     filename_0 = part.get('filename', '')
@@ -76,8 +80,7 @@ def parse_email_part(part, id, service, db, GmailAttachment, GmailLink, handle_s
         part_parts = part.get('parts', [])
         for part_1 in part_parts:
             # only go 1 way deeper
-            text_parts_in, num_processed_in = parse_email_part(part_1, id, service, db, GmailAttachment,
-                GmailLink)
+            text_parts_in, num_processed_in = parse_email_part(part_1, id, service, db)
             text_parts.extend(text_parts_in)
             num_processed += num_processed_in
     if mime_type_0 == 'text/plain':
@@ -139,39 +142,34 @@ def parse_email_part(part, id, service, db, GmailAttachment, GmailLink, handle_s
             datafile.write(file_content)
             datafile.close()
 
-        gm_att_test = GmailAttachment.query.filter_by(md5=file_hash, gmail_message_id=id).first()
-        if not gm_att_test:
-            gmail_attachment_kwargs = {'md5': file_hash
-                , 'attachment_id': attachment_id_0
-                , 'file_size': size_0
-                , 'gmail_message_id': id
-                , 'original_filename': filename_0
-                , 'part_id': part_id_0
-                , 'mime_type': mime_type_0
-                , 'file_extension': file_extension
-                , 'filepath': filepath_
-            }
-            gmail_attachment = GmailAttachment(**gmail_attachment_kwargs)
-            db.session.add(gmail_attachment)
+        ga_kwargs = OrderedDict([('md5', file_hash)
+            , ('attachment_id', attachment_id_0)
+            , ('file_size', size_0)
+            , ('gmail_message_id', id)
+            , ('original_filename', filename_0)
+            , ('part_id', part_id_0)
+            , ('mime_type', mime_type_0)
+            , ('file_extension', file_extension)
+            , ('filepath', filepath_)])
+        ga_query = get_upsert_query('gmail_attachment', ga_kwargs.keys(), 'md5')
+        db.session.execute(ga_query, ga_kwargs)
     else:
         if verbose:
             print('This type of content %s is not supported yet' % mime_type_0)
     if text:
         text_parts.append(text)
         num_processed += 1
-        gm_link_test = GmailLink.query.filter_by(gmail_message_id=id).first()
-        if not gm_link_test:
-            links = extract_links(text)
-            for link_ in links:
-                gmail_link_kwaargs = {'gmail_message_id': id,
-                    'link': link_,
-                    'domain': extract_domain(link_)
-                }
-                gmail_link = GmailLink(**gmail_link_kwaargs)
-                db.session.add(gmail_link)
+        links = extract_links(text)
+        for link_ in links:
+            link_kwargs = OrderedDict([('gmail_message_id', id)
+                , ('link', link_)
+                , ('domain', extract_domain(link_))])
+            link_query = get_upsert_query('gmail_link', link_kwargs.keys(), 'gmail_message_id, link')
+            db.session.execute(link_query, link_kwargs)
     return text_parts, num_processed
 
-def etl_gmail(service, max_messages=20, unread_only=True):
+
+def etl_gmail(service, db, max_messages=20, unread_only=True):
 
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
@@ -184,169 +182,166 @@ def etl_gmail(service, max_messages=20, unread_only=True):
         thread_id = message.get('thread_id')
         # m_data.append(message['id']) # id, threadId
         m_data.append(id)
-    with db_ops(model_names=['GmailMessage', 'GmailMessageText', \
-        'GmailMessageLabel', 'GmailMessageListMetadata', \
-        'GmailMessageTag', 'GmailUser', 'GmailAttachment', 'GmailLink']) \
-        as (db, GmailMessage, GmailMessageText, \
-            GmailMessageLabel, GmailMessageListMetadata, \
-            GmailMessageTag, GmailUser, GmailAttachment, GmailLink):
-        for id in m_data:
-            email_body = service.users().messages().get(userId='me', id=id, format='full').execute()
-            if not email_body:
+
+    for id in m_data:
+        email_body = service.users().messages().get(userId='me', id=id, format='full').execute()
+        if not email_body:
+            continue
+        snippet = email_body.get('snippet', '')
+        size_estimate = email_body.get('sizeEstimate', '')
+        label_ids = email_body.get('labelIds', [])
+        internal_date = email_body.get('internalDate', '')
+
+        if unread_only:
+            if "UNREAD" not in label_ids:
                 continue
-            snippet = email_body.get('snippet', '')
-            size_estimate = email_body.get('sizeEstimate', '')
-            label_ids = email_body.get('labelIds', [])
-            internal_date = email_body.get('internalDate', '')
 
-            if unread_only:
-                if "UNREAD" not in label_ids:
-                    continue
-
-            payload = email_body.get('payload')
-            if not payload:
-                continue
-            mime_type = payload.get('mimeType', '')
+        payload = email_body.get('payload')
+        if not payload:
+            continue
+        mime_type = payload.get('mimeType', '')
 
 
-            body = payload.get('body')
-            if not body:
-                continue
-            data = body.get('data')
-            primary_text = None
-            if data:
-                primary_text =  base64.urlsafe_b64decode(data).decode()
+        body = payload.get('body')
+        if not body:
+            continue
+        data = body.get('data')
+        primary_text = None
+        if data:
+            primary_text =  base64.urlsafe_b64decode(data).decode()
 
-            show_parts = True
-            num_parts = 0
-            multiparts = []
-            if show_parts:
-                parts = payload.get('parts', [])
-                for part in parts:
+        show_parts = True
+        num_parts = 0
+        multiparts = []
+        if show_parts:
+            parts = payload.get('parts', [])
+            for part in parts:
 
-                    extract_text_from_mixed = False
-                    handle_subparts = True
+                extract_text_from_mixed = False
+                handle_subparts = True
 
-                    multiparts_in, num_processed_in = parse_email_part(part, id, service, db, GmailAttachment,
-                        GmailLink, handle_subparts=handle_subparts, extract_text_from_mixed=extract_text_from_mixed)
-                    multiparts.extend(multiparts_in)
-                    num_parts += num_processed_in
+                multiparts_in, num_processed_in = parse_email_part(part, id, service, db,
+                    handle_subparts=handle_subparts, extract_text_from_mixed=extract_text_from_mixed)
+                multiparts.extend(multiparts_in)
+                num_parts += num_processed_in
 
-            # we will also need subject header
-            show_headers = True
+        # we will also need subject header
+        show_headers = True
 
-            headers_dict = {}
-            if show_headers:
-                headers = payload.get('headers')
-                if headers:
-                    for header in headers:
-                        name = header.get('name', '')
-                        value = header.get('value', '')
-                        if name and value:
-                            headers_dict[name] = value
-
-
-            h_mime_version = headers_dict.get('Mime-Version')
-            h_content_type = headers_dict.get('Content-Type')
-
-            date_string = headers_dict.get('Date')
-            from_string = headers_dict.get('From')
-            gmail_user_email = get_guser_email(from_string)
-            subject = headers_dict.get('Subject')
-            is_multipart = get_is_multipart(h_content_type)
-
-            list_id = headers_dict.get('List-Id')
-            message_id = headers_dict.get('Message-Id')
-            list_unsubscribe = headers_dict.get('List-Unsubscribe')
-            list_url = headers_dict.get('List-Url')
-
-            tags = get_initial_tags(from_string)
-            gmail_user_name = get_guser_name(from_string)
+        headers_dict = {}
+        if show_headers:
+            headers = payload.get('headers')
+            if headers:
+                for header in headers:
+                    name = header.get('name', '')
+                    value = header.get('value', '')
+                    if name and value:
+                        headers_dict[name] = value
 
 
-            # better attempt to insert and on conflict do nothing
-            in_user = GmailUser.query.filter_by(email=gmail_user_email).first()
-            if not in_user:
-                user_kwargs = {'email': gmail_user_email
-                    , 'name': gmail_user_name}
-                gmail_user = GmailUser(**user_kwargs)
-                db.session.add(gmail_user)
+        h_mime_version = headers_dict.get('Mime-Version')
+        h_content_type = headers_dict.get('Content-Type')
 
+        date_string = headers_dict.get('Date')
+        from_string = headers_dict.get('From')
+        gmail_user_email = get_guser_email(from_string)
+        subject = headers_dict.get('Subject')
+        is_multipart = get_is_multipart(h_content_type)
 
-            # better attempt to insert and on conflict do nothing
-            is_message = GmailMessage.query.filter_by(id=id).first()
+        list_id = headers_dict.get('List-Id')
+        message_id = headers_dict.get('Message-Id')
+        list_unsubscribe = headers_dict.get('List-Unsubscribe')
+        list_url = headers_dict.get('List-Url')
 
-            if not is_message:
-                gmail_message_kwargs = {'id': id
-                    , 'date': date_string
-                    , 'from_string': from_string
-                    , 'gmail_user_email': gmail_user_email
-                    , 'mime_type': mime_type
-                    , 'mime_version': h_mime_version
-                    , 'content_type': h_content_type
-                    , 'subject': subject
-                    , 'is_multipart': is_multipart
-                    , 'multipart_num': num_parts}
+        tags = get_initial_tags(from_string)
+        gmail_user_name = get_guser_name(from_string)
 
-                gmail_message = GmailMessage(**gmail_message_kwargs)
-                db.session.add(gmail_message)
+        in_user = None
+        platform_id = get_platform_id('gmail')
+        user_kwargs = OrderedDict([('email', gmail_user_email)
+            , ('platform_id', platform_id)
+            , ('name', gmail_user_name)])
+        user_query = get_upsert_query('gmail_user', user_kwargs.keys(), 'email, platform_id')
+        db.session.execute(user_query, user_kwargs)
 
-                if snippet:
-                    text_kwargs = {'gmail_message_id': id
-                        , 'text': snippet
-                        , 'is_primary': False
-                        , 'is_multipart': False
-                        , 'is_summary': False
-                        , 'is_snippet': True}
-                    gmail_message_text = GmailMessageText(**text_kwargs)
-                    db.session.add(gmail_message_text)
+        gm_kwargs = OrderedDict([('id', id)
+            , ('date', date_string)
+            , ('from_string', from_string)
+            , ('gmail_user_email', gmail_user_email)
+            , ('mime_type', mime_type)
+            , ('mime_version', h_mime_version)
+            , ('content_type', h_content_type)
+            , ('subject', subject)
+            , ('is_multipart', is_multipart)
+            , ('multipart_num', num_parts)])
+        gm_query = get_upsert_query('gmail_message', gm_kwargs.keys(), 'id')
+        db.session.execute(gm_query, gm_kwargs)
 
+        if snippet:
+            text_hash = hashlib.md5(snippet.encode('utf-8')).hexdigest()
+            text_kwargs = OrderedDict([('gmail_message_id', id)
+                , ('text_hash', text_hash)
+                , ('text', snippet)
+                , ('is_primary', False)
+                , ('is_multipart', False)
+                , ('is_summary', False)
+                , ('is_snippet', True)])
+            text_query = get_upsert_query('gmail_message_text', text_kwargs.keys(), 'gmail_message_id, text_hash')
+            db.session.execute(text_query, text_kwargs)
 
-                if primary_text:
-                    text_kwargs = {'gmail_message_id': id
-                        , 'text': primary_text
-                        , 'is_primary': True
-                        , 'is_multipart': False
-                        , 'is_summary': False
-                        , 'is_snippet': False}
-                    gmail_message_text = GmailMessageText(**text_kwargs)
-                    db.session.add(gmail_message_text)
+        if primary_text:
+            text_hash = hashlib.md5(primary_text.encode('utf-8')).hexdigest()
+            text_kwargs = OrderedDict([('gmail_message_id', id)
+                , ('text_hash', text_hash)
+                , ('text', primary_text)
+                , ('is_primary', True)
+                , ('is_multipart', False)
+                , ('is_summary', False)
+                , ('is_snippet', False)])
+            text_query = get_upsert_query('gmail_message_text', text_kwargs.keys(), 'gmail_message_id, text_hash')
+            db.session.execute(text_query, text_kwargs)
 
-                for i in range(len(multiparts)):
-                    text_kwargs = {'gmail_message_id': id
-                        , 'text': multiparts[i]
-                        , 'is_primary': False
-                        , 'is_multipart': True
-                        , 'is_summary': False
-                        , 'is_snippet': False
-                        , 'multipart_index': i}
-                    gmail_message_text = GmailMessageText(**text_kwargs)
-                    db.session.add(gmail_message_text)
+        for i in range(len(multiparts)):
+            text_hash = hashlib.md5(multiparts[i].encode('utf-8')).hexdigest()
+            text_kwargs = OrderedDict([('gmail_message_id', id)
+                , ('text_hash', text_hash)
+                , ('text', multiparts[i])
+                , ('is_primary', False)
+                , ('is_multipart', True)
+                , ('is_summary', False)
+                , ('is_snippet', False)
+                , ('multipart_index', i)])
+            text_query = get_upsert_query('gmail_message_text', text_kwargs.keys(), 'gmail_message_id, text_hash')
+            db.session.execute(text_query, text_kwargs)
 
-                for label in label_ids:
-                    label_kwargs = {'gmail_message_id': id
-                        , 'label': label}
-                    gmail_message_label = GmailMessageLabel(**label_kwargs)
-                    db.session.add(gmail_message_label)
+        for label in label_ids:
+            label_kwargs = OrderedDict([('gmail_message_id', id)
+                , ('label', label)])
+            label_query = get_insert_query('gmail_message_label', label_kwargs.keys())
+            db.session.execute(label_query, label_kwargs)
 
-                if list_id:
-                    list_metadata_kwargs = {'gmail_message_id': id
-                        , 'list_id': list_id
-                        , 'message_id': message_id
-                        , 'list_unsubscribe': list_unsubscribe
-                        , 'list_url': list_url}
-                    list_metadata = GmailMessageListMetadata(**list_metadata_kwargs)
-                    db.session.add(list_metadata)
+        if list_id:
+            list_metadata_kwargs = OrderedDict([('gmail_message_id', id)
+                , ('list_id', list_id)
+                , ('message_id', message_id)
+                , ('list_unsubscribe', list_unsubscribe)
+                , ('list_url', list_url)])
+            meta_query = get_insert_query('gmail_message_list_metadata', list_metadata_kwargs.keys())
+            db.session.execute(meta_query, list_metadata_kwargs)
 
-                for tag in tags:
-                    tag_kwargs = {'gmail_message_id': id
-                        , 'tag': tag}
-                    gmail_message_tag = GmailMessageTag(**tag_kwargs)
-                    db.session.add(gmail_message_tag)
+        for tag in tags:
+            tag_kwargs = OrderedDict([('gmail_message_id', id)
+                , ('tag', tag)])
+            tag_query = get_insert_query('gmail_message_tag', tag_kwargs.keys())
+            db.session.execute(tag_query, tag_kwargs)
 
 
 
 
+#  todo handle cases:
+#  when  tokens don't exist in database
+#  when cred don't exist in database
+#  when shutil couldn't find or copy file
 def auth_and_load_session_gmail():
     """Shows basic usage of the Gmail API.
     Lists the user's Gmail labels.
@@ -356,8 +351,47 @@ def auth_and_load_session_gmail():
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists('quickstart/token.json'):
-        creds = Credentials.from_authorized_user_file('quickstart/token.json', SCOPES)
+
+    # the task is to fetch 2 auth data files
+    # that would have data in file_store
+    # and move them to temp folder and give unique name
+    # and after both tokenpath and credpath would be assigned
+    # accessible filepaths on the local store - script should work
+
+    platform_id = get_platform_id('gmail')
+    tokenpath = None
+    credpath = None
+
+    with db_ops(model_names=['AuthData']) as (db, AuthData):
+        token_row = AuthData.query \
+            .filter_by(platform_id=platform_id) \
+            .filter_by(name='token.json') \
+            .filter_by(is_path=True) \
+            .first()
+
+        print(platform_id)
+        cred_row = AuthData.query \
+            .filter_by(platform_id=platform_id) \
+            .filter_by(name='credentials.json') \
+            .filter_by(is_path=True) \
+            .first()
+
+        tempdir = tempfile.gettempdir()
+
+        if token_row:
+            tokenpath = os.path.join(tempdir, token_row.name)
+            shutil.copyfile(token_row.file_path, tokenpath)
+
+        else:
+            tokenpath = os.path.join(tempdir, 'token.json')
+        if cred_row:
+            credpath = os.path.join(tempdir, cred_row.name)
+            shutil.copyfile(cred_row.file_path, credpath)
+
+
+
+    if os.path.exists(tokenpath):
+        creds = Credentials.from_authorized_user_file(tokenpath, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -369,12 +403,23 @@ def auth_and_load_session_gmail():
                 exit()
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'quickstart/credentials.json', SCOPES)
+                credpath, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('quickstart/token.json', 'w') as token:
+        if os.path.exists(tokenpath):
+            os.remove(tokenpath)
+        filename = '%s-%s' % (uuid.uuid4().hex, 'token.json')
+        new_tokenpath = os.path.join('file_store', filename)
+        with open(new_tokenpath, 'w') as token:
             token.write(creds.to_json())
-
+            authdata_kwargs = OrderedDict([('platform_id', platform_id)
+                , ('name', 'token.json')
+                , ('is_data', False)
+                , ('is_blob', False)
+                , ('is_path', True)
+                , ('file_path', new_tokenpath)])
+            auth_query = get_upsert_query('auth_data', authdata_kwargs.keys(), 'platform_id, name')
+            db.session.execute(auth_query, authdata_kwargs)
     try:
         # Call the Gmail API
         service = build('gmail', 'v1', credentials=creds)
@@ -395,7 +440,10 @@ def dumps_emails(gmail_messages):
         snippet_ = None
         with db_ops(model_names=['GmailUser', 'GmailMessageText']) as \
             (db, GmailUser, GmailMessageText):
-            gmail_user = GmailUser.query.filter_by(email=email_).one()
+            platform_id = get_platform_id('gmail')
+            gmail_user = GmailUser.query.filter_by(email=email_) \
+                .filter_by(platform_id=platform_id) \
+                .one()
             gm_snippet = GmailMessageText.query.filter_by(gmail_message_id=id_) \
                 .filter_by(is_snippet=True).one()
             name_ = gmail_user.name
@@ -411,14 +459,18 @@ def dumps_emails(gmail_messages):
 def get_gmail_comms(use_last_cached_emails=True, return_list=False):
     if not use_last_cached_emails:
         service = auth_and_load_session_gmail()
-        etl_gmail(service)
+        with db_ops(model_names=[]) as (db, ):
+            etl_gmail(service, db)
 
     gmail_messages = None
-    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel']) as \
-        (db, GmailMessage, GmailMessageLabel):
+    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailUser']) as \
+        (db, GmailMessage, GmailMessageLabel, GmailUser):
 
+        platform_id = get_platform_id('gmail')
         gmail_messages = db.session.query(GmailMessage) \
-            .join(GmailMessageLabel) \
+            .join(GmailMessageLabel, GmailMessageLabel.gmail_message_id == GmailMessage.id) \
+            .join(GmailUser, GmailUser.email == GmailMessage.gmail_user_email) \
+            .filter(GmailUser.platform_id == platform_id) \
             .filter(GmailMessageLabel.label == 'UNREAD').all()
 
     if return_list:
@@ -438,45 +490,35 @@ def is_day_old(date_string):
 
 def test_etl():
     service = auth_and_load_session_gmail()
-    etl_gmail(service)
+    with db_ops(model_names=[]) as (db, ):
+        etl_gmail(service, db)
+
+def get_gmail_attribute(att_name):
+    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', att_name, 'GmailUser']) as \
+        (db, GmailMessage, GmailMessageLabel, AttTable, GmailUser):
+
+        gmail_messages = db.session.query(GmailMessage, AttTable) \
+            .join(GmailMessageLabel, GmailMessageLabel.gmail_message_id == GmailMessage.id) \
+            .join(AttTable, AttTable.gmail_message_id == GmailMessage.id) \
+            .join(GmailUser, GmailUser.email == GmailMessage.gmail_user_email) \
+            .filter(GmailMessageLabel.label == 'UNREAD') \
+            .filter(GmailUser.platform_id == get_platform_id('gmail')) \
+            .all()
+
+    return gmail_messages
 
 def list_gtexts():
-    gmail_messages = None
-    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailMessageText']) as \
-        (db, GmailMessage, GmailMessageLabel, GmailMessageText):
-
-        gmail_messages = db.session.query(GmailMessage, GmailMessageText) \
-            .join(GmailMessageLabel) \
-            .join(GmailMessageText) \
-            .filter(GmailMessageLabel.label == 'UNREAD').all()
-
-    return gmail_messages
+    return get_gmail_attribute('GmailMessageText')
 
 def list_gfiles():
-    gmail_messages = None
-    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailAttachment']) as \
-        (db, GmailMessage, GmailMessageLabel, GmailAttachment):
-
-        gmail_messages = db.session.query(GmailMessage, GmailAttachment) \
-            .join(GmailMessageLabel) \
-            .join(GmailAttachment) \
-            .filter(GmailMessageLabel.label == 'UNREAD').all()
-
-    return gmail_messages
+    return get_gmail_attribute('GmailAttachment')
 
 def list_glinks():
-    gmail_messages = None
-    with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailLink']) as \
-        (db, GmailMessage, GmailMessageLabel, GmailLink):
+    return get_gmail_attribute('GmailLink')
 
-        gmail_messages = db.session.query(GmailMessage, GmailLink) \
-            .join(GmailMessageLabel) \
-            .join(GmailLink) \
-            .filter(GmailMessageLabel.label == 'UNREAD').all()
-
-    return gmail_messages
 
 def clean_gmail_tables():
+    # todo: make table relationships explicit and cascade on delte, then delete user/platform
     with db_ops(model_names=['GmailMessage', 'GmailMessageText', \
         'GmailMessageLabel', 'GmailMessageListMetadata', \
         'GmailMessageTag', 'GmailUser', 'GmailAttachment', 'GmailLink']) \

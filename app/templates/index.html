@@ -1,23 +1,13 @@
-<!doctype html>
-<html>
-	<head>
-		<title>{{ title }} - Fast-catchup</title>
-	</head>
-	<body>
-		<h2> Fast-catchup prototype </h2>
+{% extends "base.html" %}
 
-        <p> Prompt: {{ gptin.prompt }} </p>
-        <form action = "http://localhost:5000/" method = "post">
-            <input type="text"  placeholder="{{gptin.prompt}}" name="prompt" />
-            <input type="submit" value="Generate">
-        </form>
+{% block content %}
+    <h1>Hi, {{ current_user.username }}!</h1>
+    <h3>Credentials:</h3>
+    {% for auth_obj in auth_data %}
+        <p> {{ auth_obj.name }} </p>
+    {% endfor  %}
 
-        <p> Slack input {{ gptin.slack_text }} </p>
-		<p> Emails input {{ gptin.email_text }} </p>
-		<p> Summary: {{ gptout.summary }} </p>
-		<audio controls>
-      			<source src="/audio/file.wav" type="audio/wav">
-      			Your browser does not support the audio element.
-    	</audio>
-	</body>
-</html>
+    <p>Add Slack Authentication <a href="{{ url_for('upload_slack_auth') }}">Click to Add!</a></p>
+    <p>Add Gmail Authentication <a href="{{ url_for('upload_gmail_auth') }}">Click to Add!</a></p>
+
+{% endblock %}

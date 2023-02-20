@@ -1,18 +1,66 @@
 from app import db
+from flask_login import UserMixin
+from app import login
+from werkzeug.security import generate_password_hash, check_password_hash
 
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
-class User(db.Model):
+class AudioFile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
+    created = db.Column(db.Integer)
+    file_path = db.Column(db.Text())
+
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
 
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
     def __repr__(self):
         return '<user {}>'.format(self.username)
 
+class Workspace(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    created = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+
+    def __repr__(self):
+        return '<workspace {}>'.format(self.id)
+
+class Platform(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text())
+    workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
+    auth_method = db.Column(db.Text())
+    __table_args__ = (db.UniqueConstraint('workspace_id', 'name', name='_unique_constraint_uc'),
+        )
+
+class AuthData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
+    name = db.Column(db.Text())
+    is_data = db.Column(db.Boolean())
+    is_blob = db.Column(db.Boolean())
+    is_path = db.Column(db.Boolean())
+    file_data = db.Column(db.Text())
+    file_blob = db.Column(db.Text())
+    file_path = db.Column(db.Text())
+    __table_args__ = (db.UniqueConstraint('platform_id', 'name', name='_unique_constraint_uc'),
+        )
+
+
 class SlackUser(db.Model):
-    # id = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.String(20), primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'), primary_key=True)
     name = db.Column(db.String(120), index=True)
     team_id = db.Column(db.String(20), index=True)
     deleted = db.Column(db.Boolean())
@@ -51,8 +99,8 @@ class SlackUser(db.Model):
 
 
 class SlackChannel(db.Model):
-    # id = db.Column(db.Integer, primary_key=True)
     id = db.Column(db.String(20), primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'), primary_key=True)
     name = db.Column(db.String(120), index=True)
     is_channel = db.Column(db.Boolean())
     is_group = db.Column(db.Boolean())
@@ -79,7 +127,6 @@ class SlackChannel(db.Model):
 
 
 class SlackMessage(db.Model):
-    # id = db.Column(db.Integer, primary_key=True)
     ts = db.Column(db.String(40), primary_key=True)
     type = db.Column(db.String(60))
     slack_user_id = db.Column(db.String(20), db.ForeignKey('slack_user.id'))
@@ -96,10 +143,13 @@ class GmailMessageLabel(db.Model):
     label = db.Column(db.String(240))
     def __repr__(self):
         return '<g-label {}>'.format(self.label)
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'label', name='_unique_constraint_gl'),
+        )
 
 class GmailMessageText(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     gmail_message_id = db.Column(db.String(240), db.ForeignKey('gmail_message.id'))
+    text_hash = db.Column(db.Text())
     text = db.Column(db.UnicodeText())
     is_primary = db.Column(db.Boolean())
     is_multipart = db.Column(db.Boolean())
@@ -114,6 +164,8 @@ class GmailMessageText(db.Model):
             return '<g-message-text {}>'.format(self.text[:10].replace('\n', ''))
         else:
             return '<g-message-text {}>'.format(self.gmail_message_id)
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'text_hash', name='_unique_constraint_gt'),
+        )
 
 
 class GmailMessageListMetadata(db.Model):
@@ -128,6 +180,8 @@ class GmailMessageListMetadata(db.Model):
     def __repr__(self):
         return '<g-message-list mdata {}>'.format(self.list_id)
 
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'list_id', name='_unique_constraint_gmlm_list_id'),
+        )
 
 class GmailMessageTag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -136,6 +190,9 @@ class GmailMessageTag(db.Model):
 
     def __repr__(self):
         return '<g-tag {}>'.format(self.tag)
+
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'tag', name='_unique_constraint_gm_tag'),
+        )
 
 class GmailMessage(db.Model):
     id = db.Column(db.String(240), primary_key=True)
@@ -155,6 +212,7 @@ class GmailMessage(db.Model):
 
 class GmailUser(db.Model):
     email = db.Column(db.String(240), primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'), primary_key=True)
     name = db.Column(db.Text())
     is_newsletter = db.Column(db.Boolean())
     type = db.Column(db.String(120))
@@ -185,6 +243,10 @@ class GmailLink(db.Model):
 
     def __repr__(self):
         return '<g-link {}>'.format(self.id)
+
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'link', name='_unique_constraint_gl'),
+        )
+
 
 class SlackAttachment(db.Model):
     md5 = db.Column(db.Text(), primary_key=True)
@@ -235,3 +297,7 @@ class SlackLink(db.Model):
 
     def __repr__(self):
         return '<s-link with domain {}>'.format(self.domain)
+
+
+    __table_args__ = (db.UniqueConstraint('slack_message_ts', 'url', name='_unique_constraint_su'),
+        )

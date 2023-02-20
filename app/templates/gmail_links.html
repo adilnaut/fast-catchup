@@ -1,31 +1,26 @@
-<!doctype html>
-<html>
-	<head>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        <link rel="stylesheet"  type="text/css" href="{{url_for('.static', filename='mystyle.css')}}">
-        <title>Fast-catchup</title>
-	</head>
-	<body>
-		<h2> Gmail Message Links </h2>
+{% extends "base.html" %}
 
-        <p> Message links: </p>
-        {% for message_obj, link_obj in glinks %}
-            Id: {{ link_obj.id }} <br>
-            GmID: {{ link_obj.gmail_message_id }} <br>
-            Link: {{ link_obj.link }} <br>
-            Domain {{ link_obj.domain }} <br>
+{% block content %}
 
-            Date: {{ message_obj.date }}  <br>
-            From: {{ message_obj.from_string }}  <br>
-            Email: {{ message_obj.gmail_user_email }}  <br>
-            Mime Version: {{ message_obj.mime_version }}  <br>
-            Content Type: {{ message_obj.content_type }}  <br>
-            Subject: {{ message_obj.subject }}  <br>
+	<h2> Gmail Message Links </h2>
+
+    <p> Message links: </p>
+    {% for message_obj, link_obj in glinks %}
+        Id: {{ link_obj.id }} <br>
+        GmID: {{ link_obj.gmail_message_id }} <br>
+        Link: {{ link_obj.link }} <br>
+        Domain {{ link_obj.domain }} <br>
+
+        Date: {{ message_obj.date }}  <br>
+        From: {{ message_obj.from_string }}  <br>
+        Email: {{ message_obj.gmail_user_email }}  <br>
+        Mime Version: {{ message_obj.mime_version }}  <br>
+        Content Type: {{ message_obj.content_type }}  <br>
+        Subject: {{ message_obj.subject }}  <br>
 
 
-            <br>
-            <hr>
-        {% endfor %}
+        <br>
+        <hr>
+    {% endfor %}
 
-	</body>
-</html>
+{% endblock %}

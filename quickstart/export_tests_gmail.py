@@ -30,9 +30,6 @@ def get_text_from_html(html_text):
     text = '\n'.join(chunk for chunk in chunks if chunk)
     return text
 
-# def get_text_from_html(html_text):
-#
-#     return html_text
 
 
 def extract_links(text):
@@ -64,7 +61,7 @@ def extract_messages_from_gmail_service(service, num_messages=10):
         sizeEstimate = email_body.get('sizeEstimate', '')
         labels = email_body.get('labelIds', [])
 
-        # get rid of UNREAD
+        # get rid of not UNREAD
         # if "UNREAD" not in labels:
         #     continue
 
