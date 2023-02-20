@@ -7,9 +7,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 def load_user(id):
     return User.query.get(int(id))
 
-class PriorityMixin(db.Model):
+class PriorityItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    
+    score = db.Column(db.Real())
+    priority_list_id = db.Column(db.Integer, db.ForeignKey('priority_list.id'))
+
+class PriorityList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    created = db.Column(db.Integer)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
 
 class AudioFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
