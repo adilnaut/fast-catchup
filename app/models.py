@@ -3,6 +3,7 @@ from sqlalchemy import func
 from flask_login import UserMixin
 from app import login
 from werkzeug.security import generate_password_hash, check_password_hash
+from sklearn.neighbors import NearestNeighbors
 import numpy as np
 
 @login.user_loader
@@ -31,7 +32,7 @@ class PriorityListMethod(db.Model):
     name = db.Column(db.Text())
     python_path = db.Column(db.Text())
 
-    def update_p_m_a():
+    def update_p_m_a(self):
         # which is # time method corr. when message is imp/ # imp messages
     	# for this particular method
     	# i.e. go over all priority_list table filter by same platform_id
@@ -41,9 +42,23 @@ class PriorityListMethod(db.Model):
     	# and divide by overall imp messages
         # average of  | p_b_m_a - p_b_a | * p_a
         #  incorrect cause one priority item have multiple priority methods
-        #  consider either writing an sql query or just import data  and do that in python 
+        #  consider either writing an sql query or just import data  and do that in python
         # result = db.session.query(func.avg(func.abs(PriorityItem.p_b_a - PriorityItemMethod) * PriorityItem.p_a ))
-        pass
+        query = PriorityList.query.filter_by(id=self.priority_list_id).first()
+        platform_id = query.platform_id
+        p_lists = PriorityList.query.filter_by(platform_id=platform_id).all()
+        result = []
+        for p_list in p_lists:
+            # p_methods = PriorityListMethod.query.filter_by(priority_list_id=p_list.id).all()
+            p_items = PriorityItem.query.filter_by(priority_list_id=p_list.id).all()
+            for p_item in p_items:
+                p_item_method = PriorityItemMethod.query \
+                    .filter_by(priority_item_id=p_item.id) \
+                    .filter_by(priority_list_method_id=self.id) \
+                    .one()
+                weighted_accuracy = abs(p_item_method.p_b_m_a - p_item.p_b_a) * p_item.p_a
+                result.append(weighted_accuracy)
+        self.p_m_a = np.array(result).mean()
 
 
 class PriorityItem(db.Model):
@@ -56,23 +71,59 @@ class PriorityItem(db.Model):
     p_a_b = db.Column(db.Real())
     p_a = db.Column(db.Real())
 
-    def calculate_p_b():
+    def calculate_p_b(self):
         # get priority_message vector
     	# get first k neighbors sample
     	# get number of important ones
     	# and divide by k
-        pass
 
-    def calculate_p_b_a():
+        # this is numpy array with either ChatGPT embedding, w2v embedding or sklearn bag of words
+        p_m_vector = PriorityMessage.query.filter_by(id=self.priority_message_id).one().embedding_vector
+
+        # ideally we should have 10 nearest neighbors classifiers object fitted on all previous data
+        # but for now we can train it right there
+        query = PriorityList.query.filter_by(id=self.priority_list_id).first()
+        platform_id = query.platform_id
+        p_lists = PriorityList.query.filter_by(platform_id=platform_id).all()
+        ids = []
+        all_vectors = []
+        for p_list in p_lists:
+            # p_methods = PriorityListMethod.query.filter_by(priority_list_id=p_list.id).all()
+            p_items = PriorityItem.query.filter_by(priority_list_id=p_list.id).all()
+            for p_item in p_items:
+                _ = PriorityMessage.query.filter_by(id=p_item.priority_message_id).one()
+                ids.append(_.id)
+                all_vectors.append(_.embedding_vector)
+        X = np.array(all_vectors)
+        nbrs = NearestNeighbors(n_neighbors=10, algorithm='ball_tree').fit(X)
+
+        distances, indices = nbrs.kneighbors(p_m_vector)
+        p_as = []
+        for n_i in indices:
+            n_id = ids[n_i]
+            n_item = PriorityItem.query.filter_by(id=n_id).one()
+            p_as.append(n_item.p_a)
+        self.p_b = np.array(p_as).mean()
+
+    def calculate_p_b_a(self):
         # get all priority_item methods and sum over
 	    # assert p_m_a of all methods sum is one
-        pass
+        p_item_methods = PriorityItemMethod.query.filter_by(priority_item_id=self.id).all()
+        sum = 0
+        for p_item_method in p_item_methods:
+            p_list_method = PriorityListMethod.query.filter_by(id=p_item_method.priority_list_method_id).one()
+            p_m_a = p_list_method.p_m_a
+            p_b_m_a = p_item_method.calculate_p_b_m_a()
+            sum += p_b_m_a * p_m_a
+        self.p_b_a = sum
 
-    def calculate_p_a_b():
+
+    def calculate_p_a_b(self):
         # call calculte_p_b_a
 	    # call calculate_p_b
 	    # p_a_b = p_b_a * p_a / p_b
-        pass
+        p_a = PriorityList.query.filter_by(id=self.priority_list_id).one().p_a
+        self.p_a_b = self.p_b_a * p_a / self.p_b
 
 class PriorityItemMethod(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -83,6 +134,7 @@ class PriorityItemMethod(db.Model):
     def calculate_p_b_m_a():
         # call python method by name in PriorityMethod
 	    # from priority_item, get priority_message and get text
+        # here access p_list_method python path, import method by path and call python method
         pass
 
 class PriorityMessage(db.Model):
