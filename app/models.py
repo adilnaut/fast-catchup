@@ -1,21 +1,107 @@
 from app import db
+from sqlalchemy import func
 from flask_login import UserMixin
 from app import login
 from werkzeug.security import generate_password_hash, check_password_hash
+import numpy as np
 
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
 
+
+class PriorityList(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
+    created = db.Column(db.Integer)
+    p_a = db.Column(db.Real())
+
+    def update_p_a(self):
+        # average real importance of message
+        result = db.session.query(func.avg(PriorityItem.p_a)) \
+            .join(PriorityList) \
+            .filter(PriorityList.platform_id == self.platform.id) \
+            .all()
+        self.p_a = result.as_scalar() if result else 0.3
+
+class PriorityListMethod(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    priority_list_id = db.Column(db.Integer, db.ForeignKey('priority_list.id'))
+    p_m_a = db.Column(db.Real())
+    name = db.Column(db.Text())
+    python_path = db.Column(db.Text())
+
+    def update_p_m_a():
+        # which is # time method corr. when message is imp/ # imp messages
+    	# for this particular method
+    	# i.e. go over all priority_list table filter by same platform_id
+    	# get all the items where p_a is important (i.e. > 0.7)
+    	# get their according method data
+    	# count number of where method_p_b_m_a close to p_b_a
+    	# and divide by overall imp messages
+        # average of  | p_b_m_a - p_b_a | * p_a
+        #  incorrect cause one priority item have multiple priority methods
+        #  consider either writing an sql query or just import data  and do that in python 
+        # result = db.session.query(func.avg(func.abs(PriorityItem.p_b_a - PriorityItemMethod) * PriorityItem.p_a ))
+        pass
+
+
 class PriorityItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Real())
     priority_list_id = db.Column(db.Integer, db.ForeignKey('priority_list.id'))
+    priority_message_id = db.Column(db.Integer, db.ForeignKey('priority_message.id'))
+    p_b = db.Column(db.Real())
+    p_b_a = db.Column(db.Real())
+    p_a_b = db.Column(db.Real())
+    p_a = db.Column(db.Real())
 
-class PriorityList(db.Model):
+    def calculate_p_b():
+        # get priority_message vector
+    	# get first k neighbors sample
+    	# get number of important ones
+    	# and divide by k
+        pass
+
+    def calculate_p_b_a():
+        # get all priority_item methods and sum over
+	    # assert p_m_a of all methods sum is one
+        pass
+
+    def calculate_p_a_b():
+        # call calculte_p_b_a
+	    # call calculate_p_b
+	    # p_a_b = p_b_a * p_a / p_b
+        pass
+
+class PriorityItemMethod(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    created = db.Column(db.Integer)
-    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
+    priority_item_id = db.Column(db.Integer, db.ForeignKey('priority_item.id'))
+    priority_list_method_id = db.Column(db.Integer, db.ForeignKey('priority_list_method.id'))
+    p_b_m_a = db.Column(db.Real())
+
+    def calculate_p_b_m_a():
+        # call python method by name in PriorityMethod
+	    # from priority_item, get priority_message and get text
+        pass
+
+class PriorityMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    # implicit foreign key at this stage
+    message_id = db.Column(db.Integer)
+    input_text_value = db.Column(db.Text())
+    embedding_vector = db.Column(db.LargeBinary)
+
+    def enrich_input_text_value():
+        # different platforms would get different methods of
+	    # calculating abstracts or getting whole messages
+	    # subjects or snippets for this
+        pass
+
+    def enrich_vectors():
+        # at this stage just get w2v vector of input_text_value
+        #  or even bag of words vectors
+        pass
 
 class AudioFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
