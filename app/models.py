@@ -4,7 +4,10 @@ from flask_login import UserMixin
 from app import login
 from werkzeug.security import generate_password_hash, check_password_hash
 from sklearn.neighbors import NearestNeighbors
+from sentence_transformers import SentenceTransformer
 import numpy as np
+import importlib
+import pickle
 
 @login.user_loader
 def load_user(id):
@@ -15,7 +18,7 @@ class PriorityList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
     created = db.Column(db.Integer)
-    p_a = db.Column(db.Real())
+    p_a = db.Column(db.Float())
 
     def update_p_a(self):
         # average real importance of message
@@ -24,11 +27,12 @@ class PriorityList(db.Model):
             .filter(PriorityList.platform_id == self.platform.id) \
             .all()
         self.p_a = result.as_scalar() if result else 0.3
+        db.session.commit()
 
 class PriorityListMethod(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     priority_list_id = db.Column(db.Integer, db.ForeignKey('priority_list.id'))
-    p_m_a = db.Column(db.Real())
+    p_m_a = db.Column(db.Float())
     name = db.Column(db.Text())
     python_path = db.Column(db.Text())
 
@@ -59,17 +63,18 @@ class PriorityListMethod(db.Model):
                 weighted_accuracy = abs(p_item_method.p_b_m_a - p_item.p_b_a) * p_item.p_a
                 result.append(weighted_accuracy)
         self.p_m_a = np.array(result).mean()
+        db.session.commit()
 
 
 class PriorityItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    score = db.Column(db.Real())
+    score = db.Column(db.Float())
     priority_list_id = db.Column(db.Integer, db.ForeignKey('priority_list.id'))
     priority_message_id = db.Column(db.Integer, db.ForeignKey('priority_message.id'))
-    p_b = db.Column(db.Real())
-    p_b_a = db.Column(db.Real())
-    p_a_b = db.Column(db.Real())
-    p_a = db.Column(db.Real())
+    p_b = db.Column(db.Float())
+    p_b_a = db.Column(db.Float())
+    p_a_b = db.Column(db.Float())
+    p_a = db.Column(db.Float())
 
     def calculate_p_b(self):
         # get priority_message vector
@@ -104,6 +109,7 @@ class PriorityItem(db.Model):
             n_item = PriorityItem.query.filter_by(id=n_id).one()
             p_as.append(n_item.p_a)
         self.p_b = np.array(p_as).mean()
+        db.session.commit()
 
     def calculate_p_b_a(self):
         # get all priority_item methods and sum over
@@ -116,6 +122,7 @@ class PriorityItem(db.Model):
             p_b_m_a = p_item_method.calculate_p_b_m_a()
             sum += p_b_m_a * p_m_a
         self.p_b_a = sum
+        db.session.commit()
 
 
     def calculate_p_a_b(self):
@@ -124,18 +131,35 @@ class PriorityItem(db.Model):
 	    # p_a_b = p_b_a * p_a / p_b
         p_a = PriorityList.query.filter_by(id=self.priority_list_id).one().p_a
         self.p_a_b = self.p_b_a * p_a / self.p_b
+        db.session.commit()
 
 class PriorityItemMethod(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     priority_item_id = db.Column(db.Integer, db.ForeignKey('priority_item.id'))
     priority_list_method_id = db.Column(db.Integer, db.ForeignKey('priority_list_method.id'))
-    p_b_m_a = db.Column(db.Real())
+    p_b_m_a = db.Column(db.Float())
 
-    def calculate_p_b_m_a():
+    def calculate_p_b_m_a(self):
         # call python method by name in PriorityMethod
 	    # from priority_item, get priority_message and get text
         # here access p_list_method python path, import method by path and call python method
-        pass
+        # all methods should only take text into account
+        priority_item = PriorityItem.query.filter_by(id=priority_item_id).one()
+        priority_message = PriorityMessage.query.filter_by(id=priority_item.priority_message_id).one()
+        inp_text = priority_message.input_text_value
+        priority_list_method = PriorityListMethod.query.filter_by(id=priority_list_method_id).one()
+        python_path = priority_list_method.python_path
+        name = priority_list.name
+        # how would python_path look like?
+        #  python_path 'quickstart\priority_method.py'
+        #  name 'ask_gpt'
+        # todo:
+        # check if python_path exists
+        # check that attribute exists
+        script_module = importlib.import_module(python_path)
+        method_function = getattr(script_module, name)
+        self.p_b_m_a = method_function(inp_text)
+        db.session.commit()
 
 class PriorityMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -144,16 +168,70 @@ class PriorityMessage(db.Model):
     input_text_value = db.Column(db.Text())
     embedding_vector = db.Column(db.LargeBinary)
 
-    def enrich_input_text_value():
+    def enrich_input_text_value(self):
         # different platforms would get different methods of
 	    # calculating abstracts or getting whole messages
 	    # subjects or snippets for this
-        pass
+        # suppose there is a table that connects platform with their message table
 
-    def enrich_vectors():
+        # with self.id you can get priority list id from priority_item
+        priority_list_id = PriorityItem.query.filter_by(priority_message_id=self.id).one().id
+        platform_id = PriorityList.query.filter_by(id=priority_list_id).one().platform_id
+        platform_to_table = PlatformToMessageTables.query.filter_by(platform_id=platform_id).one()
+        func_name = platform_to_table.func_name
+        python_path = platform_to_table.python_path
+        message_table_name = platform_to_table.message_table_name
+
+        # for example
+        #  python_path quickstart\platform.py
+        #  func_name get_abstract_for_slack
+        #  message_table_name slack_message
+
+
+        abstract_builder_implemented = False
+        # let's say this is an example of text summ method
+        if not abstract_builder_implemented:
+            self.input_text_value = db.session.execute(
+                'SELECT text FROM %s WHERE id = :message_id;' % message_table_name,
+                {'message_id': self.message_id})
+        else:
+            # but more general case is
+            script_module = importlib.import_module(python_path)
+            abstract_builder = getattr(script_module, func_name)
+            self.input_text_value = abstract_builder()
+        db.session.commit()
+
+
+    def enrich_vectors(self):
         # at this stage just get w2v vector of input_text_value
         #  or even bag of words vectors
-        pass
+        #  0. plan where and when embedding builder will be called first and trained/fitted
+        #  1. then it should be pickled and uploaded to file_store
+        #  when this function will be called
+        #  2. download pickle file from file_store
+        #  3. use this object to embed input_text_value
+        # at this stage pickle filepath would be hardcoded here
+        # for reason it's a global file that wouldn't be versioned
+        # it would be set up and called in setup.py root dir folder script
+        # and there would be pickled
+
+
+        # first unpickle embedding object
+        model_filepath = os.path.join('file_store', '2023-02-22-embedding-model')
+        model_pickle = open(model_filepath, 'rb')
+        embedding_model = pickle.load(model_pickle)
+        sentence = []
+        sentence.append(self.input_text_value)
+        self.embedding_vector = embedding_model.encode(sentence)
+        db.session.commit()
+
+
+class PlatformToMessageTable(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'), unique=True)
+    message_table_name = db.Column(db.Text())
+    python_path = db.Column(db.Text())
+    func_name = db.Column(db.Text())
 
 class AudioFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
