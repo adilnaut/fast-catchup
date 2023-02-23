@@ -23,6 +23,8 @@ from google.auth.exceptions import RefreshError
 
 from quickstart.connection import db_ops, get_current_user, get_platform_id
 from quickstart.sqlite_utils import get_upsert_query, get_insert_query
+from quickstart.priority_engine import create_priority_list, create_priority_list_methods
+from quickstart.platform import get_abstract_for_gmail
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -169,7 +171,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
     return text_parts, num_processed
 
 
-def etl_gmail(service, db, max_messages=20, unread_only=True):
+def etl_gmail(service, db, session_id=None, max_messages=20, unread_only=True):
 
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
@@ -273,6 +275,7 @@ def etl_gmail(service, db, max_messages=20, unread_only=True):
             , ('content_type', h_content_type)
             , ('subject', subject)
             , ('is_multipart', is_multipart)
+            , ('session_id', session_id)
             , ('multipart_num', num_parts)])
         gm_query = get_upsert_query('gmail_message', gm_kwargs.keys(), 'id')
         db.session.execute(gm_query, gm_kwargs)
@@ -456,25 +459,39 @@ def dumps_emails(gmail_messages):
     return result_text
 
 
-def get_gmail_comms(use_last_cached_emails=True, return_list=False):
-    if not use_last_cached_emails:
-        service = auth_and_load_session_gmail()
-        with db_ops(model_names=[]) as (db, ):
-            etl_gmail(service, db)
+def get_gmail_comms(return_list=False, session_id=None):
 
+    service = auth_and_load_session_gmail()
+    with db_ops(model_names=[]) as (db, ):
+        etl_gmail(service, db, session_id=session_id)
+
+    platform_id = get_platform_id('gmail')
     gmail_messages = None
     with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailUser']) as \
         (db, GmailMessage, GmailMessageLabel, GmailUser):
 
-        platform_id = get_platform_id('gmail')
         gmail_messages = db.session.query(GmailMessage) \
             .join(GmailMessageLabel, GmailMessageLabel.gmail_message_id == GmailMessage.id) \
             .join(GmailUser, GmailUser.email == GmailMessage.gmail_user_email) \
             .filter(GmailUser.platform_id == platform_id) \
-            .filter(GmailMessageLabel.label == 'UNREAD').all()
+            .filter(GmailMessageLabel.label == 'UNREAD') \
+            .filter(GmailMessage.session_id == session_id) \
+            .all()
+
+
+    with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
+        , 'PriorityItem', 'PriorityItemMethod']) as (db, PriorityList, PriorityListMethod \
+        , PriorityMessage, PriorityItem, PriorityItemMethod):
+        plist_id = create_priority_list(db, PriorityList, platform_id, session_id)
+        # this should go to add_auth_method_now
+        update_priority_list_methods(db, PriorityListMethod)
+        # but should probably be replaced with update_p_m_a calls
+        fill_priority_list(db, messages, get_abstract_for_gmail, plist_id, PriorityMessage, PriorityList, \
+            PriorityItem, PriorityItemMethod, PriorityListMethod)
 
     if return_list:
         return gmail_messages
+
     result_text = dumps_emails(gmail_messages)
     return result_text
 

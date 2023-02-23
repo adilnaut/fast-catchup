@@ -16,7 +16,7 @@ from werkzeug.urls import url_parse
 from quickstart.quickstart import generate_summary
 from quickstart.slack_utils import get_slack_comms, list_sfiles, clear_slack_tables, slack_test_etl, list_slinks
 from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables, list_gtexts, list_gfiles, list_glinks
-
+from quickstart.priority_engine import create_priority_list_methods
 
 @app.route('/upload_gmail_auth', methods=['GET', 'POST'])
 def upload_gmail_auth():
@@ -69,6 +69,8 @@ def upload_gmail_auth():
 
         db.session.execute(text(credfile_query), credfile_kwargs)
         db.session.commit()
+
+        create_priority_list_methods(db, PriorityListMethod, platform_id)
 
         # todo save filepath to database
         return redirect(url_for('index'))
@@ -135,6 +137,8 @@ def upload_slack_auth():
         db.session.execute(text(secret_query), secret_kwargs)
         db.session.commit()
 
+        create_priority_list_methods(db, PriorityListMethod, platform_id)
+
         return redirect(url_for('index'))
 
     return render_template('upload_slack_auth.html', form=form)
@@ -187,6 +191,7 @@ def register():
 
         db.session.execute(text(workspace_query), workspace_kwargs)
         db.session.commit()
+
 
 
         return redirect(url_for('login'))
@@ -276,7 +281,7 @@ def gen_summary():
     cache_gmail = request.form.get("gmail-checkbox") != None
 
 
-    prompt, gpt_summary, filepath = generate_summary(prompt=prompt, session_id=session_id)
+    prompt, gpt_summary, filepath = generate_summary(session_id=session_id)
 
     gptin['slack_list'] = unread_slack
     gptin['gmail_list'] = unread_gmail

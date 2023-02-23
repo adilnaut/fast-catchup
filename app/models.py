@@ -16,6 +16,7 @@ def load_user(id):
 
 class PriorityList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Text())
     platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
     created = db.Column(db.Integer)
     p_a = db.Column(db.Float())
@@ -25,13 +26,17 @@ class PriorityList(db.Model):
         result = db.session.query(func.avg(PriorityItem.p_a)) \
             .join(PriorityList) \
             .filter(PriorityList.platform_id == self.platform.id) \
+            .filter(PriorityList.id != self.id) \
             .all()
         self.p_a = result.as_scalar() if result else 0.3
         db.session.commit()
 
+    __table_args__ = (db.UniqueConstraint('session_id', 'platform_id', name='_unique_constraint_sess_plat'),
+        )
+
 class PriorityListMethod(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    priority_list_id = db.Column(db.Integer, db.ForeignKey('priority_list.id'))
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
     p_m_a = db.Column(db.Float())
     name = db.Column(db.Text())
     python_path = db.Column(db.Text())
@@ -48,9 +53,10 @@ class PriorityListMethod(db.Model):
         #  incorrect cause one priority item have multiple priority methods
         #  consider either writing an sql query or just import data  and do that in python
         # result = db.session.query(func.avg(func.abs(PriorityItem.p_b_a - PriorityItemMethod) * PriorityItem.p_a ))
-        query = PriorityList.query.filter_by(id=self.priority_list_id).first()
-        platform_id = query.platform_id
-        p_lists = PriorityList.query.filter_by(platform_id=platform_id).all()
+        platform_id = self.platform_id
+        p_lists = PriorityList.query.filter_by(platform_id=platform_id) \
+            .filter(PriorityList.id != self.priority_list_id) \
+            .all()
         result = []
         for p_list in p_lists:
             # p_methods = PriorityListMethod.query.filter_by(priority_list_id=p_list.id).all()
@@ -66,6 +72,10 @@ class PriorityListMethod(db.Model):
         db.session.commit()
 
 
+    __table_args__ = (db.UniqueConstraint('platform_id', 'name', name='_unique_constraint_plat_name'),
+        )
+
+
 class PriorityItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Float())
@@ -76,7 +86,7 @@ class PriorityItem(db.Model):
     p_a_b = db.Column(db.Float())
     p_a = db.Column(db.Float())
 
-    def calculate_p_b(self):
+    def calculate_p_b(self, nbrs, ids):
         # get priority_message vector
     	# get first k neighbors sample
     	# get number of important ones
@@ -85,27 +95,7 @@ class PriorityItem(db.Model):
         # this is numpy array with either ChatGPT embedding, w2v embedding or sklearn bag of words
         p_m_vector = PriorityMessage.query.filter_by(id=self.priority_message_id).one().embedding_vector
 
-        # ideally we should have 10 nearest neighbors classifiers object fitted on all previous data
-        # but for now we can train it right there
-        query = PriorityList.query.filter_by(id=self.priority_list_id).first()
-        platform_id = query.platform_id
-        # get all priority_list items except a fresh one
-        p_lists = PriorityList.query.filter_by(platform_id=platform_id) \
-            .filter(PriorityList.id != self.priority_list_id) \
-            .all()
-        ids = []
-        all_vectors = []
-        for p_list in p_lists:
-            # p_methods = PriorityListMethod.query.filter_by(priority_list_id=p_list.id).all()
-            p_items = PriorityItem.query.filter_by(priority_list_id=p_list.id).all()
-            for p_item in p_items:
-                _ = PriorityMessage.query.filter_by(id=p_item.priority_message_id).one()
-                ids.append(_.id)
-                all_vectors.append(_.embedding_vector)
-        if all_vectors:
-            X = np.array(all_vectors)
-            nbrs = NearestNeighbors(n_neighbors=10, algorithm='ball_tree').fit(X)
-
+        if nbrs:
             distances, indices = nbrs.kneighbors(p_m_vector)
             p_as = []
             for n_i in indices:
@@ -175,39 +165,9 @@ class PriorityMessage(db.Model):
     input_text_value = db.Column(db.Text())
     embedding_vector = db.Column(db.LargeBinary)
 
-    def enrich_input_text_value(self):
-        # different platforms would get different methods of
-	    # calculating abstracts or getting whole messages
-	    # subjects or snippets for this
-        # suppose there is a table that connects platform with their message table
-
-        # with self.id you can get priority list id from priority_item
-        priority_list_id = PriorityItem.query.filter_by(priority_message_id=self.id).one().id
-        platform_id = PriorityList.query.filter_by(id=priority_list_id).one().platform_id
-        platform_to_table = PlatformToMessageTables.query.filter_by(platform_id=platform_id).one()
-        func_name = platform_to_table.func_name
-        python_path = platform_to_table.python_path
-        message_table_name = platform_to_table.message_table_name
-
-        # for example
-        #  python_path quickstart\platform.py
-        #  func_name get_abstract_for_slack
-        #  message_table_name slack_message
-
-
-        abstract_builder_implemented = False
-        # let's say this is an example of text summ method
-        if not abstract_builder_implemented:
-            self.input_text_value = db.session.execute(
-                'SELECT text FROM %s WHERE id = :message_id;' % message_table_name,
-                {'message_id': self.message_id})
-        else:
-            # but more general case is
-            script_module = importlib.import_module(python_path)
-            abstract_builder = getattr(script_module, func_name)
-            self.input_text_value = abstract_builder()
+    def enrich_input_text_value(self, inp_text):
+        self.input_text_value = inp_text
         db.session.commit()
-
 
     def enrich_vectors(self):
         # at this stage just get w2v vector of input_text_value
@@ -232,13 +192,6 @@ class PriorityMessage(db.Model):
         self.embedding_vector = embedding_model.encode(sentence)
         db.session.commit()
 
-
-class PlatformToMessageTable(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'), unique=True)
-    message_table_name = db.Column(db.Text())
-    python_path = db.Column(db.Text())
-    func_name = db.Column(db.Text())
 
 class AudioFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)

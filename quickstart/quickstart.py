@@ -92,7 +92,7 @@ def generate_voice_file(text_response, verbose=False):
             print("Did you update the subscription info?")
     return filepath
 
-def generate_summary(prompt=None, cache_slack=False, cache_gmail=False):
+def generate_summary(session_id, prompt=None, cache_slack=False, cache_gmail=False):
     if not prompt:
         prompt = '''I\'ve got the following slack messages and emails today please give me a quick summary
             of only important messages with urgent matters first.:'''

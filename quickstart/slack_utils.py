@@ -15,7 +15,8 @@ from slack_bolt import App
 from quickstart.connection import db_ops, get_current_user, get_platform_id, get_auth_data
 from quickstart.gmail_utils import extract_domain
 from quickstart.sqlite_utils import get_upsert_query
-
+from quickstart.priority_engine import create_priority_list, create_priority_list_methods
+from quickstart.platform import get_abstract_for_gmail
 
 
 
@@ -158,7 +159,7 @@ def etl_users(app, db):
             db.session.execute(su_query, su_kwargs)
 
 
-def etl_messages(app, db, days_ago=1, max_pages=1,  verbose=False):
+def etl_messages(app, db, session_id=None, days_ago=1, max_pages=1,  verbose=False):
     # don't overwhelm API rate
     slack_channels = None
     platform_id = get_platform_id('slack')
@@ -204,6 +205,7 @@ def etl_messages(app, db, days_ago=1, max_pages=1,  verbose=False):
                             , ('slack_user_id', user)
                             , ('text', text)
                             , ('slack_channel_id', channel.id)
+                            , ('session_id', session_id)
                             , ('is_unread', True)])
                     sm_query = get_upsert_query('slack_message', sm_kwargs.keys(), 'ts')
                     db.session.execute(sm_query, sm_kwargs)
@@ -464,11 +466,11 @@ def slack_test_etl():
 
 
 #  todo handle rate limited exception
-def get_slack_comms(use_last_cached_emails=True, return_list=False):
+def get_slack_comms(return_list=False, session_id=None):
     platform_id = get_platform_id('slack')
-    if not use_last_cached_emails:
-        app = auth_and_load_session_slack()
-        etl_messages(app)
+    app = auth_and_load_session_slack()
+    with db_ops(model_names=[]) as (db, ):
+        etl_messages(app, db, session_id=session_id)
 
     slack_messages = None
     with db_ops(model_names=['SlackMessage', 'SlackChannel']) as (db, SlackMessage, SlackChannel):
@@ -476,7 +478,19 @@ def get_slack_comms(use_last_cached_emails=True, return_list=False):
             .join(SlackChannel, SlackMessage.slack_channel_id == SlackChannel.id) \
             .filter(SlackChannel.platform_id == platform_id) \
             .filter(SlackMessage.is_unread == True) \
+            .filter(SlackMessage.session_id == session_id) \
             .all()
+
+
+    with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
+        , 'PriorityItem', 'PriorityItemMethod']) as (db, PriorityList, PriorityListMethod \
+        , PriorityMessage, PriorityItem, PriorityItemMethod):
+        plist_id = create_priority_list(db, PriorityList, platform_id, session_id)
+        # this should go to add_auth_method_now
+        update_priority_list_methods(db, PriorityListMethod)
+        # but should probably be replaced with update_p_m_a calls
+        fill_priority_list(db, messages, get_abstract_for_slack, plist_id, PriorityMessage, PriorityList, \
+            PriorityItem, PriorityItemMethod, PriorityListMethod)
 
     if return_list:
         return slack_messages
