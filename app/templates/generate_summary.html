@@ -4,27 +4,24 @@
 
 	<h2> Fast-catchup work communications summary prototype </h2>
 
-	<p> Summary: {{ gptout.summary }} </p>
+
 	<audio controls>
   			<source src="{{ url_for('returnAudioFile', filepath=gptout.filepath) }}" type="audio/wav">
   			Your browser does not support the audio element.
 	</audio>
 
-    <p> Prompt: {{ gptin.prompt }} </p>
 
     <div class="input-group">
       <div class="input-group-prepend">
-        <span class="input-group-text">Prompt:</span>
+        <span class="input-group-text">Summary:</span>
       </div>
       <textarea name="prompt" form="summary_form" class="form-control" aria-label="With textarea" >
-        {{gptin.prompt}}
+        Summary: {{ gptout.summary }}
       </textarea>
     </div>
 
     <form action = "/generate_summary" id="summary_form" method = "post">
-
         <!-- <input type="text"  placeholder="{{gptin.prompt}}" name="prompt" /> <br> -->
-
         <input type="checkbox" id="slack_check" name="slack-checkbox" value="Slack-Check">
         <label for="slack-checkbox"> Get slack unreads from cache </label> <br>
 

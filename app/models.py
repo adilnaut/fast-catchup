@@ -62,7 +62,7 @@ class PriorityListMethod(db.Model):
                     .one()
                 weighted_accuracy = abs(p_item_method.p_b_m_a - p_item.p_b_a) * p_item.p_a
                 result.append(weighted_accuracy)
-        self.p_m_a = np.array(result).mean()
+        self.p_m_a = np.array(result).mean() if result else 0.33
         db.session.commit()
 
 
@@ -89,7 +89,10 @@ class PriorityItem(db.Model):
         # but for now we can train it right there
         query = PriorityList.query.filter_by(id=self.priority_list_id).first()
         platform_id = query.platform_id
-        p_lists = PriorityList.query.filter_by(platform_id=platform_id).all()
+        # get all priority_list items except a fresh one
+        p_lists = PriorityList.query.filter_by(platform_id=platform_id) \
+            .filter(PriorityList.id != self.priority_list_id) \
+            .all()
         ids = []
         all_vectors = []
         for p_list in p_lists:
@@ -99,16 +102,20 @@ class PriorityItem(db.Model):
                 _ = PriorityMessage.query.filter_by(id=p_item.priority_message_id).one()
                 ids.append(_.id)
                 all_vectors.append(_.embedding_vector)
-        X = np.array(all_vectors)
-        nbrs = NearestNeighbors(n_neighbors=10, algorithm='ball_tree').fit(X)
+        if all_vectors:
+            X = np.array(all_vectors)
+            nbrs = NearestNeighbors(n_neighbors=10, algorithm='ball_tree').fit(X)
 
-        distances, indices = nbrs.kneighbors(p_m_vector)
-        p_as = []
-        for n_i in indices:
-            n_id = ids[n_i]
-            n_item = PriorityItem.query.filter_by(id=n_id).one()
-            p_as.append(n_item.p_a)
-        self.p_b = np.array(p_as).mean()
+            distances, indices = nbrs.kneighbors(p_m_vector)
+            p_as = []
+            for n_i in indices:
+                n_id = ids[n_i]
+                n_item = PriorityItem.query.filter_by(id=n_id).one()
+                if n_item:
+                    p_as.append(n_item.p_a)
+            self.p_b = np.array(p_as).mean()
+        else:
+            self.p_b = 0.1
         db.session.commit()
 
     def calculate_p_b_a(self):
@@ -119,7 +126,7 @@ class PriorityItem(db.Model):
         for p_item_method in p_item_methods:
             p_list_method = PriorityListMethod.query.filter_by(id=p_item_method.priority_list_method_id).one()
             p_m_a = p_list_method.p_m_a
-            p_b_m_a = p_item_method.calculate_p_b_m_a()
+            p_b_m_a = p_item_method.p_b_m_a
             sum += p_b_m_a * p_m_a
         self.p_b_a = sum
         db.session.commit()
@@ -357,6 +364,7 @@ class SlackMessage(db.Model):
     type = db.Column(db.String(60))
     slack_user_id = db.Column(db.String(20), db.ForeignKey('slack_user.id'))
     slack_channel_id = db.Column(db.String(20), db.ForeignKey('slack_channel.id'))
+    session_id = db.Column(db.Text())
     text = db.Column(db.Text())
     is_unread = db.Column(db.Boolean())
 
@@ -431,6 +439,7 @@ class GmailMessage(db.Model):
     subject = db.Column(db.Text())
     is_multipart = db.Column(db.Boolean())
     multipart_num = db.Column(db.Integer)
+    session_id = db.Column(db.Text())
 
     def __repr__(self):
         return '<g-message by {} on {}>'.format(self.from_string, self.date)

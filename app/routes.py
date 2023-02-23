@@ -249,65 +249,58 @@ def test_clear_slack_table():
     clear_slack_tables()
     return redirect(url_for('index'))
 
-@app.route('/first', methods=['GET'])
+@app.route('/generate_summary', methods=['GET'])
 @login_required
 def first():
-    unread_slack = get_slack_comms(return_list=True)
-    unread_gmail = get_gmail_comms(return_list=True)
+    unread_slack = []
+    unread_gmail = []
 
     gptin = {'slack_list': unread_slack,
-             'gmail_list': unread_gmail,
-             'prompt': 'Here are my slack and email texts could you summarize them?'}
+             'gmail_list': unread_gmail}
     gptout = {'summary': 'Press Generate to generate summary'}
 
-    return render_template('first.html', title='Summary', gptin=gptin, gptout=gptout)
+    return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
 
 @app.route('/generate_summary', methods=['POST'])
 @login_required
 def gen_summary():
     gptin = {}
     gptout = {}
-    prompt = '''I\'ve got the following slack messages and emails today please give me a quick summary
-        of only important messages with urgent matters first.:'''
-    unread_slack = get_slack_comms(return_list=True)
-    unread_gmail = get_gmail_comms(return_list=True)
+    session_id = uuid.uuid4().hex
 
+    unread_slack = get_slack_comms(return_list=True, session_id=session_id)
+    unread_gmail = get_gmail_comms(return_list=True, session_id=session_id)
 
-    # get prompt from post form
-    _ = request.form['prompt']
-    if _:
-        prompt = _
 
     cache_slack = request.form.get("slack-checkbox") != None
     cache_gmail = request.form.get("gmail-checkbox") != None
 
 
-    prompt, gpt_summary, filepath = generate_summary(prompt=prompt,
-        cache_slack=cache_slack, cache_gmail=cache_gmail)
+    prompt, gpt_summary, filepath = generate_summary(prompt=prompt, session_id=session_id)
 
     gptin['slack_list'] = unread_slack
     gptin['gmail_list'] = unread_gmail
     gptin['prompt'] = prompt
 
-    user_id = current_user.get_id()
+    persist_audio = False
+    if persist_audio:
+        user_id = current_user.get_id()
+        workspace = Workspace.query.filter_by(user_id=user_id).one()
+        workspace_id = workspace.id
+        timestamp = int(round(datetime.now().timestamp()))
+        audio_kwargs = {'workspace_id': workspace_id
+            , 'created': timestamp
+            , 'file_path': filepath}
 
-    workspace = Workspace.query.filter_by(user_id=user_id).one()
-    workspace_id = workspace.id
-    timestamp = int(round(datetime.now().timestamp()))
-
-    audio_kwargs = {'workspace_id': workspace_id
-        , 'created': timestamp
-        , 'file_path': filepath}
-
-    audio_row = AudioFile(**audio_kwargs)
-    db.session.add(audio_row)
-    db.session.commit()
+        audio_row = AudioFile(**audio_kwargs)
+        db.session.add(audio_row)
+        db.session.commit()
 
     gptout['filepath'] = filepath
     gptout['summary'] = gpt_summary
 
 
-    return render_template('first.html', title='Summary', gptin=gptin, gptout=gptout)
+    return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
 
 
 @app.route('/', methods=['POST', 'GET'])
