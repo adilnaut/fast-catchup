@@ -4,6 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy import MetaData
 from flask_login import LoginManager
+from flask_admin import Admin
+
+
 
 import sqlite3
 import numpy as np
@@ -22,6 +25,9 @@ convention = {
 app = Flask(__name__)
 app.config.from_object(Config)
 
+admin = Admin(app, name='fast-catchup', template_mode='bootstrap3')
+
+
 
 metadata = MetaData(naming_convention=convention)
 db = SQLAlchemy(app, metadata=metadata)
@@ -29,4 +35,5 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
 
-from app import routes, models
+
+from app import routes, models, admin_views

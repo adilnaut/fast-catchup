@@ -503,42 +503,6 @@ def get_slack_comms(return_list=False, session_id=None):
     return result
 
 
-def list_sfiles():
-    slack_messages = None
-    platform_id = get_platform_id('slack')
-    with db_ops(model_names=['SlackMessage', 'SlackAttachment', 'SlackUser', 'SlackChannel']) as \
-        (db, SlackMessage, SlackAttachment, SlackUser, SlackChannel):
-
-        sm_query = db.session.query(SlackMessage, SlackAttachment, SlackUser, SlackChannel) \
-            .select_from(SlackMessage) \
-            .join(SlackAttachment, SlackMessage.ts == SlackAttachment.slack_message_ts) \
-            .join(SlackUser, SlackMessage.slack_user_id == SlackUser.id) \
-            .join(SlackChannel, SlackChannel.id == SlackMessage.slack_channel_id) \
-            .filter(SlackUser.platform_id == platform_id)
-
-
-        slack_messages = sm_query.all()
-
-
-    return slack_messages
-
-
-def list_slinks():
-    slack_messages = None
-    platform_id = get_platform_id('slack')
-    with db_ops(model_names=['SlackMessage', 'SlackLink', 'SlackUser', 'SlackChannel']) as \
-        (db, SlackMessage, SlackLink, SlackUser, SlackChannel):
-
-        sm_query = db.session.query(SlackMessage, SlackLink, SlackUser, SlackChannel) \
-            .select_from(SlackMessage) \
-            .join(SlackLink, SlackMessage.ts == SlackLink.slack_message_ts) \
-            .join(SlackUser, SlackMessage.slack_user_id == SlackUser.id) \
-            .join(SlackChannel, SlackChannel.id == SlackMessage.slack_channel_id) \
-            .filter(SlackUser.platform_id == platform_id)
-
-        slack_messages = sm_query.all()
-
-    return slack_messages
 
 def clear_slack_tables():
     with db_ops(model_names=['SlackMessage', 'SlackAttachment', 'SlackUser', 'SlackChannel']) as \

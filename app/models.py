@@ -21,6 +21,7 @@ class PriorityList(db.Model):
     platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
     created = db.Column(db.Integer)
     p_a = db.Column(db.Float())
+    items = db.relationship('PriorityItem', backref='list', lazy='dynamic')
 
     def update_p_a(self):
         items = db.session.query(PriorityItem) \
@@ -98,7 +99,7 @@ class PriorityItem(db.Model):
     	# and divide by k
 
         # this is numpy array with either ChatGPT embedding, w2v embedding or sklearn bag of words
-        p_m_vector = PriorityMessage.query.filter_by(id=self.priority_message_id).().embedding_vector
+        p_m_vector = PriorityMessage.query.filter_by(id=self.priority_message_id).embedding_vector
         p_m_vector = np.frombuffer(p_m_vector, dtype='<f4').reshape(-1, 1)
 
         if nbrs:

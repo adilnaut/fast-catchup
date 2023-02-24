@@ -10,3 +10,4 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     # SQLALCHEMY_ENGINE_OPTIONS = {'detect_types': sqlite3.PARSE_DECLTYPES}
     # SQLALCHEMY_ENGINE_OPTIONS = {'native_datetime': True}
+    FLASK_ADMIN_SWATCH = 'cerulean'

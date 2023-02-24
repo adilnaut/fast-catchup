@@ -524,16 +524,6 @@ def get_gmail_attribute(att_name):
 
     return gmail_messages
 
-def list_gtexts():
-    return get_gmail_attribute('GmailMessageText')
-
-def list_gfiles():
-    return get_gmail_attribute('GmailAttachment')
-
-def list_glinks():
-    return get_gmail_attribute('GmailLink')
-
-
 def clean_gmail_tables():
     # todo: make table relationships explicit and cascade on delte, then delete user/platform
     with db_ops(model_names=['GmailMessage', 'GmailMessageText', \

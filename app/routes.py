@@ -209,58 +209,6 @@ def remove_users():
     return redirect(url_for('index'))
 
 
-@app.route('/clear_priority_tables', methods=['GET'])
-def clear_priority():
-    ps = PriorityItemMethod.query.all()
-    for p in ps:
-        db.session.delete(p)
-    db.session.commit()
-    ps = PriorityMessage.query.all()
-    for p in ps:
-        db.session.delete(p)
-    db.session.commit()
-    ps = PriorityItem.query.all()
-    for p in ps:
-        db.session.delete(p)
-    db.session.commit()
-    ps = PriorityListMethod.query.all()
-    for p in ps:
-        db.session.delete(p)
-    db.session.commit()
-    plists = PriorityList.query.all()
-    for pl in plists:
-        db.session.delete(pl)
-
-    db.session.commit()
-    return redirect(url_for('index'))
-
-@app.route('/list_gmail_texts', methods=['GET'])
-def list_gmail_texts():
-    gtexts = list_gtexts()
-    # print(gtexts)
-    return render_template('gmail_texts.html', gtexts=gtexts)
-
-@app.route('/list_gmail_files', methods=['GET'])
-def list_gmail_files():
-    gfiles = list_gfiles()
-    # print(gtexts)
-    return render_template('gmail_files.html', gfiles=gfiles)
-
-@app.route('/list_gmail_links', methods=['GET'])
-def list_gmail_links():
-    glinks = list_glinks()
-    # print(gtexts)
-    return render_template('gmail_links.html', glinks=glinks)
-
-@app.route('/list_slack_files', methods=['GET'])
-def list_slack_files():
-    sfiles = list_sfiles()
-    return render_template('slack_files.html', sfiles=sfiles)
-
-@app.route('/list_slack_links', methods=['GET'])
-def list_slack_links():
-    slinks = list_slinks()
-    return render_template('slack_links.html', slinks=slinks)
 
 @app.route('/test_gmail_etl', methods=['GET'])
 def test_gmail_etl():
@@ -272,7 +220,7 @@ def test_slack_etl():
     slack_test_etl()
     return redirect(url_for('index'))
 
-@app.route('/test_clear_gmail_table', methods=['GET'])
+@app.route('/clear_gmail_table', methods=['GET'])
 def test_clear_gmail_table():
     clean_gmail_tables()
     return redirect(url_for('index'))
