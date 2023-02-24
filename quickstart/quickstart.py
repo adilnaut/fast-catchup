@@ -92,15 +92,15 @@ def generate_voice_file(text_response, verbose=False):
             print("Did you update the subscription info?")
     return filepath
 
-def generate_summary(session_id, prompt=None, cache_slack=False, cache_gmail=False):
+def generate_summary(session_id):
     if not prompt:
         prompt = '''I\'ve got the following slack messages and emails today please give me a quick summary
             of only important messages with urgent matters first.:'''
 
-    unread_emails = get_gmail_comms()
+    unread_emails = get_gmail_comms(session_id=session_id)
 
     # from db
-    unread_slack = get_slack_comms()
+    unread_slack = get_slack_comms(session_id=session_id)
 
     gpt_summary = get_gpt_summary(prompt, unread_emails, unread_slack)
 

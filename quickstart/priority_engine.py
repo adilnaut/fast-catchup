@@ -35,7 +35,12 @@ def build_knn(PriorityList, PriorityItem, PriorityMessage, p_item):
         nbrs = NearestNeighbors(n_neighbors=10, algorithm='ball_tree').fit(X)
     return nbrs, ids
 
-def create_priority_list(db, PriorityList, platform_id, session_id):
+def create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id):
+
+    # check if no priority_list_methods for this platform
+    p_list_methods = PriorityListMethod.query.filter_by(platform_id=platform_id).all()
+    if not p_list_methods:
+        create_priority_list_methods(db, PriorityListMethod, platform_id)
 
     timestamp = int(round(datetime.now().timestamp()))
     plist_kwargs = OrderedDict([('session_id', session_id)
@@ -54,7 +59,7 @@ def create_priority_list(db, PriorityList, platform_id, session_id):
 
 
 def create_priority_list_methods(db, PriorityListMethod, platform_id):
-    script_path = os.path.join('quickstart', 'priority_method.py')
+    script_path = 'quickstart.priority_method'
     methods = [(script_path, 'ask_gpt')
         , (script_path, 'toy_keyword_match')
         , (script_path, 'sentiment_analysis')]
@@ -67,10 +72,6 @@ def create_priority_list_methods(db, PriorityListMethod, platform_id):
         db.session.execute(plist_method_query, plist_method_kwargs)
         db.session.commit()
 
-        # pl_method = PriorityListMethod.query.filter_by(platform_id=platform_id) \
-        #     .filter_by(name=name) \
-        #     .one()
-        # pl_method.update_p_m_a()
 
 def update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id):
     pl_methods = PriorityListMethod.query.filter_by(platform_id=platform_id).all()

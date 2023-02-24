@@ -72,8 +72,9 @@ class PriorityListMethod(db.Model):
                     .filter_by(priority_item_id=p_item.id) \
                     .filter_by(priority_list_method_id=self.id) \
                     .first()
-                weighted_accuracy = abs(p_item_method.p_b_m_a - p_item.p_b_a) * p_item.p_a
-                result.append(weighted_accuracy)
+                if p_item.p_b_a and p_item_method and p_item_method.p_b_m_a and p_item.p_a:
+                    weighted_accuracy = abs(p_item_method.p_b_m_a - p_item.p_b_a) * p_item.p_a
+                    result.append(weighted_accuracy)
         self.p_m_a = np.array(result).mean() if result else 0.33
         db.session.commit()
 
@@ -91,6 +92,7 @@ class PriorityItem(db.Model):
     p_b_a = db.Column(db.Float())
     p_a_b = db.Column(db.Float())
     p_a = db.Column(db.Float())
+    methods = db.relationship('PriorityItemMethod', backref='item', lazy='dynamic')
 
     def calculate_p_b(self, nbrs, ids):
         # get priority_message vector
@@ -150,19 +152,20 @@ class PriorityItemMethod(db.Model):
 	    # from priority_item, get priority_message and get text
         # here access p_list_method python path, import method by path and call python method
         # all methods should only take text into account
-        priority_item = PriorityItem.query.filter_by(id=priority_item_id).one()
+        priority_item = PriorityItem.query.filter_by(id=self.priority_item_id).one()
         priority_message = PriorityMessage.query.filter_by(id=priority_item.priority_message_id).one()
         inp_text = priority_message.input_text_value
-        priority_list_method = PriorityListMethod.query.filter_by(id=priority_list_method_id).one()
+        priority_list_method = PriorityListMethod.query.filter_by(id=self.priority_list_method_id).one()
         python_path = priority_list_method.python_path
-        name = priority_list.name
+        name = priority_list_method.name
         # how would python_path look like?
         #  python_path 'quickstart\priority_method.py'
         #  name 'ask_gpt'
         # todo:
         # check if python_path exists
         # check that attribute exists
-        script_module = importlib.import_module(python_path)
+        package_name, module_name = python_path.split('.')
+        script_module = importlib.import_module('.%s' % module_name, package=package_name)
         method_function = getattr(script_module, name)
         self.p_b_m_a = method_function(inp_text)
         db.session.commit()
@@ -232,6 +235,7 @@ class Workspace(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    platforms = db.relationship('Platform', backref='workspace', lazy='dynamic')
 
     def __repr__(self):
         return '<workspace {}>'.format(self.id)
@@ -241,6 +245,7 @@ class Platform(db.Model):
     name = db.Column(db.Text())
     workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
     auth_method = db.Column(db.Text())
+    auth_records = db.relationship('AuthData', backref='platform', lazy='dynamic')
     __table_args__ = (db.UniqueConstraint('workspace_id', 'name', name='_unique_constraint_uc'),
         )
 

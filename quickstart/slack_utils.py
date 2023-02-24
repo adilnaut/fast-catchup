@@ -485,7 +485,7 @@ def get_slack_comms(return_list=False, session_id=None):
     with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
         , 'PriorityItem', 'PriorityItemMethod']) as (db, PriorityList, PriorityListMethod \
         , PriorityMessage, PriorityItem, PriorityItemMethod):
-        plist_id = create_priority_list(db, PriorityList, platform_id, session_id)
+        plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
         # this should go to add_auth_method_now
         update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
         # but should probably be replaced with update_p_m_a calls

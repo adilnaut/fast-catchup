@@ -15,8 +15,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.urls import url_parse
 
 from quickstart.quickstart import generate_summary
-from quickstart.slack_utils import get_slack_comms, list_sfiles, clear_slack_tables, slack_test_etl, list_slinks
-from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables, list_gtexts, list_gfiles, list_glinks
+from quickstart.slack_utils import get_slack_comms, clear_slack_tables, slack_test_etl
+from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables
 from quickstart.priority_engine import create_priority_list_methods
 from setup import setup_sentence_embeddings_model, setup_sentiment_analysis_model
 
@@ -71,8 +71,6 @@ def upload_gmail_auth():
 
         db.session.execute(text(credfile_query), credfile_kwargs)
         db.session.commit()
-
-        create_priority_list_methods(db, PriorityListMethod, platform_id)
 
         # todo save filepath to database
         return redirect(url_for('index'))
@@ -138,8 +136,6 @@ def upload_slack_auth():
 
         db.session.execute(text(secret_query), secret_kwargs)
         db.session.commit()
-
-        create_priority_list_methods(db, PriorityListMethod, platform_id)
 
         return redirect(url_for('index'))
 

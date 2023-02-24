@@ -1,3 +1,4 @@
+import os
 import openai
 from transformers import pipeline
 
@@ -12,7 +13,7 @@ def parse_gpt_response(text_response):
     # if there are multiple values, take first one
     # but later check keywords like 'out of '
     # i.e. 20 out of 100
-    return int_vals[0]*0.01 if int_vals else None
+    return int_vals[0]*0.01 if int_vals else 0
 
 def ask_gpt(input_text):
     ''' Prompt ChatGPT or GPT3 level of importance of one message directly
@@ -53,7 +54,7 @@ def toy_keyword_match(input_text):
 def sentiment_analysis(input_text):
     ''' get transformered sentiment analysis value
         but only negative one, with a score
-        if positive return 0 
+        if positive return 0
     '''
     # todo load locally
     sentiment_pipeline = pipeline("sentiment-analysis")
