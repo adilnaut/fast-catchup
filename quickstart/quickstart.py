@@ -97,10 +97,10 @@ def generate_summary(session_id, prompt=None, cache_slack=False, cache_gmail=Fal
         prompt = '''I\'ve got the following slack messages and emails today please give me a quick summary
             of only important messages with urgent matters first.:'''
 
-    unread_emails = get_gmail_comms(use_last_cached_emails=cache_gmail)
+    unread_emails = get_gmail_comms()
 
     # from db
-    unread_slack = get_slack_comms(use_last_cached_emails=cache_slack)
+    unread_slack = get_slack_comms()
 
     gpt_summary = get_gpt_summary(prompt, unread_emails, unread_slack)
 

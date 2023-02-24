@@ -2,6 +2,7 @@ from app import db
 from sqlalchemy import func
 from flask_login import UserMixin
 from app import login
+from sqlalchemy import select
 from werkzeug.security import generate_password_hash, check_password_hash
 from sklearn.neighbors import NearestNeighbors
 from sentence_transformers import SentenceTransformer
@@ -22,13 +23,17 @@ class PriorityList(db.Model):
     p_a = db.Column(db.Float())
 
     def update_p_a(self):
-        # average real importance of message
-        result = db.session.query(func.avg(PriorityItem.p_a).label('average_p_a')) \
+        items = db.session.query(PriorityItem) \
             .join(PriorityList) \
             .filter(PriorityList.platform_id == self.platform_id) \
             .filter(PriorityList.id != self.id) \
-            .first()
-        self.p_a = result.average_p_a if result else 0.3
+            .all()
+        # average real importance of message
+        p_as = []
+        for item in items:
+            if item.p_a:
+                p_as.append(item.p_a)
+        self.p_a = np.array(p_as).mean() if p_as else 0.3
         db.session.commit()
 
     __table_args__ = (db.UniqueConstraint('session_id', 'platform_id', name='_unique_constraint_sess_plat'),
@@ -65,7 +70,7 @@ class PriorityListMethod(db.Model):
                 p_item_method = PriorityItemMethod.query \
                     .filter_by(priority_item_id=p_item.id) \
                     .filter_by(priority_list_method_id=self.id) \
-                    .one()
+                    .first()
                 weighted_accuracy = abs(p_item_method.p_b_m_a - p_item.p_b_a) * p_item.p_a
                 result.append(weighted_accuracy)
         self.p_m_a = np.array(result).mean() if result else 0.33
@@ -93,7 +98,8 @@ class PriorityItem(db.Model):
     	# and divide by k
 
         # this is numpy array with either ChatGPT embedding, w2v embedding or sklearn bag of words
-        p_m_vector = PriorityMessage.query.filter_by(id=self.priority_message_id).one().embedding_vector
+        p_m_vector = PriorityMessage.query.filter_by(id=self.priority_message_id).().embedding_vector
+        p_m_vector = np.frombuffer(p_m_vector, dtype='<f4').reshape(-1, 1)
 
         if nbrs:
             distances, indices = nbrs.kneighbors(p_m_vector)
@@ -101,7 +107,7 @@ class PriorityItem(db.Model):
             for n_i in indices:
                 n_id = ids[n_i]
                 n_item = PriorityItem.query.filter_by(id=n_id).one()
-                if n_item:
+                if n_item and n_item.p_a:
                     p_as.append(n_item.p_a)
             self.p_b = np.array(p_as).mean()
         else:
@@ -126,10 +132,10 @@ class PriorityItem(db.Model):
         # call calculte_p_b_a
 	    # call calculate_p_b
 	    # p_a_b = p_b_a * p_a / p_b
-        p_a = PriorityList.query.filter_by(id=self.priority_list_id).one().p_a
+        p_a = PriorityList.query.filter_by(id=self.priority_list_id).first().p_a
         self.p_a_b = self.p_b_a * p_a / self.p_b
         db.session.commit()
-    __table_args__ = (db.UniqueConstraint('priority_list_id', 'priority_method_id', name='_unique_constraint_pl_pm'),
+    __table_args__ = (db.UniqueConstraint('priority_list_id', 'priority_message_id', name='_unique_constraint_pl_pm'),
         )
 
 class PriorityItemMethod(db.Model):
@@ -166,7 +172,8 @@ class PriorityItemMethod(db.Model):
 class PriorityMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # implicit foreign key at this stage
-    message_id = db.Column(db.Integer, unique=True)
+    session_id = db.Column(db.Text())
+    message_id = db.Column(db.Integer)
     input_text_value = db.Column(db.Text())
     embedding_vector = db.Column(db.LargeBinary)
 
@@ -196,7 +203,8 @@ class PriorityMessage(db.Model):
         sentence.append(self.input_text_value)
         self.embedding_vector = embedding_model.encode(sentence)
         db.session.commit()
-
+    __table_args__ = (db.UniqueConstraint('session_id', 'message_id', name='_unique_constraint_sess_mess'),
+        )
 
 class AudioFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -6,7 +6,8 @@ from sqlalchemy.sql import text
 from flask import render_template, send_file, request, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
-from app.models import User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod
+from app.models import (User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod, PriorityItemMethod,
+    PriorityItem, PriorityMessage, PriorityList)
 from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthDataForm
 
 
@@ -204,6 +205,32 @@ def remove_users():
     users = User.query.all()
     for user in users:
         db.session.delete(user)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+
+@app.route('/clear_priority_tables', methods=['GET'])
+def clear_priority():
+    ps = PriorityItemMethod.query.all()
+    for p in ps:
+        db.session.delete(p)
+    db.session.commit()
+    ps = PriorityMessage.query.all()
+    for p in ps:
+        db.session.delete(p)
+    db.session.commit()
+    ps = PriorityItem.query.all()
+    for p in ps:
+        db.session.delete(p)
+    db.session.commit()
+    ps = PriorityListMethod.query.all()
+    for p in ps:
+        db.session.delete(p)
+    db.session.commit()
+    plists = PriorityList.query.all()
+    for pl in plists:
+        db.session.delete(pl)
+
     db.session.commit()
     return redirect(url_for('index'))
 

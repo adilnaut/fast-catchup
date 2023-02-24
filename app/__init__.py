@@ -5,6 +5,12 @@ from flask_migrate import Migrate
 from sqlalchemy import MetaData
 from flask_login import LoginManager
 
+import sqlite3
+import numpy as np
+import io
+
+sqlite3.register_adapter(np.int64, lambda val: int(val))
+
 convention = {
     "ix": 'ix_%(column_0_label)s',
     "uq": "uq_%(table_name)s_%(column_0_name)s",
