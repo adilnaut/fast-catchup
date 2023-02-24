@@ -15,8 +15,8 @@ from slack_bolt import App
 from quickstart.connection import db_ops, get_current_user, get_platform_id, get_auth_data
 from quickstart.gmail_utils import extract_domain
 from quickstart.sqlite_utils import get_upsert_query
-from quickstart.priority_engine import create_priority_list, create_priority_list_methods
-from quickstart.platform import get_abstract_for_gmail
+from quickstart.priority_engine import create_priority_list, update_priority_list_methods, fill_priority_list
+from quickstart.platform import get_abstract_for_slack
 
 
 
@@ -487,9 +487,9 @@ def get_slack_comms(return_list=False, session_id=None):
         , PriorityMessage, PriorityItem, PriorityItemMethod):
         plist_id = create_priority_list(db, PriorityList, platform_id, session_id)
         # this should go to add_auth_method_now
-        update_priority_list_methods(db, PriorityListMethod)
+        update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
         # but should probably be replaced with update_p_m_a calls
-        fill_priority_list(db, messages, get_abstract_for_slack, plist_id, PriorityMessage, PriorityList, \
+        fill_priority_list(db, slack_messages, get_abstract_for_slack, plist_id, PriorityMessage, PriorityList, \
             PriorityItem, PriorityItemMethod, PriorityListMethod)
 
     if return_list:
@@ -550,8 +550,8 @@ def clear_slack_tables():
         for m in SlackMessage.query.all():
             db.session.delete(m)
 
-        for m in SlackUser.query.all():
-            db.session.delete(m)
-
-        for m in SlackChannel.query.all():
-            db.session.delete(m)
+        # for m in SlackUser.query.all():
+        #     db.session.delete(m)
+        #
+        # for m in SlackChannel.query.all():
+        #     db.session.delete(m)

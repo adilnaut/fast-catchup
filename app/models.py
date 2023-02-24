@@ -23,12 +23,12 @@ class PriorityList(db.Model):
 
     def update_p_a(self):
         # average real importance of message
-        result = db.session.query(func.avg(PriorityItem.p_a)) \
+        result = db.session.query(func.avg(PriorityItem.p_a).label('average_p_a')) \
             .join(PriorityList) \
-            .filter(PriorityList.platform_id == self.platform.id) \
+            .filter(PriorityList.platform_id == self.platform_id) \
             .filter(PriorityList.id != self.id) \
-            .all()
-        self.p_a = result.as_scalar() if result else 0.3
+            .first()
+        self.p_a = result.average_p_a if result else 0.3
         db.session.commit()
 
     __table_args__ = (db.UniqueConstraint('session_id', 'platform_id', name='_unique_constraint_sess_plat'),
@@ -41,7 +41,7 @@ class PriorityListMethod(db.Model):
     name = db.Column(db.Text())
     python_path = db.Column(db.Text())
 
-    def update_p_m_a(self):
+    def update_p_m_a(self, plist_id):
         # which is # time method corr. when message is imp/ # imp messages
     	# for this particular method
     	# i.e. go over all priority_list table filter by same platform_id
@@ -55,7 +55,7 @@ class PriorityListMethod(db.Model):
         # result = db.session.query(func.avg(func.abs(PriorityItem.p_b_a - PriorityItemMethod) * PriorityItem.p_a ))
         platform_id = self.platform_id
         p_lists = PriorityList.query.filter_by(platform_id=platform_id) \
-            .filter(PriorityList.id != self.priority_list_id) \
+            .filter(PriorityList.id != plist_id) \
             .all()
         result = []
         for p_list in p_lists:
@@ -129,6 +129,8 @@ class PriorityItem(db.Model):
         p_a = PriorityList.query.filter_by(id=self.priority_list_id).one().p_a
         self.p_a_b = self.p_b_a * p_a / self.p_b
         db.session.commit()
+    __table_args__ = (db.UniqueConstraint('priority_list_id', 'priority_method_id', name='_unique_constraint_pl_pm'),
+        )
 
 class PriorityItemMethod(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -158,10 +160,13 @@ class PriorityItemMethod(db.Model):
         self.p_b_m_a = method_function(inp_text)
         db.session.commit()
 
+    __table_args__ = (db.UniqueConstraint('priority_item_id', 'priority_list_method_id', name='_unique_constraint_pitem_plmethod'),
+        )
+
 class PriorityMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # implicit foreign key at this stage
-    message_id = db.Column(db.Integer)
+    message_id = db.Column(db.Integer, unique=True)
     input_text_value = db.Column(db.Text())
     embedding_vector = db.Column(db.LargeBinary)
 

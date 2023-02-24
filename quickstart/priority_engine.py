@@ -1,3 +1,6 @@
+import os
+
+import pickle
 import numpy as np
 
 from collections import OrderedDict
@@ -53,22 +56,22 @@ def create_priority_list_methods(db, PriorityListMethod, platform_id):
         , (script_path, 'sentiment_analysis')]
 
     for python_path, name in methods:
-        plist_method_kwargs = OrderedDicts([('platform_id', platform_id)
+        plist_method_kwargs = OrderedDict([('platform_id', platform_id)
             , ('name', name)
             , ('python_path', python_path)])
         plist_method_query = get_insert_query('priority_list_method', plist_method_kwargs.keys())
-        db.session.execute()
+        db.session.execute(plist_method_query, plist_method_kwargs)
         db.session.commit()
 
-        pl_method = PriorityListMethod.query.filter_by(platform_id=platform_id) \
-            .filter_by(name=name) \
-            .one()
-        pl_method.update_p_m_a()
+        # pl_method = PriorityListMethod.query.filter_by(platform_id=platform_id) \
+        #     .filter_by(name=name) \
+        #     .one()
+        # pl_method.update_p_m_a()
 
-def update_priority_list_methods(db, PriorityListMethod, platform_id):
+def update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id):
     pl_methods = PriorityListMethod.query.filter_by(platform_id=platform_id).all()
     for pl_method in pl_methods:
-        pl_method.update_p_m_a()
+        pl_method.update_p_m_a(plist_id)
 
 # todo: replace with named tuple
 def fill_priority_list(db, messages, get_abstract_func, plist_id, \
@@ -76,7 +79,7 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
     # iterate over records of variable platform
     message_ids = []
     item_ids = []
-    result = PriorityList.query.filter_by(id=p_item.priority_list_id).first()
+    result = PriorityList.query.filter_by(id=plist_id).first()
     platform_id = result.platform_id
     method_ids = [ x.id for x in PriorityListMethod.query.filter_by(platform_id=platform_id).all() ]
     method_item_ids = []
@@ -87,6 +90,10 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
             , ('input_text_value', inp_text)])
         p_message_query = get_insert_query('priority_message', p_message_kwargs.keys(), returning_id=True)
         result = db.session.execute(p_message_query, p_message_kwargs).one()
+
+        p_list = PriorityList.query.filter_by(session_id=session_id) \
+            .filter_by(platform_id=platform_id) \
+            .one()
         message_id = result.id
         message_ids.append(message_id)
     db.session.commit()
@@ -103,13 +110,13 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
     assert len(embedding_vectors) == len(priority_messages)
     # todo: assert items correspond appropriately, not only by length of arrays but elementwise assertion
     for i in range(len(priority_messages)):
-        priority_message[i].embedding_vector = embedding_vector[i]
+        priority_messages[i].embedding_vector = embedding_vectors[i]
     db.session.commit()
 
     for message_id in message_ids:
         p_item_kwargs = OrderedDict([('priority_list_id', plist_id)
             , ('priority_message_id', message_id)])
-        p_item_query = get_insert_query('priority_ite', p_item_kwargs.keys(), returning_id=True)
+        p_item_query = get_insert_query('priority_item', p_item_kwargs.keys(), returning_id=True)
         result = db.session.execute(p_item_query, p_item_kwargs).one()
         item_id = result.id
         item_ids.append(item_id)

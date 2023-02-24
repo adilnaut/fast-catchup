@@ -1,5 +1,9 @@
-from sentence_transformers import SentenceTransformer
+import os
+
 import pickle
+
+from transformers import pipeline
+from sentence_transformers import SentenceTransformer
 
 
 def setup_sentence_embeddings_model():

@@ -6,7 +6,7 @@ from sqlalchemy.sql import text
 from flask import render_template, send_file, request, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
-from app.models import User, Workspace, AudioFile, Platform, AuthData
+from app.models import User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod
 from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthDataForm
 
 
@@ -17,6 +17,7 @@ from quickstart.quickstart import generate_summary
 from quickstart.slack_utils import get_slack_comms, list_sfiles, clear_slack_tables, slack_test_etl, list_slinks
 from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables, list_gtexts, list_gfiles, list_glinks
 from quickstart.priority_engine import create_priority_list_methods
+from setup import setup_sentence_embeddings_model, setup_sentiment_analysis_model
 
 @app.route('/upload_gmail_auth', methods=['GET', 'POST'])
 def upload_gmail_auth():
@@ -319,6 +320,12 @@ def index():
     # auth_data = AuthData.query.filter_by(platform_id=platform_id).all()
     return render_template('index.html',title='Home', auth_data=auth_data)
 
+@app.route('/setup', methods=['GET'])
+@login_required
+def setup_workspace():
+    setup_sentence_embeddings_model()
+    setup_sentiment_analysis_model()
+    return redirect(url_for('index'))
 
 @app.route('/audio/<filepath>')
 def returnAudioFile(filepath):
