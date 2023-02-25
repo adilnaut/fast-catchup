@@ -245,8 +245,8 @@ def gen_summary():
     gptout = {}
     session_id = uuid.uuid4().hex
 
-    unread_slack = get_slack_comms(return_list=True, session_id=session_id)
-    unread_gmail = get_gmail_comms(return_list=True, session_id=session_id)
+    # unread_slack = get_slack_comms(return_list=True, session_id=session_id)
+    # unread_gmail = get_gmail_comms(return_list=True, session_id=session_id)
 
 
     cache_slack = request.form.get("slack-checkbox") != None

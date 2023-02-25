@@ -93,10 +93,6 @@ def generate_voice_file(text_response, verbose=False):
     return filepath
 
 def generate_summary(session_id):
-    if not prompt:
-        prompt = '''I\'ve got the following slack messages and emails today please give me a quick summary
-            of only important messages with urgent matters first.:'''
-
     unread_emails = get_gmail_comms(session_id=session_id)
 
     # from db

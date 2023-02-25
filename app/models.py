@@ -75,7 +75,7 @@ class PriorityListMethod(db.Model):
                 if p_item.p_b_a and p_item_method and p_item_method.p_b_m_a and p_item.p_a:
                     weighted_accuracy = abs(p_item_method.p_b_m_a - p_item.p_b_a) * p_item.p_a
                     result.append(weighted_accuracy)
-        self.p_m_a = np.array(result).mean() if result else 0.33
+        self.p_m_a = np.array(result).mean() if result else 0.05
         db.session.commit()
 
 
@@ -101,7 +101,8 @@ class PriorityItem(db.Model):
     	# and divide by k
 
         # this is numpy array with either ChatGPT embedding, w2v embedding or sklearn bag of words
-        p_m_vector = PriorityMessage.query.filter_by(id=self.priority_message_id).embedding_vector
+        p_m_result = PriorityMessage.query.filter_by(id=self.priority_message_id).first()
+        p_m_vector = p_m_result.embedding_vector
         p_m_vector = np.frombuffer(p_m_vector, dtype='<f4').reshape(-1, 1)
 
         if nbrs:
@@ -114,7 +115,7 @@ class PriorityItem(db.Model):
                     p_as.append(n_item.p_a)
             self.p_b = np.array(p_as).mean()
         else:
-            self.p_b = 0.1
+            self.p_b = 0.2
         db.session.commit()
 
     def calculate_p_b_a(self):
@@ -176,6 +177,7 @@ class PriorityItemMethod(db.Model):
 class PriorityMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # implicit foreign key at this stage
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
     session_id = db.Column(db.Text())
     message_id = db.Column(db.Integer)
     input_text_value = db.Column(db.Text())

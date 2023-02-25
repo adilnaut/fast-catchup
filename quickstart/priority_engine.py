@@ -60,7 +60,7 @@ def create_priority_list(db, PriorityList, PriorityListMethod, platform_id, sess
 
 def create_priority_list_methods(db, PriorityListMethod, platform_id):
     script_path = 'quickstart.priority_method'
-    methods = [(script_path, 'ask_gpt')
+    methods = [(script_path, 'ask_bloom')
         , (script_path, 'toy_keyword_match')
         , (script_path, 'sentiment_analysis')]
 
@@ -88,17 +88,19 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
     platform_id = result.platform_id
     method_ids = [ x.id for x in PriorityListMethod.query.filter_by(platform_id=platform_id).all() ]
     method_item_ids = []
-    session_id = messages[0].session_id
+    session_id = messages[0].session_id if messages else None
     for message in messages:
         inp_text, m_id = get_abstract_func(message)
         p_message_kwargs = OrderedDict([('message_id', m_id)
             , ('input_text_value', inp_text)
+            , ('platform_id', platform_id)
             , ('session_id', message.session_id)])
         p_message_query = get_insert_query('priority_message', p_message_kwargs.keys())
         db.session.execute(p_message_query, p_message_kwargs)
     db.session.commit()
 
-    priority_messages = db.session.query(PriorityMessage).filter_by(session_id=session_id).all()
+    priority_messages = db.session.query(PriorityMessage).filter_by(session_id=session_id) \
+        .filter_by(platform_id=platform_id).all()
     message_ids = [x.id for x in priority_messages]
     sentences = [x.input_text_value for x in priority_messages]
     model_filepath = os.path.join('file_store', '2023-02-22-embedding-model')

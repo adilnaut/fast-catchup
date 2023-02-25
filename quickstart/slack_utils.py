@@ -481,6 +481,8 @@ def get_slack_comms(return_list=False, session_id=None):
             .filter(SlackMessage.session_id == session_id) \
             .all()
 
+    if not slack_messages and return_list:
+        return slack_messages
 
     with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
         , 'PriorityItem', 'PriorityItemMethod']) as (db, PriorityList, PriorityListMethod \

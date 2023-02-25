@@ -467,6 +467,7 @@ def get_gmail_comms(return_list=False, session_id=None):
 
     platform_id = get_platform_id('gmail')
     gmail_messages = None
+
     with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailUser']) as \
         (db, GmailMessage, GmailMessageLabel, GmailUser):
 
@@ -478,6 +479,8 @@ def get_gmail_comms(return_list=False, session_id=None):
             .filter(GmailMessage.session_id == session_id) \
             .all()
 
+    if not gmail_messages and return_list:
+        return gmail_messages
 
     with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
         , 'PriorityItem', 'PriorityItemMethod']) as (db, PriorityList, PriorityListMethod \
