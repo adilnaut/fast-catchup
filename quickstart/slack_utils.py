@@ -200,6 +200,10 @@ def etl_messages(app, db, session_id=None, days_ago=1, max_pages=1,  verbose=Fal
                     text = message.get('text')
                     channel_id = message.get('channel')
                     ts = message.get('ts')
+                    with db_ops(model_names=['SlackMessage']) as (db_s, SlackMessage):
+                        sid = SlackMessage.query.filter_by(ts=ts).first()
+                        if sid:
+                            continue
                     sm_kwargs = OrderedDict([('ts', ts)
                             , ('type', type)
                             , ('slack_user_id', user)

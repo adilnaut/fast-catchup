@@ -98,7 +98,7 @@ def generate_summary(session_id):
     # from db
     unread_slack = get_slack_comms(session_id=session_id)
 
-    gpt_summary = get_gpt_summary(prompt, unread_emails, unread_slack)
+    gpt_summary = get_gpt_summary(unread_emails, unread_slack)
 
     filepath = generate_voice_file(gpt_summary)
 

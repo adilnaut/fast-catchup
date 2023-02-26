@@ -171,7 +171,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
     return text_parts, num_processed
 
 
-def etl_gmail(service, db, session_id=None, max_messages=20, unread_only=True):
+def etl_gmail(service, db, session_id=None, max_messages=5, unread_only=True):
 
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
@@ -185,7 +185,15 @@ def etl_gmail(service, db, session_id=None, max_messages=20, unread_only=True):
         # m_data.append(message['id']) # id, threadId
         m_data.append(id)
 
+
     for id in m_data:
+        # todo:
+        #  1. check if email id is not present
+        #  2. if present, skip
+        with db_ops(model_names=['GmailMessage']) as (db_s, GmailMessage):
+            gid = GmailMessage.query.filter_by(id=id).first()
+            if gid:
+                continue
         email_body = service.users().messages().get(userId='me', id=id, format='full').execute()
         if not email_body:
             continue

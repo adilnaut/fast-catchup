@@ -30,9 +30,13 @@ def build_knn(PriorityList, PriorityItem, PriorityMessage, p_item):
             # emb_vector = struct.unpack('<q', b'\x15\x00\x00\x00\x00\x00\x00\x00')
             emb_vector = np.frombuffer(_.embedding_vector, dtype='<f4')
             all_vectors.append(emb_vector)
+
     if all_vectors:
         X = np.array(all_vectors)
-        nbrs = NearestNeighbors(n_neighbors=10, algorithm='ball_tree').fit(X)
+        # we want to build NN algorithm for any number of samples present
+        # but initially there would not be many
+        # let's set this up to 2 for now
+        nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(X)
     return nbrs, ids
 
 def create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id):
@@ -60,7 +64,7 @@ def create_priority_list(db, PriorityList, PriorityListMethod, platform_id, sess
 
 def create_priority_list_methods(db, PriorityListMethod, platform_id):
     script_path = 'quickstart.priority_method'
-    methods = [(script_path, 'ask_bloom')
+    methods = [(script_path, 'ask_large_bloom')
         , (script_path, 'toy_keyword_match')
         , (script_path, 'sentiment_analysis')]
 

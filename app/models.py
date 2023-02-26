@@ -103,14 +103,17 @@ class PriorityItem(db.Model):
         # this is numpy array with either ChatGPT embedding, w2v embedding or sklearn bag of words
         p_m_result = PriorityMessage.query.filter_by(id=self.priority_message_id).first()
         p_m_vector = p_m_result.embedding_vector
-        p_m_vector = np.frombuffer(p_m_vector, dtype='<f4').reshape(-1, 1)
+        p_m_vector = np.frombuffer(p_m_vector, dtype='<f4')
+        p_m_vector = np.array([p_m_vector])
+
 
         if nbrs:
             distances, indices = nbrs.kneighbors(p_m_vector)
             p_as = []
+            indices = indices[0]
             for n_i in indices:
                 n_id = ids[n_i]
-                n_item = PriorityItem.query.filter_by(id=n_id).one()
+                n_item = PriorityItem.query.filter_by(priority_message_id=n_id).one()
                 if n_item and n_item.p_a:
                     p_as.append(n_item.p_a)
             self.p_b = np.array(p_as).mean()
@@ -127,7 +130,8 @@ class PriorityItem(db.Model):
             p_list_method = PriorityListMethod.query.filter_by(id=p_item_method.priority_list_method_id).one()
             p_m_a = p_list_method.p_m_a
             p_b_m_a = p_item_method.p_b_m_a
-            sum += p_b_m_a * p_m_a
+            if p_m_a and p_b_m_a:
+                sum += p_b_m_a * p_m_a
         self.p_b_a = sum
         db.session.commit()
 
@@ -137,7 +141,13 @@ class PriorityItem(db.Model):
 	    # call calculate_p_b
 	    # p_a_b = p_b_a * p_a / p_b
         p_a = PriorityList.query.filter_by(id=self.priority_list_id).first().p_a
-        self.p_a_b = self.p_b_a * p_a / self.p_b
+        # print(p_a)
+        # print(self.p_b)
+        # print(self.p_b_a)
+        if self.p_b_a and p_a and self.p_b:
+            self.p_a_b = self.p_b_a * p_a / self.p_b
+        else:
+            self.p_a_b = 0.5
         db.session.commit()
     __table_args__ = (db.UniqueConstraint('priority_list_id', 'priority_message_id', name='_unique_constraint_pl_pm'),
         )
