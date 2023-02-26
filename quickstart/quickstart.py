@@ -21,9 +21,9 @@ from quickstart.slack_utils import get_slack_comms
 
 
 # todo handle API exceptions and bad results
-def get_gpt_summary(prompt, unread_emails, unread_slack, verbose=False):
+def get_gpt_summary(unread_emails, unread_slack, verbose=False):
     openai.api_key = os.getenv("OPEN_AI_KEY")
-
+    prompt = "Summarize following messages:"
     prompt += unread_emails
     prompt += unread_slack
 
