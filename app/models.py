@@ -14,6 +14,19 @@ import pickle
 def load_user(id):
     return User.query.get(int(id))
 
+# ideally we not only want columns list but
+# list of implemented equality functions
+# or similarity score calculators
+# here column order is very important
+# that would decide sampling bias
+def smart_filtering(TableName, column_list, p_item, query, max_samples=10):
+    # initial number of rows
+    if len(query) <= max_samples:
+        return result
+    for column_name in column_list:
+        result = query.filter(getattr(TableName, column_name) == getattr(p_item, column_name)).all()
+        if len(result) <= max_samples:
+            return result
 
 class PriorityList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
