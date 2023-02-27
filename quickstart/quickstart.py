@@ -102,4 +102,4 @@ def generate_summary(session_id):
 
     filepath = generate_voice_file(gpt_summary)
 
-    return prompt, gpt_summary, filepath
+    return gpt_summary, filepath

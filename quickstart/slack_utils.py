@@ -488,15 +488,17 @@ def get_slack_comms(return_list=False, session_id=None):
     if not slack_messages and return_list:
         return slack_messages
 
-    with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
-        , 'PriorityItem', 'PriorityItemMethod']) as (db, PriorityList, PriorityListMethod \
-        , PriorityMessage, PriorityItem, PriorityItemMethod):
-        plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
-        # this should go to add_auth_method_now
-        update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
-        # but should probably be replaced with update_p_m_a calls
-        fill_priority_list(db, slack_messages, get_abstract_for_slack, plist_id, PriorityMessage, PriorityList, \
-            PriorityItem, PriorityItemMethod, PriorityListMethod)
+    if slack_messages:
+        with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
+            , 'PriorityItem', 'PriorityItemMethod', 'SlackMessage']) as (db, PriorityList, PriorityListMethod \
+            , PriorityMessage, PriorityItem, PriorityItemMethod, SlackMessage):
+            plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
+            # this should go to add_auth_method_now
+            update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
+            # but should probably be replaced with update_p_m_a calls
+            columns_list = ['ts', 'slack_channel_id', 'slack_user_id']
+            fill_priority_list(db, slack_messages, get_abstract_for_slack, plist_id, PriorityMessage, PriorityList, \
+                PriorityItem, PriorityItemMethod, PriorityListMethod, SlackMessage, columns_list)
 
     if return_list:
         return slack_messages

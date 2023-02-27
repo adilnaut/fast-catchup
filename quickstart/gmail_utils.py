@@ -379,29 +379,27 @@ def auth_and_load_session_gmail():
             .filter_by(name='token.json') \
             .filter_by(is_path=True) \
             .first()
-
-        print(platform_id)
+        # print(token_row)
         cred_row = AuthData.query \
             .filter_by(platform_id=platform_id) \
             .filter_by(name='credentials.json') \
             .filter_by(is_path=True) \
             .first()
-
+        # print(cred_row)
         tempdir = tempfile.gettempdir()
 
         if token_row:
             tokenpath = os.path.join(tempdir, token_row.name)
             shutil.copyfile(token_row.file_path, tokenpath)
-
-        else:
-            tokenpath = os.path.join(tempdir, 'token.json')
+            # print('shutil')
+        # else:
+        #     tokenpath = os.path.join(tempdir, 'token.json')
+        #     print('ne shutil')
         if cred_row:
             credpath = os.path.join(tempdir, cred_row.name)
             shutil.copyfile(cred_row.file_path, credpath)
 
-
-
-    if os.path.exists(tokenpath):
+    if tokenpath and os.path.exists(tokenpath):
         creds = Credentials.from_authorized_user_file(tokenpath, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -417,7 +415,7 @@ def auth_and_load_session_gmail():
                 credpath, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        if os.path.exists(tokenpath):
+        if tokenpath and os.path.exists(tokenpath):
             os.remove(tokenpath)
         filename = '%s-%s' % (uuid.uuid4().hex, 'token.json')
         new_tokenpath = os.path.join('file_store', filename)
@@ -490,15 +488,17 @@ def get_gmail_comms(return_list=False, session_id=None):
     if not gmail_messages and return_list:
         return gmail_messages
 
-    with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
-        , 'PriorityItem', 'PriorityItemMethod']) as (db, PriorityList, PriorityListMethod \
-        , PriorityMessage, PriorityItem, PriorityItemMethod):
-        plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
-        # this should go to add_auth_method_now
-        update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
-        # but should probably be replaced with update_p_m_a calls
-        fill_priority_list(db, gmail_messages, get_abstract_for_gmail, plist_id, PriorityMessage, PriorityList, \
-            PriorityItem, PriorityItemMethod, PriorityListMethod)
+    if gmail_messages:
+        with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
+            , 'PriorityItem', 'PriorityItemMethod', 'GmailMessage']) as (db, PriorityList, PriorityListMethod \
+            , PriorityMessage, PriorityItem, PriorityItemMethod, GmailMessage):
+            plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
+            # this should go to add_auth_method_now
+            update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
+            # but should probably be replaced with update_p_m_a calls
+            columns_list = ['id', 'gmail_user_email', 'content_type']
+            fill_priority_list(db, gmail_messages, get_abstract_for_gmail, plist_id, PriorityMessage, PriorityList, \
+                PriorityItem, PriorityItemMethod, PriorityListMethod, GmailMessage, columns_list)
 
     if return_list:
         return gmail_messages

@@ -84,7 +84,8 @@ def update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id):
 
 # todo: replace with named tuple
 def fill_priority_list(db, messages, get_abstract_func, plist_id, \
-        PriorityMessage, PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod):
+        PriorityMessage, PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod \
+        , TableName, columns_list):
     # iterate over records of variable platform
     message_ids = []
     item_ids = []
@@ -158,4 +159,7 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
         priority_item.calculate_p_b(nbrs, ids)
         priority_item.calculate_p_b_a()
         priority_item.calculate_p_a_b()
+        priority_item.calculate_p_a_c(TableName, columns_list)
+        priority_item.calculate_p_b_c(TableName, columns_list)
+        priority_item.calculate_p_a_b_c()
     db.session.commit()

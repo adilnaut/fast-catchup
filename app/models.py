@@ -19,12 +19,25 @@ def load_user(id):
 # or similarity score calculators
 # here column order is very important
 # that would decide sampling bias
-def smart_filtering(TableName, column_list, p_item, query, max_samples=10):
+# first element of columns_list is TableName id id_column
+def smart_filtering(TableName, columns_list, m_item, query, max_samples=10, min_samples=2):
     # initial number of rows
-    if len(query) <= max_samples:
-        return result
-    for column_name in column_list:
-        result = query.filter(getattr(TableName, column_name) == getattr(p_item, column_name)).all()
+    _ = query.all()
+    if len(_) <= max_samples:
+        return _
+    # todo
+    # TableName is message table
+    # where query have query of PriorityItem elements
+    result_query = None
+    for column_name in columns_list[1:]:
+        result_query = query.join(PriorityMessage) \
+            .join(TableName, getattr(TableName, columns_list[0]) == PriorityMessage.message_id) \
+            .filter(getattr(TableName, column_name) == getattr(m_item, column_name))
+        result = result_query.all()
+        # todo
+        # what if there are 0 results or less than min_samples
+        if len(result) <= min_samples:
+            return _
         if len(result) <= max_samples:
             return result
 
@@ -106,6 +119,87 @@ class PriorityItem(db.Model):
     p_a_b = db.Column(db.Float())
     p_a = db.Column(db.Float())
     methods = db.relationship('PriorityItemMethod', backref='item', lazy='dynamic')
+    p_a_c = db.Column(db.Float())
+    p_b_c = db.Column(db.Float())
+    p_a_b_c = db.Column(db.Float())
+
+    def calculate_p_a_c(self, TableName, columns_list):
+        m_item = TableName.query \
+            .join(PriorityMessage, getattr(TableName, columns_list[0]) == PriorityMessage.message_id) \
+            .filter(PriorityMessage.id == self.priority_message_id).first()
+
+        result = PriorityList.query.filter_by(id=self.priority_list_id).first()
+        platform_id = result.platform_id
+
+        items_query = db.session.query(PriorityItem) \
+            .join(PriorityList) \
+            .filter(PriorityList.platform_id == platform_id) \
+            .filter(PriorityList.id != self.id)
+
+        items = smart_filtering(TableName, columns_list, m_item, items_query)
+        # average real importance of message
+        p_as = []
+        for item in items:
+            if item.p_a:
+                p_as.append(item.p_a)
+        self.p_a_c = np.array(p_as).mean() if p_as else 0.3
+        db.session.commit()
+
+    # expensive, we build knn model for each item
+    def calculate_p_b_c(self, TableName, columns_list):
+        # ideally we should have 10 nearest neighbors classifiers object fitted on all previous data
+        # but for now we can train it right there
+        result = PriorityList.query.filter_by(id=self.priority_list_id).first()
+        platform_id = result.platform_id
+
+        p_items_query = PriorityItem.query.join(PriorityList) \
+            .filter(PriorityList.platform_id == platform_id) \
+            .filter(PriorityList.id != self.priority_list_id)
+
+        m_item = TableName.query \
+            .join(PriorityMessage, getattr(TableName, columns_list[0]) == PriorityMessage.message_id) \
+            .filter(PriorityMessage.id == self.priority_message_id).first()
+
+        p_items = smart_filtering(TableName, columns_list, m_item, p_items_query)
+
+        ids = []
+        all_vectors = []
+        nbrs = None
+
+        for p_item in p_items:
+            # p_methods = PriorityListMethod.query.filter_by(priority_list_id=p_list.id).all()
+            _ = PriorityMessage.query.filter_by(id=p_item.priority_message_id).first()
+            ids.append(_.id)
+            # emb_vector = struct.unpack('<q', b'\x15\x00\x00\x00\x00\x00\x00\x00')
+            emb_vector = np.frombuffer(_.embedding_vector, dtype='<f4')
+            all_vectors.append(emb_vector)
+
+        if all_vectors:
+            X = np.array(all_vectors)
+            # we want to build NN algorithm for any number of samples present
+            # but initially there would not be many
+            # let's set this up to 2 for now
+            nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(X)
+
+        p_m_result = PriorityMessage.query.filter_by(id=self.priority_message_id).first()
+        p_m_vector = p_m_result.embedding_vector
+        p_m_vector = np.frombuffer(p_m_vector, dtype='<f4')
+        p_m_vector = np.array([p_m_vector])
+
+
+        if nbrs:
+            distances, indices = nbrs.kneighbors(p_m_vector)
+            p_as = []
+            indices = indices[0]
+            for n_i in indices:
+                n_id = ids[n_i]
+                n_item = PriorityItem.query.filter_by(priority_message_id=n_id).one()
+                if n_item and n_item.p_a:
+                    p_as.append(n_item.p_a)
+            self.p_b_c = np.array(p_as).mean()
+        else:
+            self.p_b_c = 0.2
+        db.session.commit()
 
     def calculate_p_b(self, nbrs, ids):
         # get priority_message vector
@@ -160,8 +254,17 @@ class PriorityItem(db.Model):
         if self.p_b_a and p_a and self.p_b:
             self.p_a_b = self.p_b_a * p_a / self.p_b
         else:
-            self.p_a_b = 0.5
+            self.p_a_b = 0.497424242
         db.session.commit()
+
+    def calculate_p_a_b_c(self):
+
+        if self.p_b_a and self.p_a_c and self.p_b_c:
+            self.p_a_b_c = self.p_b_a * self.p_a_c / self.p_b_c
+        else:
+            self.p_a_b_c = 0.49696969
+        db.session.commit()
+
     __table_args__ = (db.UniqueConstraint('priority_list_id', 'priority_message_id', name='_unique_constraint_pl_pm'),
         )
 
