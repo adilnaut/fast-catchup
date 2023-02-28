@@ -24,8 +24,10 @@ from quickstart.slack_utils import get_slack_comms
 def get_gpt_summary(unread_emails, unread_slack, verbose=False):
     openai.api_key = os.getenv("OPEN_AI_KEY")
     prompt = "Summarize following messages:"
-    prompt += unread_emails
-    prompt += unread_slack
+    if unread_emails:
+        prompt += unread_emails
+    if unread_slack:
+        prompt += unread_slack
 
     try:
         response = openai.Completion.create(

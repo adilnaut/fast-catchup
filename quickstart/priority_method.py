@@ -12,7 +12,7 @@ import torch
 
 import requests
 
-def ask_large_bloom(input_text):
+def ask_large_bloom_raw(prompt, temperature=1.0, do_sample=True, top_k=20, top_p=0.2):
     time.sleep(1)
     API_URL = "https://api-inference.huggingface.co/models/bigscience/bloom"
     headers = {"Authorization": f"Bearer %s" % os.environ['HUGGINGFACE_TOKEN']}
@@ -21,26 +21,47 @@ def ask_large_bloom(input_text):
     	response = requests.post(API_URL, headers=headers, json=payload)
     	return response.json()
 
-    prompt = '''Here I would print one email I\'ve got in my inbox. I also written manual metrics after
-    email subjects to later help me to classify them. For example one of them is email importance.
-    It is a score from 0 to 100. This score tells us how quick I should look at this email.
-    Here is email info: email subject is "%s", email importance score is
-    '''
-    # prompt = 'Rate this message text from 0 to 100 by level of importance: %s'
-
-    prompt = prompt % input_text
-
     output = query({
     	"inputs": prompt
-        , "temperature": 2.0
-        # , "do_sample": True
+        , "temperature": temperature
+        , "do_sample": do_sample
+        , "top_k": top_k
+        , "top_p": top_p
     })
-    out_text = output[0]['generated_text']
+    if 'error' in output:
+        # ask_instruct_bloom(input_text)
+        print('Error in large bloom')
+        exit()
+    else:
+        out_text = output[0]['generated_text']
     out_text = out_text.replace(prompt, '')
-    print(out_text)
+    return out_text
+
+def ask_large_bloom(input_text):
+
+    # first ask the reasons why email is important
+    prompt = '%s The thing that makes this email important is'
+    prompt = prompt % input_text
+
+    out_text = ask_large_bloom_raw(prompt)
+
+    prompt += out_text
+
+    # then ask the reason why email is not important
+    second_prompt = '%s The thing that makes this email not important is'
+    out_text = ask_large_bloom_raw(second_prompt % input_text)
+    prompt += second_prompt + out_text
+
+    # then ask to classify
+    prompt += '. With all that in mind the email importance score out of 10 is'
+    # prompt += 'With all that in mind the email importance class (\'not important\', \'less than medium\', \'medium\', \'more than medium\', \'very important\') is '
+    out_text = ask_large_bloom_raw(prompt)
+
+    # print(prompt)
+    # print(out_text)
     priority_score = parse_bloom_response(out_text)
-    print("Score: %s " % priority_score)
-    return int(priority_score)*0.01 if priority_score else None
+    # print("Score: %s " % priority_score)
+    return int(priority_score)*0.1 if priority_score else None
 
 
 
@@ -217,6 +238,9 @@ def sentiment_analysis(input_text):
     result = sentiment_pipeline(data)
     label = result[0].get('label')
     score = result[0].get('score')
+    print('sentiment')
+    print(label)
+    print(score)
     if label == 'NEGATIVE':
         return score
     else:

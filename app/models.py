@@ -1,8 +1,9 @@
 from app import db
-from sqlalchemy import func
+from sqlalchemy import func, union
 from flask_login import UserMixin
 from app import login
 from sqlalchemy import select
+import sqlalchemy as sa
 from werkzeug.security import generate_password_hash, check_password_hash
 from sklearn.neighbors import NearestNeighbors
 from sentence_transformers import SentenceTransformer
@@ -30,16 +31,78 @@ def smart_filtering(TableName, columns_list, m_item, query, max_samples=10, min_
     # where query have query of PriorityItem elements
     result_query = None
     for column_name in columns_list[1:]:
-        result_query = query.join(PriorityMessage) \
-            .join(TableName, getattr(TableName, columns_list[0]) == PriorityMessage.message_id) \
-            .filter(getattr(TableName, column_name) == getattr(m_item, column_name))
-        result = result_query.all()
-        # todo
-        # what if there are 0 results or less than min_samples
+        # print(column_name)
+        if '.' in column_name:
+            meta_table, meta_column = column_name.split('.')
+            # MetaTable = getattr(models, meta_table)
+            MetaTable = globals()[meta_table]
+            # todo
+            # here we should get MetaTable instance of m_item
+            # and also query and filter item results to pass through
+
+            m_item_meta = MetaTable.query.join(TableName) \
+                .filter(getattr(TableName, columns_list[0]) == getattr(m_item, columns_list[0])).all()
+            # just query results list for each m_item_meta instance and do something with list of outputs
+            results_list = []
+
+            # now we have 0 or more instances of item meta and list of metas of priority_messages
+            # probably have to group by PriorityItem which is originally selected
+            # should we take union of all the queries, but without repitions in values?
+            i = 0
+            for m_meta in m_item_meta:
+                # assume that explicit foreign key definition handles join params
+                result_query = query.join(PriorityMessage) \
+                    .join(TableName, getattr(TableName, columns_list[0]) == PriorityMessage.message_id) \
+                    .join(MetaTable) \
+                    .filter(getattr(MetaTable, meta_column) == getattr(MetaTable, meta_column))
+                # result = result_query.all()
+                results_list.append(result_query)
+                i += 1
+            result_query = union(*results_list)
+            # result_query = union(results_list[0], results_list[1])
+            # print(result_query)
+            # result = result_query
+            # result_query = result_query.select()
+            result = db.session.execute(result_query).fetchall()
+            # result = result.all()
+            result = cast_tuples_to_p_items(result)
+        else:
+            result_query = query.join(PriorityMessage) \
+                .join(TableName, getattr(TableName, columns_list[0]) == PriorityMessage.message_id) \
+                .filter(getattr(TableName, column_name) == getattr(m_item, column_name))
+            result = result_query.all()
         if len(result) <= min_samples:
             return _
         if len(result) <= max_samples:
             return result
+    return result
+
+def cast_tuples_to_p_items(rows):
+    stmts = [
+        sa.select(
+            sa.cast(sa.literal(i), sa.Integer).label('id'),
+            sa.cast(sa.literal(s), sa.Float).label('score'),
+            sa.cast(sa.literal(pli), sa.Integer).label('priority_list_id'),
+            sa.cast(sa.literal(pmi), sa.Integer).label('priority_message_id'),
+            sa.cast(sa.literal(pb), sa.Float).label('p_b'),
+            sa.cast(sa.literal(pba), sa.Float).label('p_b_a'),
+            sa.cast(sa.literal(pab), sa.Float).label('p_a_b'),
+            sa.cast(sa.literal(pa), sa.Float).label('p_a'),
+            sa.cast(sa.literal(pac), sa.Float).label('p_a_c'),
+            sa.cast(sa.literal(pbc), sa.Float).label('p_b_c'),
+            sa.cast(sa.literal(pabc), sa.Float).label('p_a_b_c'))
+            for idx, (i, s, pli, pmi, pb, pba, pab, pa, pac, pbc, pabc) in enumerate(rows)
+    ]
+    subquery = sa.union_all(*stmts)
+    subquery = subquery.alias(name="temp_priority_items")
+    query = (
+        db.session
+        .query(PriorityItem)
+        .join(subquery, subquery.c.id == PriorityItem.id)
+        # .filter(subquery.c.date >= XXX_DATE)
+    )
+    return query.all()
+
 
 class PriorityList(db.Model):
     id = db.Column(db.Integer, primary_key=True)

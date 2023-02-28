@@ -472,6 +472,8 @@ def slack_test_etl():
 #  todo handle rate limited exception
 def get_slack_comms(return_list=False, session_id=None):
     platform_id = get_platform_id('slack')
+    if not platform_id:
+        return None
     app = auth_and_load_session_slack()
     with db_ops(model_names=[]) as (db, ):
         etl_messages(app, db, session_id=session_id)
@@ -521,9 +523,3 @@ def clear_slack_tables():
 
         for m in SlackMessage.query.all():
             db.session.delete(m)
-
-        # for m in SlackUser.query.all():
-        #     db.session.delete(m)
-        #
-        # for m in SlackChannel.query.all():
-        #     db.session.delete(m)

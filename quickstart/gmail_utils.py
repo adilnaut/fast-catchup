@@ -467,11 +467,14 @@ def dumps_emails(gmail_messages):
 
 def get_gmail_comms(return_list=False, session_id=None):
 
+    platform_id = get_platform_id('gmail')
+    if not platform_id:
+        return None
     service = auth_and_load_session_gmail()
     with db_ops(model_names=[]) as (db, ):
         etl_gmail(service, db, session_id=session_id)
 
-    platform_id = get_platform_id('gmail')
+
     gmail_messages = None
 
     with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailUser']) as \
@@ -496,7 +499,7 @@ def get_gmail_comms(return_list=False, session_id=None):
             # this should go to add_auth_method_now
             update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
             # but should probably be replaced with update_p_m_a calls
-            columns_list = ['id', 'gmail_user_email', 'content_type']
+            columns_list = ['id', 'GmailMessageLabel.label', 'gmail_user_email', 'content_type']
             fill_priority_list(db, gmail_messages, get_abstract_for_gmail, plist_id, PriorityMessage, PriorityList, \
                 PriorityItem, PriorityItemMethod, PriorityListMethod, GmailMessage, columns_list)
 

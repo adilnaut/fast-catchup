@@ -255,9 +255,9 @@ def gen_summary():
 
     gpt_summary, filepath = generate_summary(session_id=session_id)
 
-    gptin['slack_list'] = unread_slack
-    gptin['gmail_list'] = unread_gmail
-    
+    # gptin['slack_list'] = unread_slack
+    # gptin['gmail_list'] = unread_gmail
+
 
     persist_audio = False
     if persist_audio:

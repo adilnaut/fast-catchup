@@ -79,8 +79,22 @@ def create_priority_list_methods(db, PriorityListMethod, platform_id):
 
 def update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id):
     pl_methods = PriorityListMethod.query.filter_by(platform_id=platform_id).all()
+
     for pl_method in pl_methods:
         pl_method.update_p_m_a(plist_id)
+    pl_methods = PriorityListMethod.query.filter_by(platform_id=platform_id).all()
+    new_values = []
+    for pl in pl_methods:
+        new_values.append(pl.p_m_a)
+    _ = sum(new_values)
+    if _ < 1:
+        for pl in pl_methods:
+            pl.p_m_a *= 1.0 / _
+    else:
+        for pl in pl_methods:
+            pl.p_m_a /= _
+    db.session.commit()
+
 
 # todo: replace with named tuple
 def fill_priority_list(db, messages, get_abstract_func, plist_id, \
