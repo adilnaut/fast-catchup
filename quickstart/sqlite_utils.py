@@ -21,9 +21,13 @@ def get_upsert_query(table_name, columns, prime_keys):
     upsert_query = gen_upsert.format(**upsert_dict)
     return text(upsert_query)
 
-def get_insert_query(table_name, columns):
+def get_insert_query(table_name, columns, returning_id=False):
     gen_insert = '''INSERT OR IGNORE INTO {table_name} ({columns_list})
-        VALUES({params_list});'''
+        VALUES({params_list})'''
+    if returning_id:
+        gen_insert += 'RETURNING id'
+    gen_insert += ';'
+
 
     insert_dict = {'table_name': table_name
         , 'columns_list': ', '.join(columns)

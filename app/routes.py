@@ -6,7 +6,8 @@ from sqlalchemy.sql import text
 from flask import render_template, send_file, request, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
-from app.models import User, Workspace, AudioFile, Platform, AuthData
+from app.models import (User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod, PriorityItemMethod,
+    PriorityItem, PriorityMessage, PriorityList)
 from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthDataForm
 
 
@@ -14,9 +15,10 @@ from werkzeug.utils import secure_filename
 from werkzeug.urls import url_parse
 
 from quickstart.quickstart import generate_summary
-from quickstart.slack_utils import get_slack_comms, list_sfiles, clear_slack_tables, slack_test_etl, list_slinks
-from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables, list_gtexts, list_gfiles, list_glinks
-
+from quickstart.slack_utils import get_slack_comms, clear_slack_tables, slack_test_etl
+from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables
+from quickstart.priority_engine import create_priority_list_methods
+from setup import setup_sentence_embeddings_model, setup_sentiment_analysis_model
 
 @app.route('/upload_gmail_auth', methods=['GET', 'POST'])
 def upload_gmail_auth():
@@ -189,6 +191,7 @@ def register():
         db.session.commit()
 
 
+
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -201,113 +204,80 @@ def remove_users():
     db.session.commit()
     return redirect(url_for('index'))
 
-@app.route('/list_gmail_texts', methods=['GET'])
-def list_gmail_texts():
-    gtexts = list_gtexts()
-    # print(gtexts)
-    return render_template('gmail_texts.html', gtexts=gtexts)
 
-@app.route('/list_gmail_files', methods=['GET'])
-def list_gmail_files():
-    gfiles = list_gfiles()
-    # print(gtexts)
-    return render_template('gmail_files.html', gfiles=gfiles)
-
-@app.route('/list_gmail_links', methods=['GET'])
-def list_gmail_links():
-    glinks = list_glinks()
-    # print(gtexts)
-    return render_template('gmail_links.html', glinks=glinks)
-
-@app.route('/list_slack_files', methods=['GET'])
-def list_slack_files():
-    sfiles = list_sfiles()
-    return render_template('slack_files.html', sfiles=sfiles)
-
-@app.route('/list_slack_links', methods=['GET'])
-def list_slack_links():
-    slinks = list_slinks()
-    return render_template('slack_links.html', slinks=slinks)
 
 @app.route('/test_gmail_etl', methods=['GET'])
 def test_gmail_etl():
     test_etl()
-    return "OK"
+    return redirect(url_for('index'))
 
 @app.route('/test_slack_etl', methods=['GET'])
 def test_slack_etl():
     slack_test_etl()
-    return "OK"
+    return redirect(url_for('index'))
 
-@app.route('/test_clear_gmail_table', methods=['GET'])
+@app.route('/clear_gmail_table', methods=['GET'])
 def test_clear_gmail_table():
     clean_gmail_tables()
-    return "OK"
+    return redirect(url_for('index'))
 
 @app.route('/clear_slack_table', methods=['GET'])
 def test_clear_slack_table():
     clear_slack_tables()
-    return "OK"
+    return redirect(url_for('index'))
 
-@app.route('/first', methods=['GET'])
+@app.route('/generate_summary', methods=['GET'])
 @login_required
 def first():
-    unread_slack = get_slack_comms(return_list=True)
-    unread_gmail = get_gmail_comms(return_list=True)
+    unread_slack = []
+    unread_gmail = []
 
     gptin = {'slack_list': unread_slack,
-             'gmail_list': unread_gmail,
-             'prompt': 'Here are my slack and email texts could you summarize them?'}
+             'gmail_list': unread_gmail}
     gptout = {'summary': 'Press Generate to generate summary'}
 
-    return render_template('first.html', title='Summary', gptin=gptin, gptout=gptout)
+    return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
 
 @app.route('/generate_summary', methods=['POST'])
 @login_required
 def gen_summary():
     gptin = {}
     gptout = {}
-    prompt = '''I\'ve got the following slack messages and emails today please give me a quick summary
-        of only important messages with urgent matters first.:'''
-    unread_slack = get_slack_comms(return_list=True)
-    unread_gmail = get_gmail_comms(return_list=True)
+    session_id = uuid.uuid4().hex
 
+    # unread_slack = get_slack_comms(return_list=True, session_id=session_id)
+    # unread_gmail = get_gmail_comms(return_list=True, session_id=session_id)
 
-    # get prompt from post form
-    _ = request.form['prompt']
-    if _:
-        prompt = _
 
     cache_slack = request.form.get("slack-checkbox") != None
     cache_gmail = request.form.get("gmail-checkbox") != None
 
 
-    prompt, gpt_summary, filepath = generate_summary(prompt=prompt,
-        cache_slack=cache_slack, cache_gmail=cache_gmail)
+    gpt_summary, filepath = generate_summary(session_id=session_id)
 
-    gptin['slack_list'] = unread_slack
-    gptin['gmail_list'] = unread_gmail
-    gptin['prompt'] = prompt
+    # gptin['slack_list'] = unread_slack
+    # gptin['gmail_list'] = unread_gmail
 
-    user_id = current_user.get_id()
 
-    workspace = Workspace.query.filter_by(user_id=user_id).one()
-    workspace_id = workspace.id
-    timestamp = int(round(datetime.now().timestamp()))
+    persist_audio = False
+    if persist_audio:
+        user_id = current_user.get_id()
+        workspace = Workspace.query.filter_by(user_id=user_id).one()
+        workspace_id = workspace.id
+        timestamp = int(round(datetime.now().timestamp()))
+        audio_kwargs = {'workspace_id': workspace_id
+            , 'created': timestamp
+            , 'file_path': filepath}
 
-    audio_kwargs = {'workspace_id': workspace_id
-        , 'created': timestamp
-        , 'file_path': filepath}
-
-    audio_row = AudioFile(**audio_kwargs)
-    db.session.add(audio_row)
-    db.session.commit()
+        audio_row = AudioFile(**audio_kwargs)
+        db.session.add(audio_row)
+        db.session.commit()
 
     gptout['filepath'] = filepath
     gptout['summary'] = gpt_summary
 
 
-    return render_template('first.html', title='Summary', gptin=gptin, gptout=gptout)
+    return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
 
 
 @app.route('/', methods=['POST', 'GET'])
@@ -321,6 +291,12 @@ def index():
     # auth_data = AuthData.query.filter_by(platform_id=platform_id).all()
     return render_template('index.html',title='Home', auth_data=auth_data)
 
+@app.route('/setup', methods=['GET'])
+@login_required
+def setup_workspace():
+    setup_sentence_embeddings_model()
+    setup_sentiment_analysis_model()
+    return redirect(url_for('index'))
 
 @app.route('/audio/<filepath>')
 def returnAudioFile(filepath):

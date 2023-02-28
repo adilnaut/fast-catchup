@@ -23,6 +23,8 @@ from google.auth.exceptions import RefreshError
 
 from quickstart.connection import db_ops, get_current_user, get_platform_id
 from quickstart.sqlite_utils import get_upsert_query, get_insert_query
+from quickstart.priority_engine import create_priority_list, update_priority_list_methods, fill_priority_list
+from quickstart.platform import get_abstract_for_gmail
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -169,7 +171,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
     return text_parts, num_processed
 
 
-def etl_gmail(service, db, max_messages=20, unread_only=True):
+def etl_gmail(service, db, session_id=None, max_messages=5, unread_only=True):
 
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
@@ -183,7 +185,15 @@ def etl_gmail(service, db, max_messages=20, unread_only=True):
         # m_data.append(message['id']) # id, threadId
         m_data.append(id)
 
+
     for id in m_data:
+        # todo:
+        #  1. check if email id is not present
+        #  2. if present, skip
+        with db_ops(model_names=['GmailMessage']) as (db_s, GmailMessage):
+            gid = GmailMessage.query.filter_by(id=id).first()
+            if gid:
+                continue
         email_body = service.users().messages().get(userId='me', id=id, format='full').execute()
         if not email_body:
             continue
@@ -273,6 +283,7 @@ def etl_gmail(service, db, max_messages=20, unread_only=True):
             , ('content_type', h_content_type)
             , ('subject', subject)
             , ('is_multipart', is_multipart)
+            , ('session_id', session_id)
             , ('multipart_num', num_parts)])
         gm_query = get_upsert_query('gmail_message', gm_kwargs.keys(), 'id')
         db.session.execute(gm_query, gm_kwargs)
@@ -368,29 +379,27 @@ def auth_and_load_session_gmail():
             .filter_by(name='token.json') \
             .filter_by(is_path=True) \
             .first()
-
-        print(platform_id)
+        # print(token_row)
         cred_row = AuthData.query \
             .filter_by(platform_id=platform_id) \
             .filter_by(name='credentials.json') \
             .filter_by(is_path=True) \
             .first()
-
+        # print(cred_row)
         tempdir = tempfile.gettempdir()
 
         if token_row:
             tokenpath = os.path.join(tempdir, token_row.name)
             shutil.copyfile(token_row.file_path, tokenpath)
-
-        else:
-            tokenpath = os.path.join(tempdir, 'token.json')
+            # print('shutil')
+        # else:
+        #     tokenpath = os.path.join(tempdir, 'token.json')
+        #     print('ne shutil')
         if cred_row:
             credpath = os.path.join(tempdir, cred_row.name)
             shutil.copyfile(cred_row.file_path, credpath)
 
-
-
-    if os.path.exists(tokenpath):
+    if tokenpath and os.path.exists(tokenpath):
         creds = Credentials.from_authorized_user_file(tokenpath, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -406,7 +415,7 @@ def auth_and_load_session_gmail():
                 credpath, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        if os.path.exists(tokenpath):
+        if tokenpath and os.path.exists(tokenpath):
             os.remove(tokenpath)
         filename = '%s-%s' % (uuid.uuid4().hex, 'token.json')
         new_tokenpath = os.path.join('file_store', filename)
@@ -456,25 +465,47 @@ def dumps_emails(gmail_messages):
     return result_text
 
 
-def get_gmail_comms(use_last_cached_emails=True, return_list=False):
-    if not use_last_cached_emails:
-        service = auth_and_load_session_gmail()
-        with db_ops(model_names=[]) as (db, ):
-            etl_gmail(service, db)
+def get_gmail_comms(return_list=False, session_id=None):
+
+    platform_id = get_platform_id('gmail')
+    if not platform_id:
+        return None
+    service = auth_and_load_session_gmail()
+    with db_ops(model_names=[]) as (db, ):
+        etl_gmail(service, db, session_id=session_id)
+
 
     gmail_messages = None
+
     with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailUser']) as \
         (db, GmailMessage, GmailMessageLabel, GmailUser):
 
-        platform_id = get_platform_id('gmail')
         gmail_messages = db.session.query(GmailMessage) \
             .join(GmailMessageLabel, GmailMessageLabel.gmail_message_id == GmailMessage.id) \
             .join(GmailUser, GmailUser.email == GmailMessage.gmail_user_email) \
             .filter(GmailUser.platform_id == platform_id) \
-            .filter(GmailMessageLabel.label == 'UNREAD').all()
+            .filter(GmailMessageLabel.label == 'UNREAD') \
+            .filter(GmailMessage.session_id == session_id) \
+            .all()
+
+    if not gmail_messages and return_list:
+        return gmail_messages
+
+    if gmail_messages:
+        with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
+            , 'PriorityItem', 'PriorityItemMethod', 'GmailMessage']) as (db, PriorityList, PriorityListMethod \
+            , PriorityMessage, PriorityItem, PriorityItemMethod, GmailMessage):
+            plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
+            # this should go to add_auth_method_now
+            update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
+            # but should probably be replaced with update_p_m_a calls
+            columns_list = ['id', 'GmailMessageLabel.label', 'gmail_user_email', 'content_type']
+            fill_priority_list(db, gmail_messages, get_abstract_for_gmail, plist_id, PriorityMessage, PriorityList, \
+                PriorityItem, PriorityItemMethod, PriorityListMethod, GmailMessage, columns_list)
 
     if return_list:
         return gmail_messages
+
     result_text = dumps_emails(gmail_messages)
     return result_text
 
@@ -506,16 +537,6 @@ def get_gmail_attribute(att_name):
             .all()
 
     return gmail_messages
-
-def list_gtexts():
-    return get_gmail_attribute('GmailMessageText')
-
-def list_gfiles():
-    return get_gmail_attribute('GmailAttachment')
-
-def list_glinks():
-    return get_gmail_attribute('GmailLink')
-
 
 def clean_gmail_tables():
     # todo: make table relationships explicit and cascade on delte, then delete user/platform

@@ -21,11 +21,13 @@ from quickstart.slack_utils import get_slack_comms
 
 
 # todo handle API exceptions and bad results
-def get_gpt_summary(prompt, unread_emails, unread_slack, verbose=False):
+def get_gpt_summary(unread_emails, unread_slack, verbose=False):
     openai.api_key = os.getenv("OPEN_AI_KEY")
-
-    prompt += unread_emails
-    prompt += unread_slack
+    prompt = "Summarize following messages:"
+    if unread_emails:
+        prompt += unread_emails
+    if unread_slack:
+        prompt += unread_slack
 
     try:
         response = openai.Completion.create(
@@ -92,18 +94,14 @@ def generate_voice_file(text_response, verbose=False):
             print("Did you update the subscription info?")
     return filepath
 
-def generate_summary(prompt=None, cache_slack=False, cache_gmail=False):
-    if not prompt:
-        prompt = '''I\'ve got the following slack messages and emails today please give me a quick summary
-            of only important messages with urgent matters first.:'''
-
-    unread_emails = get_gmail_comms(use_last_cached_emails=cache_gmail)
+def generate_summary(session_id):
+    unread_emails = get_gmail_comms(session_id=session_id)
 
     # from db
-    unread_slack = get_slack_comms(use_last_cached_emails=cache_slack)
+    unread_slack = get_slack_comms(session_id=session_id)
 
-    gpt_summary = get_gpt_summary(prompt, unread_emails, unread_slack)
+    gpt_summary = get_gpt_summary(unread_emails, unread_slack)
 
     filepath = generate_voice_file(gpt_summary)
 
-    return prompt, gpt_summary, filepath
+    return gpt_summary, filepath
