@@ -1,4 +1,4 @@
-# from quickstart.connection import db_ops, get_platform_id
+from quickstart.connection import db_ops, get_platform_id
 import torch
 import numpy as np
 
@@ -20,6 +20,7 @@ def get_abstract_for_gmail(gmail_message):
     email_ = gmail_message.gmail_user_email
     name_ = None
     snippet_ = None
+    final_summary_ = None
     with db_ops(model_names=['GmailUser', 'GmailMessageText']) as \
         (db, GmailUser, GmailMessageText):
         platform_id = get_platform_id('gmail')
@@ -27,24 +28,34 @@ def get_abstract_for_gmail(gmail_message):
             .filter_by(platform_id=platform_id) \
             .one()
         gm_snippet = GmailMessageText.query.filter_by(gmail_message_id=id_) \
-            .filter_by(is_snippet=True).one()
+            .filter_by(is_snippet=True).first()
+
+        gm_texts = GmailMessageText.query.filter_by(gmail_message_id=id_).all()
+        summaries = []
+        for gm_text in gm_texts:
+            summaries.append(build_abstract_for_unbounded_text(gm_text.text))
+        summary = '\n'.join(summaries)
+        final_summary_ = build_abstract_for_unbounded_text(summary)
+
         name_ = gmail_user.name
         snippet_ = gm_snippet.text
     subject_ = gmail_message.subject
     # date_ = gmail_message.date
     # date_ = convert_to_utc(date_).strftime('%m%d')
     # result_text += "%s emailed you %s with subject %s on %s\n" % (name_, snippet_, subject_, date_)
-    result_text += "%s emailed %s with subject %s\n" % (name_, snippet_, subject_)
+    result_text += "%s emailed starting with %s and summary %s and with subject %s\n" % (name_, snippet_,
+        final_summary_, subject_)
 
     return result_text, id_
 
 
 
-def build_abstract_for_unbounded_text(text):
-    model_name="knkarthick/MEETING_SUMMARY"
+def build_abstract_for_unbounded_text(text, truncate=False):
+    # model_name="knkarthick/MEETING_SUMMARY"
+    model_name="sshleifer/distilbart-cnn-12-6"
     model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    inputs_no_trunc = tokenizer(text, max_length=None, return_tensors='pt', truncation=False)
+    inputs_no_trunc = tokenizer(text, max_length=None, return_tensors='pt', truncation=truncate)
     chunk_start = 0
     chunk_end = tokenizer.model_max_length  # == 1024 for Bart
     inputs_batch_lst = []
