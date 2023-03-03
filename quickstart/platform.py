@@ -1,4 +1,12 @@
-from quickstart.connection import db_ops, get_platform_id
+# from quickstart.connection import db_ops, get_platform_id
+import torch
+import numpy as np
+
+from PyPDF2 import PdfReader
+from nltk.tokenize import word_tokenize
+from nltk.tokenize import sent_tokenize
+from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 def get_abstract_for_slack(slack_message):
     return slack_message.text, slack_message.ts
@@ -29,3 +37,52 @@ def get_abstract_for_gmail(gmail_message):
     result_text += "%s emailed %s with subject %s\n" % (name_, snippet_, subject_)
 
     return result_text, id_
+
+
+
+def build_abstract_for_unbounded_text(text):
+    model_name="knkarthick/MEETING_SUMMARY"
+    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    inputs_no_trunc = tokenizer(text, max_length=None, return_tensors='pt', truncation=False)
+    chunk_start = 0
+    chunk_end = tokenizer.model_max_length  # == 1024 for Bart
+    inputs_batch_lst = []
+    while chunk_start <= len(inputs_no_trunc['input_ids'][0]):
+        inputs_batch = inputs_no_trunc['input_ids'][0][chunk_start:chunk_end]  # get batch of n tokens
+        inputs_batch = torch.unsqueeze(inputs_batch, 0)
+        inputs_batch_lst.append(inputs_batch)
+        chunk_start += tokenizer.model_max_length  # == 1024 for Bart
+        chunk_end += tokenizer.model_max_length  # == 1024 for Bart
+
+    summary_ids_lst = [model.generate(inputs, num_beams=4, max_length=100, early_stopping=True) for inputs in inputs_batch_lst]
+
+    # summary_ids_lst = [model.generate(inputs, max_length=100, do_sample=False) for inputs in inputs_batch_lst]
+
+    # decode the output and join into one string with one paragraph per summary batch
+    summary_batch_lst = []
+    for summary_id in summary_ids_lst:
+        summary_batch = [tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in summary_id]
+        summary_batch_lst.append(summary_batch[0])
+    summary_all = '\n'.join(summary_batch_lst)
+    # print(summary_all)
+    return summary_all
+
+def test_doc_summary(filepath):
+    texts = extract_text_from_pdf(filepath)
+    summaries = []
+    for text in texts:
+        summaries.append(build_abstract_for_unbounded_text(text))
+    print(summaries)
+    summary = '\n'.join(summaries)
+    final_summary = build_abstract_for_unbounded_text(summary)
+    print(final_summary)
+
+
+def extract_text_from_pdf(filepath):
+    # creating a pdf reader object
+
+    reader = PdfReader(filepath)
+    # extracting text from page
+    text = [page.extract_text() for page in reader.pages]
+    return text
