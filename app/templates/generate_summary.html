@@ -4,13 +4,19 @@
 
 	<h2> Fast-catchup prototype </h2>
 
-    <script src="{{url_for('.static', filename='summaryscript.js')}}"></script>
 
-	<audio controls>
+
+	<audio class="player" controls>
   			<source src="{{ url_for('returnAudioFile', filepath=gptout.filepath) }}" type="audio/wav">
   			Your browser does not support the audio element.
 	</audio>
 
+    <div class="lyrics" style="display: none">
+            <!-- {% for line in gptout.word_boundaries %}
+                {{ line }}
+            {% endfor %} -->
+            {{ gptout.word_boundaries }}
+    </div>
 
     <div class="input-group">
       <p>
@@ -25,5 +31,7 @@
     <form action = "/generate_summary" id="summary_form" method = "post">
         <input type="submit" value="Generate">
     </form>
+
+    <script src="{{url_for('.static', filename='summaryscript.js')}}"></script>
 
 {% endblock %}

@@ -253,7 +253,7 @@ def gen_summary():
     cache_gmail = request.form.get("gmail-checkbox") != None
 
 
-    gpt_summary, filepath = generate_summary(session_id=session_id)
+    gpt_summary, filepath, word_boundaries = generate_summary(session_id=session_id)
 
     # gptin['slack_list'] = unread_slack
     # gptin['gmail_list'] = unread_gmail
@@ -274,8 +274,20 @@ def gen_summary():
         db.session.commit()
 
     gptout['filepath'] = filepath
+
+
     gptout['summary'] = gpt_summary
 
+    # todo
+    # transform array of word_boundary milliseconds and text summary into
+    #  1.685 | and the little
+    # list of the following text
+    words = gpt_summary.split(' ')
+    timed_text = []
+    for i in range(min(len(word_boundaries), len(words))):
+        timed_text.append('%s | %s' % (word_boundaries[i], words[i]))
+
+    gptout['word_boundaries'] = '\n'.join(timed_text)
 
     return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
 
