@@ -14,15 +14,16 @@ import requests
 
 def ask_large_bloom_raw(prompt, temperature=1.0, do_sample=True, top_k=20, top_p=0.2):
     time.sleep(1)
-    API_URL = "https://api-inference.huggingface.co/models/bigscience/bloom"
+    API_URL = "https://api-inference.huggingface.co/models/bigscience/bloomz"
     headers = {"Authorization": f"Bearer %s" % os.environ['HUGGINGFACE_TOKEN']}
 
     def query(payload):
-    	response = requests.post(API_URL, headers=headers, json=payload)
-    	return response.json()
+        response = requests.post(API_URL, headers=headers, json=payload)
+        # print(response)
+        return response.json()
 
     output = query({
-    	"inputs": prompt
+        "inputs": prompt
         , "temperature": temperature
         , "do_sample": do_sample
         , "top_k": top_k
@@ -30,6 +31,7 @@ def ask_large_bloom_raw(prompt, temperature=1.0, do_sample=True, top_k=20, top_p
     })
     if 'error' in output:
         # ask_instruct_bloom(input_text)
+        print(output)
         print('Error in large bloom')
         exit()
     else:
@@ -201,20 +203,40 @@ def ask_gpt(input_text):
     try:
         # at this stage as text-davinci-003
         # however
-        response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=prompt,
-                temperature=0.3,
-                max_tokens=150,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0
-                )
+        # response = openai.Completion.create(
+        #         model="text-davinci-003",
+        #         prompt=prompt,
+        #         temperature=0.3,
+        #         max_tokens=150,
+        #         top_p=1,
+        #         frequency_penalty=0,
+        #         presence_penalty=0
+        #         )
+        system_prompt = '''
+            You are assisting human with incoming messages prioritisation.
+            Please try to guess what emails are generic or sent automatically and
+            non-urgent and don't give them scores above 50.
+            Above 50 is for emails that need actions from receiving person.
+            Please keep advertisements under 20.
+            Slack messages are not less important than emails.
+            Work related slack messages and not requiring actions from 40 to 60.
+            And work related  slack messages and requiring actions from you should be around 80.
+        '''
+        response = openai.ChatCompletion.create(
+              model="gpt-3.5-turbo",
+              messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt}
+                ]
+            )
     except RateLimitError:
         return "You exceeded your current quota, please check your plan and billing details."
-    text_response = response['choices'][0]['text']
-    priority_score = parse_gpt_response(text_response)
-    return priority_score
+    # print(response)
+    text_response = response['choices'][0]['message']['content']
+    # print(text_response)
+    # priority_score = parse_gpt_response(text_response)
+    priority_score = parse_bloom_response(text_response)
+    return int(priority_score)*0.01 if priority_score else None
 
 
 def toy_keyword_match(input_text):

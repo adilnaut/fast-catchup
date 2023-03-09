@@ -364,19 +364,12 @@ def encapsulate_names_by_ids(text):
     return text
 
 # (message, slack_users, slack_conversation)
-def format_slack_message(slack_message):
+def format_slack_message(slack_message, date_string=False, channel_misc=False):
     text = slack_message.text
-    # text = slack_message.get('text')
     user_id = slack_message.slack_user_id
-    # user_id = slack_message.get('slack_user_id')
     channel_id = slack_message.slack_channel_id
-    # channel_id = slack_message.get('slack_channel_id')
     ts = slack_message.ts
-    # ts = slack_message.get('ts')
 
-    # old
-    # get user name
-    # user_data = slack_users.get(user_id)
     user_data = None
     platform_id = get_platform_id('slack')
     with db_ops(model_names=['SlackUser']) as (db, SlackUser):
@@ -388,13 +381,8 @@ def format_slack_message(slack_message):
     if user_data:
         user_name = user_data.name
         user_email = user_data.profile_email
-        # user_name = user_data.get('name')
-        # user_email = user_data.get('profile_email')
 
-    # old
-    # get channel name
-    # channel_data = slack_conversations.get(channel_id)
-    channel_data = None
+        channel_data = None
     with db_ops(model_names=['SlackChannel']) as (db, SlackChannel):
         if platform_id:
             channel_data = SlackChannel.query.filter_by(id=channel_id) \
@@ -408,18 +396,13 @@ def format_slack_message(slack_message):
         channel_is_channel = channel_data.is_channel
         channel_is_group = channel_data.is_group
         channel_is_im = channel_data.is_im
-        # channel_name = channel_data.get('name')
-        # channel_topic = channel_data.get('topic')
-        # channel_purpose = channel_data.get('purpose')
-        # channel_is_channel = channel_data.get('is_channel')
-        # channel_is_group = channel_data.get('is_group')
-        # channel_is_im = channel_data.get('is_im')
 
     # convert ts into datetime formatted string
     date_string = ts_to_formatted_date(ts)
 
     # encapsulate all mentions to real names by id
     text = encapsulate_names_by_ids(text)
+    
 
     result = 'Slack message:'
     result += ' with text \'%s\' ' % text
@@ -432,9 +415,9 @@ def format_slack_message(slack_message):
     if channel_data and channel_is_channel:
         if channel_name:
             result += ' in a channel named %s ' % channel_name
-        if channel_topic:
+        if channel_topic and channel_misc:
             result += ' with a channel topic %s ' % channel_topic
-        if channel_purpose:
+        if channel_purpose and channel_misc:
             result += ' with a channel purpose %s ' % channel_purpose
     elif channel_data and channel_is_group:
         # could also share num of mebers

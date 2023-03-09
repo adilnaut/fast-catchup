@@ -18,33 +18,64 @@ import azure.cognitiveservices.speech as speechsdk
 from quickstart.gmail_utils import get_gmail_comms
 from quickstart.slack_utils import get_slack_comms
 
-
+from quickstart.connection import db_ops
 
 # todo handle API exceptions and bad results
-def get_gpt_summary(unread_emails, unread_slack, verbose=False):
+def get_gpt_summary(session_id=None, verbose=True):
     openai.api_key = os.getenv("OPEN_AI_KEY")
-    prompt = "Summarize following messages:"
-    if unread_emails:
-        prompt += unread_emails
-    if unread_slack:
-        prompt += unread_slack
+
+
+    message_texts = []
+    with db_ops(model_names=['PriorityItem', 'PriorityList', 'PriorityMessage']) as (db, \
+        PriorityItem, PriorityList, PriorityMessage):
+        # get a priority list instance for each platform
+        p_lists = PriorityList.query.filter_by(session_id=session_id).all()
+        for p_list in p_lists:
+            p_items = p_list.items
+            for p_item in p_items:
+                p_message = PriorityMessage.query.filter_by(id=p_item.priority_message_id).first()
+                if p_message:
+                    message_texts.append((p_item.p_a_b_c, p_message.input_text_value))
+    sorted_messages = sorted(
+        message_texts,
+        key=lambda x: x[0],
+        reverse=True
+    )
+    # print(sorted_messages)
+    input_text = '\n'.join(['text %s, score %s' % (text, score) for score, text in sorted_messages])
+
+    prompt = '''Here is a list of incoming messages with their priority scores.
+        Please transform this list of message summaries to narrated text starting from most important
+        values closer to 1 more important:
+        '''
+    prompt = '%s%s' % (prompt, input_text)
 
     try:
-        response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=prompt,
-                temperature=0.3,
-                max_tokens=150,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0
-                )
+        system_prompt = '''
+            You are communications catch-up assistant
+            whose task is to transform list of messages with assigned importance scores
+            to narrated text or summary of missed messages.
+            You don't list priority_scores themselves or mention what the task is.
+            You just simply tell user what he missed based on messages and scores.
+            In case of emails try to give a brief summary without mentioning fields like subjects etc.
+            and mention only user name or company that send that email.
+            In case of slack messages you should mention the sender and channel
+        '''
+
+        response = openai.ChatCompletion.create(
+              model="gpt-3.5-turbo",
+              messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt}
+                ]
+            )
     except RateLimitError:
         return "You exceeded your current quota, please check your plan and billing details."
     if verbose:
         print(response)
-    text_response = response['choices'][0]['text']
+    text_response = response['choices'][0]['message']['content']
     return text_response
+
 
 # generates file.wav
 # todo:
@@ -100,7 +131,7 @@ def generate_summary(session_id):
     # from db
     unread_slack = get_slack_comms(session_id=session_id)
 
-    gpt_summary = get_gpt_summary(unread_emails, unread_slack)
+    gpt_summary = get_gpt_summary(session_id=session_id)
 
     filepath = generate_voice_file(gpt_summary)
 

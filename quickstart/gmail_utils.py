@@ -46,7 +46,8 @@ def extract_domain(link):
 
 # todo parse with regex
 def get_is_multipart(content_type):
-    return 'multipart' in content_type
+    if content_type:
+        return 'multipart' in content_type
 
 def get_initial_tags(from_string):
     tags = set()
@@ -144,16 +145,16 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
             datafile.write(file_content)
             datafile.close()
 
-        ga_kwargs = OrderedDict([('md5', file_hash)
+        ga_kwargs = OrderedDict([('gmail_message_id', id)
+            , ('md5', file_hash)
             , ('attachment_id', attachment_id_0)
             , ('file_size', size_0)
-            , ('gmail_message_id', id)
             , ('original_filename', filename_0)
             , ('part_id', part_id_0)
             , ('mime_type', mime_type_0)
             , ('file_extension', file_extension)
             , ('filepath', filepath_)])
-        ga_query = get_upsert_query('gmail_attachment', ga_kwargs.keys(), 'md5')
+        ga_query = get_upsert_query('gmail_attachment', ga_kwargs.keys(), 'gmail_message_id, md5')
         db.session.execute(ga_query, ga_kwargs)
     else:
         if verbose:
