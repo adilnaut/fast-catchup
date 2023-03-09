@@ -162,7 +162,8 @@ class PriorityListMethod(db.Model):
                     .filter_by(priority_list_method_id=self.id) \
                     .first()
                 if p_item.p_b_a and p_item_method and p_item_method.p_b_m_a and p_item.p_a:
-                    weighted_accuracy = abs(p_item_method.p_b_m_a - p_item.p_b_a) * p_item.p_a
+                    p_dif = abs(p_item_method.p_b_m_a - p_item.p_a)
+                    weighted_accuracy = 1 - p_dif if p_dif < 1 else 0.000001 
                     result.append(weighted_accuracy)
         self.p_m_a = np.array(result).mean() if result else 0.05
         db.session.commit()
@@ -632,6 +633,9 @@ class GmailAttachment(db.Model):
 
     def __repr__(self):
         return '<g-attachment with filename {}>'.format(self.original_filename)
+
+    __table_args__ = (db.UniqueConstraint('gmail_message_id', 'md5', name='_unique_constraint_gid_md5'),
+        )
 
 class GmailLink(db.Model):
     id = db.Column(db.Integer, primary_key=True)
