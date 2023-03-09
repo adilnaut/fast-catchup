@@ -2,8 +2,9 @@
 
 {% block content %}
 
-	<h2> Fast-catchup work communications summary prototype </h2>
+	<h2> Fast-catchup prototype </h2>
 
+    <script src="{{url_for('.static', filename='summaryscript.js')}}"></script>
 
 	<audio controls>
   			<source src="{{ url_for('returnAudioFile', filepath=gptout.filepath) }}" type="audio/wav">
@@ -12,33 +13,17 @@
 
 
     <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Summary:</span>
-      </div>
-      <textarea name="prompt" form="summary_form" class="form-control" aria-label="With textarea" >
-        Summary: {{ gptout.summary }}
-      </textarea>
+      <p>
+        Summary:
+      </p> <br>
+
+      <p>
+        {{ gptout.summary }}
+      </p>
     </div>
 
     <form action = "/generate_summary" id="summary_form" method = "post">
-        <!-- <input type="text"  placeholder="{{gptin.prompt}}" name="prompt" /> <br> -->
-        <input type="checkbox" id="slack_check" name="slack-checkbox" value="Slack-Check">
-        <label for="slack-checkbox"> Get slack unreads from cache </label> <br>
-
-        <input type="checkbox" id="gmail_check" name="gmail-checkbox" value="Gmail-Check">
-        <label for="gmail-checkbox"> Get gmail unreads from cache </label> <br>
-
         <input type="submit" value="Generate">
     </form>
-
-    <p> Slack input: </p>
-    {% for slack_obj in gptin.slack_list %}
-        <p> {{ slack_obj.text }} </p>
-    {% endfor %}
-
-    <p> Gmail input: </p>
-    {% for gmail_obj in gptin.gmail_list %}
-	    <p> {{ gmail_obj.subject }} </p>
-    {% endfor %}
 
 {% endblock %}

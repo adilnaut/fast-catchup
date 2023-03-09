@@ -21,13 +21,6 @@
             {% endif %}
 
 
-            <a href="{{ url_for('remove_users') }}"> Remove users </a>
-            <a href="{{ url_for('test_clear_gmail_table') }}"> Clear Gmail table </a>
-            <a href="{{ url_for('test_clear_slack_table') }}"> Clear Slack table </a>
-
-            <a href="{{ url_for('test_gmail_etl') }}"> Enrich Gmail data </a>
-            <a href="{{ url_for('test_slack_etl') }}"> Enrich Slck data </a>
-
         </div>
         <hr>
         {% with messages = get_flashed_messages() %}

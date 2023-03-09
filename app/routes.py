@@ -234,7 +234,7 @@ def first():
 
     gptin = {'slack_list': unread_slack,
              'gmail_list': unread_gmail}
-    gptout = {'summary': 'Press Generate to generate summary'}
+    gptout = {'summary': ' Press Generate to generate summary'}
 
     return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
 

@@ -105,6 +105,8 @@ def generate_voice_file(text_response, verbose=False):
     # Creates a speech synthesizer using the default speaker as audio output.
     speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
 
+    speech_synthesizer.synthesis_word_boundary.connect(lambda evt: print(
+        "Word boundary event received: {}, audio offset in ms: {}ms".format(evt, evt.audio_offset / 10000)))
     # Synthesizes the received text to speech.
     # The synthesized speech is expected to be heard on the speaker with this line executed.
     result = speech_synthesizer.speak_text_async(text_response).get()
