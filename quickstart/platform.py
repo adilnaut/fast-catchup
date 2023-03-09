@@ -24,7 +24,7 @@ from transformers import GPT2TokenizerFast
 
 
 def get_abstract_for_slack(slack_message):
-    return format_slack_message(slack_message, abstract_func=build_abstract_for_unbounded_text), slack_message.ts
+    return format_slack_message(slack_message, abstract_func=build_abstract_for_unbounded_text_2), slack_message.ts
 
 
 def ts_to_formatted_date(ts):
