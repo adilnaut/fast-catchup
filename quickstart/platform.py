@@ -191,7 +191,7 @@ def summarize_with_gpt3(input_text):
     return text_response
 
 def build_abstract_for_unbounded_text_2(text, truncate=False):
-    chunk_length = 2500
+    chunk_length = 2000
     chunk_start = 0
     chunk_end = chunk_length
     tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
@@ -203,7 +203,7 @@ def build_abstract_for_unbounded_text_2(text, truncate=False):
             for i in range(chunk_start + len(inputs_batch))])
         inputs_batch_lst.append(in_text)
         chunk_start += chunk_length
-        chunk_end += chunk_length
+        chunk_end += chunk_start + chunk_length - (len(inputs_batch) - chunk_length)
     summaries = [summarize_with_gpt3(x) for x in inputs_batch_lst]
     summary = '\n'.join(summaries)
     return summary

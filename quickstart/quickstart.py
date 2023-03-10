@@ -20,6 +20,9 @@ from quickstart.slack_utils import get_slack_comms
 
 from quickstart.connection import db_ops
 
+
+
+
 # todo handle API exceptions and bad results
 def get_gpt_summary(session_id=None, verbose=True):
     openai.api_key = os.getenv("OPEN_AI_KEY")
@@ -42,11 +45,10 @@ def get_gpt_summary(session_id=None, verbose=True):
         reverse=True
     )
     # print(sorted_messages)
-    input_text = '\n'.join(['text %s, score %s' % (text, score) for score, text in sorted_messages])
+    input_text = '\n'.join(['text %s, score %s' % (text, int(score*100.0)) for score, text in sorted_messages])
 
     prompt = '''Here is a list of incoming messages with their priority scores.
-        Please transform this list of message summaries to narrated text starting from most important
-        values closer to 1 more important:
+        Please transform this list of message summaries to narrated text starting from most important:
         '''
     prompt = '%s%s' % (prompt, input_text)
 
@@ -55,11 +57,10 @@ def get_gpt_summary(session_id=None, verbose=True):
             You are communications catch-up assistant
             whose task is to transform list of messages with assigned importance scores
             to narrated text or summary of missed messages.
-            You don't list priority_scores themselves or mention what the task is.
-            You just simply tell user what he missed based on messages and scores.
-            In case of emails try to give a brief summary without mentioning fields like subjects etc.
-            and mention only user name or company that send that email.
-            In case of slack messages you should mention the sender and channel
+            You just simply tell user what he missed.
+            In case of slack messages you should mention the sender and channel.
+            Do not return priority_scores.
+            Do not return email subjects.
         '''
 
         response = openai.ChatCompletion.create(
@@ -75,6 +76,8 @@ def get_gpt_summary(session_id=None, verbose=True):
         print(response)
     text_response = response['choices'][0]['message']['content']
     return text_response
+
+
 
 
 # generates file.wav
@@ -108,7 +111,10 @@ def generate_voice_file(text_response, verbose=False):
     word_boundaries = []
     # speech_synthesizer.synthesis_word_boundary.connect(lambda evt: print(
     #     "Word boundary event received: {}, audio offset in ms: {}ms".format(evt, evt.audio_offset / 10000)))
-    speech_synthesizer.synthesis_word_boundary.connect(lambda evt: word_boundaries.append(evt.audio_offset / 10000000))
+    # print(text_response)
+    # SpeechSynthesisWordBoundaryEventArgs(audio_offset=329750000, duration=0:00:00.100000, text_offset=562, word_length=1)
+    speech_synthesizer.synthesis_word_boundary.connect(lambda evt: word_boundaries.append({'audio_offset': evt.audio_offset / 10000000 \
+        , 'text_offset': evt.text_offset, 'word_length': evt.word_length, 'duration': evt.duration }) )
     # Synthesizes the received text to speech.
     # The synthesized speech is expected to be heard on the speaker with this line executed.
     result = speech_synthesizer.speak_text_async(text_response).get()
@@ -129,11 +135,10 @@ def generate_voice_file(text_response, verbose=False):
             print("Did you update the subscription info?")
     return filepath, word_boundaries
 
-def generate_summary(session_id):
-    unread_emails = get_gmail_comms(session_id=session_id)
-
-    # from db
-    unread_slack = get_slack_comms(session_id=session_id)
+def generate_summary(session_id, get_last_session=False):
+    if not get_last_session:
+        unread_emails = get_gmail_comms(session_id=session_id)
+        unread_slack = get_slack_comms(session_id=session_id)
 
     gpt_summary = get_gpt_summary(session_id=session_id)
 

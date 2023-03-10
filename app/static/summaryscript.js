@@ -1,6 +1,7 @@
 window.onload = function() {
     const player = document.querySelector('.player')
     const lyrics = document.querySelector('.lyrics')
+    const summary = document.querySelector('.summary')
     const lines = lyrics.textContent.trim().split('\n')
 
     lyrics.removeAttribute('style')
@@ -9,14 +10,19 @@ window.onload = function() {
     let syncData = []
 
     lines.map((line, index) => {
-        const [time, text] = line.trim().split('|')
-        syncData.push({'start': time.trim(), 'text': text.trim()})
+        const [time, durr] = line.trim().split('|')
+        syncData.push({'start': time.trim(), 'duration': durr.trim()})
     })
 
     player.addEventListener('timeupdate', () => {
+
         syncData.forEach((item) => {
-            console.log(item)
-            if (player.currentTime >= item.start) lyrics.innerText = item.text
+            if ((player.currentTime >= item.start) && (player.currentTime <= parseFloat(item.start) + parseFloat(item.duration)) ) {
+                document.getElementById(item.start).style.backgroundColor = "yellow";
+            } else {
+                document.getElementById(item.start).style.backgroundColor = "white"
+            }
         })
+
     })
 }

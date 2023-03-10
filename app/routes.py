@@ -19,6 +19,13 @@ from quickstart.slack_utils import get_slack_comms, clear_slack_tables, slack_te
 from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables
 from quickstart.priority_engine import create_priority_list_methods
 from setup import setup_sentence_embeddings_model, setup_sentiment_analysis_model
+from datetime import timedelta
+from flask import send_from_directory
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/upload_gmail_auth', methods=['GET', 'POST'])
 def upload_gmail_auth():
@@ -238,6 +245,11 @@ def first():
 
     return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
 
+def get_seconds(duration):
+    # td = timedelta(hours=0, minutes=0, seconds=float(duration))
+    total_seconds = duration.total_seconds()
+    return total_seconds
+
 @app.route('/generate_summary', methods=['POST'])
 @login_required
 def gen_summary():
@@ -249,11 +261,18 @@ def gen_summary():
     # unread_gmail = get_gmail_comms(return_list=True, session_id=session_id)
 
 
-    cache_slack = request.form.get("slack-checkbox") != None
-    cache_gmail = request.form.get("gmail-checkbox") != None
+    # cache_slack = request.form.get("slack-checkbox") != None
+    get_last_session = request.form.get("session-checkbox") != None
 
-
-    gpt_summary, filepath, word_boundaries = generate_summary(session_id=session_id)
+    if get_last_session:
+        session_id = db.session.execute(text('''
+            SELECT session_id FROM priority_list WHERE id = (SELECT max(id) FROM priority_list);''')).fetchone()
+        if session_id:
+            session_id = session_id[0]
+        else:
+            flash('No previous sessions found!')
+            redirect(url_for('first'))
+    gpt_summary, filepath, word_boundaries = generate_summary(session_id=session_id, get_last_session=get_last_session)
 
     # gptin['slack_list'] = unread_slack
     # gptin['gmail_list'] = unread_gmail
@@ -275,19 +294,29 @@ def gen_summary():
 
     gptout['filepath'] = filepath
 
-
-    gptout['summary'] = gpt_summary
-
-    # todo
-    # transform array of word_boundary milliseconds and text summary into
-    #  1.685 | and the little
-    # list of the following text
-    words = gpt_summary.split(' ')
     timed_text = []
-    for i in range(min(len(word_boundaries), len(words))):
-        timed_text.append('%s | %s' % (word_boundaries[i], words[i]))
+    p_tags = []
+    a_tags = []
+    for wb in word_boundaries:
+        start = wb['text_offset']
+        end = wb['word_length'] + start
+        a_text = gpt_summary[start:end]
+        if '\n' in a_text:
+            p_tags.append(' '.join(a_tags))
+            a_tags = []
+        a_tags.append('<a id=%s>%s</a>' % (wb['audio_offset'], a_text) )
 
+        # highlight_text = gpt_summary[start:end]
+        # all_text = gpt_summary[:start] + ' <mark> ' + highlight_text + ' </mark> ' + gpt_summary[end:]
+        # timed_text.append('%s | %s' % (wb['audio_offset'], all_text))
+        timed_text.append('%s | %s' % (wb['audio_offset'], get_seconds(wb['duration'])))
+
+    if not p_tags:
+        p_tags.append(' '.join(a_tags))
+    # print(timed_text)
     gptout['word_boundaries'] = '\n'.join(timed_text)
+    gptout['p_tags'] = '<p>'+ '</p><p>'.join(p_tags) + '</p>'
+    # gptout['word_boundaries'] = timed_text
 
     return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
 
