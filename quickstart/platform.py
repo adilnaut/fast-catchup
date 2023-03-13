@@ -1,10 +1,11 @@
-from quickstart.connection import db_ops, get_platform_id
 import torch
 import time
 import numpy as np
 import os
+import hashlib
 import openai
 
+from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil import parser
 import pytz
@@ -21,7 +22,8 @@ from transformers import pipeline
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import GPT2TokenizerFast
 
-
+from quickstart.connection import db_ops, get_platform_id
+from quickstart.sqlite_utils import get_upsert_query
 
 def get_abstract_for_slack(slack_message):
     return format_slack_message(slack_message, abstract_func=build_abstract_for_unbounded_text_2), slack_message.ts
@@ -131,26 +133,31 @@ def get_abstract_for_gmail(gmail_message):
         gmail_user = GmailUser.query.filter_by(email=email_) \
             .filter_by(platform_id=platform_id) \
             .one()
-        gm_snippet = GmailMessageText.query.filter_by(gmail_message_id=id_) \
-            .filter_by(is_snippet=True).first()
 
-        gm_texts = GmailMessageText.query.filter_by(gmail_message_id=id_).all()
+        gm_texts = GmailMessageText.query.filter_by(gmail_message_id=id_) \
+            .filter_by(is_snippet=False).all()
         summaries = []
         for gm_text in gm_texts:
-            print(len(gm_text.text))
             summaries.append(build_abstract_for_unbounded_text_2(gm_text.text))
         summary = '\n'.join(summaries)
-        print(len(summary))
+
         final_summary_ = build_abstract_for_unbounded_text_2(summary)
 
+        text_hash = hashlib.md5(final_summary_.encode('utf-8')).hexdigest()
+        text_kwargs = OrderedDict([('gmail_message_id', id_)
+            , ('text_hash', text_hash)
+            , ('text', final_summary_)
+            , ('is_primary', False)
+            , ('is_multipart', False)
+            , ('is_summary', True)
+            , ('is_snippet', False)])
+        text_query = get_upsert_query('gmail_message_text', text_kwargs.keys(), 'gmail_message_id, text_hash')
+        db.session.execute(text_query, text_kwargs)
+
         name_ = gmail_user.name
-        snippet_ = gm_snippet.text
     subject_ = gmail_message.subject
-    # date_ = gmail_message.date
-    # date_ = convert_to_utc(date_).strftime('%m%d')
-    # result_text += "%s emailed you %s with subject %s on %s\n" % (name_, snippet_, subject_, date_)
-    result_text += "%s emailed starting with %s and summary %s and with subject %s\n" % (name_, snippet_,
-        final_summary_, subject_)
+
+    result_text += "Email from %s with a summary %s and subject %s\n" % (name_, final_summary_, subject_)
 
     return result_text, id_
 

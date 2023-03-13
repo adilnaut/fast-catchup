@@ -440,6 +440,43 @@ def auth_and_load_session_gmail():
         pass
         # print(f'An error occurred: {error}')
 
+def get_list_data_by_g_id(gmail_message_id):
+    with db_ops(model_names=['GmailUser', 'GmailMessage', 'GmailMessageText']) as \
+        (db, GmailUser, GmailMessage, GmailMessageText):
+        gmail_message = GmailMessage.query.filter_by(id=gmail_message_id).first()
+
+        id_ = gmail_message.id
+        email_ = gmail_message.gmail_user_email
+        name_ = None
+
+        platform_id = get_platform_id('gmail')
+        gmail_user = GmailUser.query.filter_by(email=email_) \
+            .filter_by(platform_id=platform_id) \
+            .one()
+
+        name_ = gmail_user.name
+        subject_ = gmail_message.subject
+        date_ = gmail_message.date
+        date_ = convert_to_utc(date_).strftime('%m/%d/%Y, %H:%M:%S')
+
+        text_summary = GmailMessageText.query.filter_by(gmail_message_id=gmail_message_id) \
+            .filter_by(is_summary=True).first()
+        snippet = GmailMessageText.query.filter_by(gmail_message_id=gmail_message_id) \
+            .filter_by(is_snippet=True).first()
+        if text_summary:
+            text_summary = text_summary.text
+        elif snippet:
+            text_summary = snippet.text
+        else:
+            text_summary = subject_
+
+        list_body = {}
+        list_body['headline'] = name_
+        list_body['text'] = text_summary
+        list_body['subject'] = subject_
+        list_body['date'] = date_
+        return list_body
+
 def dumps_emails(gmail_messages):
     result_text = ""
 

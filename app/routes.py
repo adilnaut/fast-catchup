@@ -14,7 +14,7 @@ from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthD
 from werkzeug.utils import secure_filename
 from werkzeug.urls import url_parse
 
-from quickstart.quickstart import generate_summary
+from quickstart.quickstart import generate_summary, get_p_items_by_session
 from quickstart.slack_utils import get_slack_comms, clear_slack_tables, slack_test_etl
 from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables
 from quickstart.priority_engine import create_priority_list_methods
@@ -313,10 +313,16 @@ def gen_summary():
 
     if not p_tags:
         p_tags.append(' '.join(a_tags))
+
+    sorted_items = get_p_items_by_session(session_id=session_id)
+    print(sorted_items)
     # print(timed_text)
     gptout['word_boundaries'] = '\n'.join(timed_text)
     gptout['p_tags'] = '<p>'+ '</p><p>'.join(p_tags) + '</p>'
+    gptout['sorted_items'] = sorted_items
     # gptout['word_boundaries'] = timed_text
+
+
 
     return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
 
@@ -337,6 +343,13 @@ def index():
 def setup_workspace():
     setup_sentence_embeddings_model()
     setup_sentiment_analysis_model()
+    return redirect(url_for('index'))
+
+@app.route('/delete_auth/<auth_id>')
+def delete_auth(auth_id):
+    auth_data = AuthData.query.filter_by(id=auth_id).first()
+    db.session.delete(auth_data)
+    db.session.commit()
     return redirect(url_for('index'))
 
 @app.route('/audio/<filepath>')

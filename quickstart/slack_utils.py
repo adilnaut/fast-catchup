@@ -363,6 +363,62 @@ def encapsulate_names_by_ids(text):
             text = text.replace('<@%s>' % middle, user_name)
     return text
 
+
+def get_list_data_by_m_id(slack_message_ts):
+    with db_ops(model_names=['SlackMessage, SlackChannel, SlackUser']) as (db, SlackMessage, SlackChannel, SlackUser):
+        slack_message = SlackMessage.query.filter_by(ts=slack_message_ts).first()
+        if not slack_message:
+            return None
+        text = slack_message.text
+        user_id = slack_message.slack_user_id
+        channel_id = slack_message.slack_channel_id
+
+        user_data = None
+        user_name = None
+        platform_id = get_platform_id('slack')
+        if platform_id:
+            user_data = SlackUser.query.filter_by(id=user_id)  \
+                .filter_by(platform_id=platform_id) \
+                .first()
+        if user_data:
+            user_name = user_data.name
+            # user_pic = user_data.profile_image_32
+        if platform_id:
+            channel_data = SlackChannel.query.filter_by(id=channel_id) \
+                .filter_by(platform_id=platform_id) \
+                .first()
+        if channel_data:
+            channel_name = channel_data.name
+            channel_is_channel = channel_data.is_channel
+            channel_is_group = channel_data.is_group
+            channel_is_im = channel_data.is_im
+
+        text = encapsulate_names_by_ids(text)
+        headline = ""
+        if channel_data and channel_is_channel:
+            if channel_name and user_name:
+                headline += '%s in %s' % (user_name, channel_name)
+            elif channel_name:
+                headline += 'unknown in %s' % channel_name
+        elif channel_data and channel_is_group:
+            if user_name:
+                headline += '%s in group' % user_name
+            else:
+                headline += 'unknown in group'
+        elif channel_data and channel_is_im:
+            if user_name:
+                headline += '%s dm' % user_name
+            else:
+                headline += 'in dm'
+        date_string = ts_to_formatted_date(ts)
+        list_body = {}
+        list_body['headline'] = headline
+        list_body['text'] = text
+        list_body['date'] = date_string
+        return list_body
+
+
+
 # (message, slack_users, slack_conversation)
 def format_slack_message(slack_message, date_string=False, channel_misc=False):
     text = slack_message.text
@@ -402,7 +458,7 @@ def format_slack_message(slack_message, date_string=False, channel_misc=False):
 
     # encapsulate all mentions to real names by id
     text = encapsulate_names_by_ids(text)
-    
+
 
     result = 'Slack message:'
     result += ' with text \'%s\' ' % text

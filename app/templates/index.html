@@ -4,7 +4,8 @@
     <h1>Hi, {{ current_user.username }}!</h1>
     <h3>Credentials:</h3>
     {% for auth_obj in auth_data %}
-        <p> {{ auth_obj.name }} </p>
+        <p> {{ auth_obj.name }} | 
+        <a href="{{url_for('delete_auth', auth_id=auth_obj.id)}}" > delete </a>  </p>
     {% endfor  %}
 
     <p>Add Slack Authentication <a href="{{ url_for('upload_slack_auth') }}">Click to Add!</a></p>

@@ -15,10 +15,44 @@ import azure.cognitiveservices.speech as speechsdk
 
 
 
-from quickstart.gmail_utils import get_gmail_comms
-from quickstart.slack_utils import get_slack_comms
+from quickstart.gmail_utils import get_gmail_comms, get_list_data_by_g_id
+from quickstart.slack_utils import get_slack_comms, get_list_data_by_m_id
 
 from quickstart.connection import db_ops
+
+
+def get_p_items_by_session(session_id=None):
+
+    # we need short information to show on tabs
+    # and summary to show on the right views
+    list_body_l = []
+    with db_ops(model_names=['PriorityItem', 'PriorityList', 'PriorityMessage', 'Platform']) as (db, \
+        PriorityItem, PriorityList, PriorityMessage, Platform):
+        # get a priority list instance for each platform
+        p_lists = PriorityList.query.filter_by(session_id=session_id).all()
+        for p_list in p_lists:
+            platform_id = p_list.platform_id
+            platform = Platform.query.filter_by(id=platform_id).first()
+            platform_name = platform.name
+            p_items = p_list.items
+            for p_item in p_items:
+                p_message = PriorityMessage.query.filter_by(id=p_item.priority_message_id).first()
+                if p_message:
+                    message_id = p_message.message_id
+                    if platform_name == 'slack':
+                        list_body= get_list_data_by_m_id(message_id)
+                    elif platform_name == 'gmail':
+                        list_body = get_list_data_by_g_id(message_id)
+                    list_body['score'] = int(p_item.p_a_b_c*100.0)
+                    list_body['id'] = p_message.id
+                    list_body_l.append(list_body)
+
+    sorted_results = sorted(
+        list_body_l,
+        key=lambda x: x['score'],
+        reverse=True
+    )
+    return sorted_results
 
 
 

@@ -163,7 +163,7 @@ class PriorityListMethod(db.Model):
                     .first()
                 if p_item.p_b_a and p_item_method and p_item_method.p_b_m_a and p_item.p_a:
                     p_dif = abs(p_item_method.p_b_m_a - p_item.p_a)
-                    weighted_accuracy = 1 - p_dif if p_dif < 1 else 0.000001 
+                    weighted_accuracy = 1 - p_dif if p_dif < 1 else 0.000001
                     result.append(weighted_accuracy)
         self.p_m_a = np.array(result).mean() if result else 0.05
         db.session.commit()
@@ -316,7 +316,8 @@ class PriorityItem(db.Model):
         # print(self.p_b)
         # print(self.p_b_a)
         if self.p_b_a and p_a and self.p_b:
-            self.p_a_b = self.p_b_a * p_a / self.p_b
+            temp = self.p_b_a * p_a / ( 1 - self.p_b) if self.p_b != 1 else self.p_b_a * p_a
+            self.p_a_b = temp if temp <= 1 else 1
         else:
             self.p_a_b = 0.497424242
         db.session.commit()
@@ -324,7 +325,9 @@ class PriorityItem(db.Model):
     def calculate_p_a_b_c(self):
 
         if self.p_b_a and self.p_a_c and self.p_b_c:
-            self.p_a_b_c = self.p_b_a * self.p_a_c / self.p_b_c
+            temp = self.p_b_a * self.p_a_c / (1 - self.p_b_c) if self.p_b_c  != 1 else self.p_b_a * self.p_a_c
+            # self.p_a_b_c = 1/(1 + np.exp(-temp))
+            self.p_a_b_c = temp if temp <= 1 else 1
         else:
             self.p_a_b_c = 0.49696969
         db.session.commit()
