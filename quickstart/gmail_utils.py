@@ -457,7 +457,8 @@ def get_list_data_by_g_id(gmail_message_id):
         name_ = gmail_user.name
         subject_ = gmail_message.subject
         date_ = gmail_message.date
-        date_ = convert_to_utc(date_).strftime('%m/%d/%Y, %H:%M:%S')
+        if date_:
+            date_ = convert_to_utc(date_).strftime('%m/%d/%Y, %H:%M:%S')
 
         text_summary = GmailMessageText.query.filter_by(gmail_message_id=gmail_message_id) \
             .filter_by(is_summary=True).first()
@@ -497,7 +498,8 @@ def dumps_emails(gmail_messages):
             snippet_ = gm_snippet.text
         subject_ = row.subject
         date_ = row.date
-        date_ = convert_to_utc(date_).strftime('%m%d')
+        if date_:
+            date_ = convert_to_utc(date_).strftime('%m%d')
         result_text += "%s emailed you %s with subject %s on %s\n" % (name_, snippet_, subject_, date_)
 
     return result_text
@@ -548,6 +550,8 @@ def get_gmail_comms(return_list=False, session_id=None):
     return result_text
 
 def convert_to_utc(date_string):
+    if not date_string:
+        return ''
     dt = parser.parse(date_string)
     dt = dt.astimezone(pytz.UTC)
     return dt

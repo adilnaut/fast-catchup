@@ -26,8 +26,8 @@ def get_p_items_by_session(session_id=None):
     # we need short information to show on tabs
     # and summary to show on the right views
     list_body_l = []
-    with db_ops(model_names=['PriorityItem', 'PriorityList', 'PriorityMessage', 'Platform']) as (db, \
-        PriorityItem, PriorityList, PriorityMessage, Platform):
+    with db_ops(model_names=['PriorityItem', 'PriorityList', 'PriorityMessage', 'Platform', 'PriorityItemMethod']) \
+        as (db, PriorityItem, PriorityList, PriorityMessage, Platform, PriorityItemMethod):
         # get a priority list instance for each platform
         p_lists = PriorityList.query.filter_by(session_id=session_id).all()
         for p_list in p_lists:
@@ -37,6 +37,8 @@ def get_p_items_by_session(session_id=None):
             p_items = p_list.items
             for p_item in p_items:
                 p_message = PriorityMessage.query.filter_by(id=p_item.priority_message_id).first()
+                p_i_m = PriorityItemMethod.query.filter_by(priority_item_id=p_item.id) \
+                    .filter(PriorityItemMethod.model_justification != None).first()
                 if p_message:
                     message_id = p_message.message_id
                     if platform_name == 'slack':
@@ -44,7 +46,10 @@ def get_p_items_by_session(session_id=None):
                     elif platform_name == 'gmail':
                         list_body = get_list_data_by_g_id(message_id)
                     list_body['score'] = int(p_item.p_a_b_c*100.0)
+                    list_body['text_score'] = int(p_item.p_b_a*100.0)
                     list_body['id'] = p_message.id
+                    if p_i_m:
+                        list_body['model_justification'] = p_i_m.model_justification
                     list_body_l.append(list_body)
 
     sorted_results = sorted(

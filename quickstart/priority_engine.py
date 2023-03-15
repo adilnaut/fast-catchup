@@ -164,6 +164,7 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
 
     for priority_method_item in priority_method_items:
         priority_method_item.calculate_p_b_m_a()
+        
 
     db.session.commit()
     # todo optimise calculate_p_b cause it build the same KNearestNeighbors model each item

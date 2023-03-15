@@ -27,6 +27,20 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+@app.route('/assign_priorities', methods=['POST'])
+def assign_priorities():
+    item_id = request.form['item_id']
+    range_value = request.form['range_value']
+    # print(item_id)
+    # print(range_value)
+    # Perform database update or other actions based on item_id and range_value
+    # p_message = PriorityMessage.query.filter_by(id=item_id).first()
+    p_item = PriorityItem.query.filter_by(priority_message_id=item_id).first()
+    p_item.p_a = int(range_value)*0.01
+    db.session.commit()
+
+    return 'Success!'
+
 @app.route('/upload_gmail_auth', methods=['GET', 'POST'])
 def upload_gmail_auth():
     form = GmailAuthDataForm()
@@ -257,11 +271,7 @@ def gen_summary():
     gptout = {}
     session_id = uuid.uuid4().hex
 
-    # unread_slack = get_slack_comms(return_list=True, session_id=session_id)
-    # unread_gmail = get_gmail_comms(return_list=True, session_id=session_id)
 
-
-    # cache_slack = request.form.get("slack-checkbox") != None
     get_last_session = request.form.get("session-checkbox") != None
 
     if get_last_session:
@@ -273,9 +283,6 @@ def gen_summary():
             flash('No previous sessions found!')
             redirect(url_for('first'))
     gpt_summary, filepath, word_boundaries = generate_summary(session_id=session_id, get_last_session=get_last_session)
-
-    # gptin['slack_list'] = unread_slack
-    # gptin['gmail_list'] = unread_gmail
 
 
     persist_audio = False

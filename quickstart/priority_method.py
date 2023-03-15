@@ -41,17 +41,21 @@ def ask_large_bloom_raw(prompt, temperature=1.0, do_sample=True, top_k=20, top_p
 
 def ask_large_bloom(input_text):
 
+    justification = ""
     # first ask the reasons why email is important
     prompt = '%s The thing that makes this email important is'
     prompt = prompt % input_text
 
     out_text = ask_large_bloom_raw(prompt)
+    justification += 'The thing that makes this email important is' + out_text
 
     prompt += out_text
 
     # then ask the reason why email is not important
     second_prompt = '%s The thing that makes this email not important is'
     out_text = ask_large_bloom_raw(second_prompt % input_text)
+
+    justification += 'The thing that makes this email not important is' + out_text
     prompt += second_prompt + out_text
 
     # then ask to classify
@@ -59,11 +63,10 @@ def ask_large_bloom(input_text):
     # prompt += 'With all that in mind the email importance class (\'not important\', \'less than medium\', \'medium\', \'more than medium\', \'very important\') is '
     out_text = ask_large_bloom_raw(prompt)
 
-    # print(prompt)
-    # print(out_text)
     priority_score = parse_bloom_response(out_text)
-    # print("Score: %s " % priority_score)
-    return int(priority_score)*0.1 if priority_score else None
+    priority_score = int(priority_score)*0.1 if priority_score else None
+
+    return priority_score, justification
 
 
 
@@ -189,7 +192,7 @@ def ask_bloom(input_text, temperature=1.0, top_k=50, top_p=0.9):
     text_response = text_response.replace(prompt, '')
     print('Text response for <<%s>> is <<%s>>' % (input_text, text_response))
     priority_score = parse_gpt_response(text_response)
-    return priority_score
+    return priority_score, None
 
 def ask_gpt(input_text):
     time.sleep(0.5)
@@ -201,17 +204,7 @@ def ask_gpt(input_text):
     # todo might be worth specifying what type of data a bit ( if not independent of metadata )
     prompt = 'Rate this message text from 0 to 100 by level of importance: %s' % input_text
     try:
-        # at this stage as text-davinci-003
-        # however
-        # response = openai.Completion.create(
-        #         model="text-davinci-003",
-        #         prompt=prompt,
-        #         temperature=0.3,
-        #         max_tokens=150,
-        #         top_p=1,
-        #         frequency_penalty=0,
-        #         presence_penalty=0
-        #         )
+
         system_prompt = '''
             You are assisting human with incoming messages prioritisation.
             Please try to guess what emails are generic or sent automatically and
@@ -231,22 +224,22 @@ def ask_gpt(input_text):
             )
     except RateLimitError:
         return "You exceeded your current quota, please check your plan and billing details."
-    # print(response)
     text_response = response['choices'][0]['message']['content']
-    # print(text_response)
-    # priority_score = parse_gpt_response(text_response)
+
     priority_score = parse_bloom_response(text_response)
-    return int(priority_score)*0.01 if priority_score else None
+    model_justification = text_response.replace('%s ' % priority_score, '')
+    priority_score = int(priority_score)*0.01 if priority_score else None
+    return priority_score, model_justification
 
 
 def toy_keyword_match(input_text):
     ''' if match hardcoded keywords return 1 else 0
     '''
     keywords = ['urgent', 'important', 'billing', 'asap']
-    if input_text.lower() in keywords:
-        return 1
-    else:
-        return 0
+    for keyword in keywords:
+        if keyword in input_text.lower():
+            return 1, None
+    return 0, None
 
 def sentiment_analysis(input_text):
     ''' get transformered sentiment analysis value
@@ -264,6 +257,6 @@ def sentiment_analysis(input_text):
     print(label)
     print(score)
     if label == 'NEGATIVE':
-        return score
+        return score, None
     else:
-        return 0
+        return 0, None

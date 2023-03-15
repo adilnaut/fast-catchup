@@ -340,6 +340,7 @@ class PriorityItemMethod(db.Model):
     priority_item_id = db.Column(db.Integer, db.ForeignKey('priority_item.id'))
     priority_list_method_id = db.Column(db.Integer, db.ForeignKey('priority_list_method.id'))
     p_b_m_a = db.Column(db.Float())
+    model_justification = db.Column(db.Text())
 
     def calculate_p_b_m_a(self):
         # call python method by name in PriorityMethod
@@ -361,7 +362,9 @@ class PriorityItemMethod(db.Model):
         package_name, module_name = python_path.split('.')
         script_module = importlib.import_module('.%s' % module_name, package=package_name)
         method_function = getattr(script_module, name)
-        self.p_b_m_a = method_function(inp_text)
+        score, justification = method_function(inp_text)
+        self.p_b_m_a = score
+        self.model_justification = justification
         db.session.commit()
 
     __table_args__ = (db.UniqueConstraint('priority_item_id', 'priority_list_method_id', name='_unique_constraint_pitem_plmethod'),
