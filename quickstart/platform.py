@@ -162,7 +162,7 @@ def get_abstract_for_gmail(gmail_message):
     return result_text, id_
 
 def summarize_with_gpt3(input_text):
-    time.sleep(0.5)
+    time.sleep(0.1)
     ''' Prompt ChatGPT or GPT3 level of importance of one message directly
         TODO: save not only parsed value but also explanation
         TODO: decice where None values should be handled and throw exception

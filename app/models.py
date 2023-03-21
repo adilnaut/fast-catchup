@@ -103,6 +103,12 @@ def cast_tuples_to_p_items(rows):
     )
     return query.all()
 
+class Session(db.Model):
+    session_id = db.Column(db.Text(), primary_key=True)
+    workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
+    date = db.Column(db.Text())
+    summary = db.Column(db.Text())
+
 
 class PriorityList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -111,6 +117,7 @@ class PriorityList(db.Model):
     created = db.Column(db.Integer)
     p_a = db.Column(db.Float())
     items = db.relationship('PriorityItem', backref='list', lazy='dynamic')
+
 
     def update_p_a(self):
         items = db.session.query(PriorityItem) \
@@ -289,7 +296,7 @@ class PriorityItem(db.Model):
                     p_as.append(n_item.p_a)
             self.p_b = np.array(p_as).mean()
         else:
-            self.p_b = 0.2
+            self.p_b = None
         db.session.commit()
 
     def calculate_p_b_a(self):
@@ -312,12 +319,12 @@ class PriorityItem(db.Model):
 	    # call calculate_p_b
 	    # p_a_b = p_b_a * p_a / p_b
         p_a = PriorityList.query.filter_by(id=self.priority_list_id).first().p_a
-        # print(p_a)
-        # print(self.p_b)
-        # print(self.p_b_a)
+
         if self.p_b_a and p_a and self.p_b:
             temp = self.p_b_a * p_a / ( 1 - self.p_b) if self.p_b != 1 else self.p_b_a * p_a
             self.p_a_b = temp if temp <= 1 else 1
+        elif self.p_b_a:
+            self.p_a_b = self.p_b_a
         else:
             self.p_a_b = 0.497424242
         db.session.commit()
@@ -384,6 +391,7 @@ class PriorityMessage(db.Model):
         db.session.commit()
 
     def enrich_vectors(self):
+        # depreciated - vectors are enriched in priority_engine.py -> fill_priority_list
         # at this stage just get w2v vector of input_text_value
         #  or even bag of words vectors
         #  0. plan where and when embedding builder will be called first and trained/fitted
@@ -410,9 +418,10 @@ class PriorityMessage(db.Model):
 
 class AudioFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
     created = db.Column(db.Integer)
+    session_id = db.Column(db.Text())
     file_path = db.Column(db.Text())
+    word_boundaries = db.Column(db.Text())
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)

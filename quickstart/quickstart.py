@@ -7,19 +7,20 @@ import json
 import uuid
 import openai
 
+from datetime import datetime
 
+from collections import OrderedDict
 from openai.error import RateLimitError
 
 
 import azure.cognitiveservices.speech as speechsdk
 
 
-
 from quickstart.gmail_utils import get_gmail_comms, get_list_data_by_g_id
 from quickstart.slack_utils import get_slack_comms, get_list_data_by_m_id
 
-from quickstart.connection import db_ops
-
+from quickstart.connection import db_ops, get_current_user
+from quickstart.sqlite_utils import get_insert_query
 
 def get_p_items_by_session(session_id=None):
 
@@ -45,7 +46,11 @@ def get_p_items_by_session(session_id=None):
                         list_body= get_list_data_by_m_id(message_id)
                     elif platform_name == 'gmail':
                         list_body = get_list_data_by_g_id(message_id)
-                    list_body['score'] = int(p_item.p_a_b_c*100.0)
+                    # list_body['score'] = int(p_item.p_a_b_c*100.0)
+                    if p_item.p_a:
+                        list_body['score'] = p_item.p_a
+                    else:
+                        list_body['score'] = int(p_item.p_a_b*100.0)
                     list_body['text_score'] = int(p_item.p_b_a*100.0)
                     list_body['id'] = p_message.id
                     if p_i_m:
@@ -77,7 +82,7 @@ def get_gpt_summary(session_id=None, verbose=True):
             for p_item in p_items:
                 p_message = PriorityMessage.query.filter_by(id=p_item.priority_message_id).first()
                 if p_message:
-                    message_texts.append((p_item.p_a_b_c, p_message.input_text_value))
+                    message_texts.append((p_item.p_a_b, p_message.input_text_value))
     sorted_messages = sorted(
         message_texts,
         key=lambda x: x[0],
@@ -114,10 +119,27 @@ def get_gpt_summary(session_id=None, verbose=True):
     if verbose:
         print(response)
     text_response = response['choices'][0]['message']['content']
+    current_user = get_current_user()
+    user_id = current_user.get_id()
+    with db_ops(model_names=['Workspace']) as (db, Workspace):
+
+        workspace = Workspace.query.filter_by(user_id=user_id).one()
+        workspace_id = workspace.id
+        label_kwargs = OrderedDict([('session_id', session_id)
+            , ('workspace_id', workspace_id)
+            , ('date', datetime.now().strftime('%m/%d/%Y, %H:%M'))
+            , ('summary', text_response)])
+        label_query = get_insert_query('session', label_kwargs.keys())
+        db.session.execute(label_query, label_kwargs)
+
     return text_response
 
 
 
+def get_seconds(duration):
+    # td = timedelta(hours=0, minutes=0, seconds=float(duration))
+    total_seconds = duration.total_seconds()
+    return total_seconds
 
 # generates file.wav
 # todo:
@@ -153,7 +175,7 @@ def generate_voice_file(text_response, verbose=False):
     # print(text_response)
     # SpeechSynthesisWordBoundaryEventArgs(audio_offset=329750000, duration=0:00:00.100000, text_offset=562, word_length=1)
     speech_synthesizer.synthesis_word_boundary.connect(lambda evt: word_boundaries.append({'audio_offset': evt.audio_offset / 10000000 \
-        , 'text_offset': evt.text_offset, 'word_length': evt.word_length, 'duration': evt.duration }) )
+        , 'text_offset': evt.text_offset, 'word_length': evt.word_length, 'duration': get_seconds(evt.duration) }) )
     # Synthesizes the received text to speech.
     # The synthesized speech is expected to be heard on the speaker with this line executed.
     result = speech_synthesizer.speak_text_async(text_response).get()
@@ -175,12 +197,25 @@ def generate_voice_file(text_response, verbose=False):
     return filepath, word_boundaries
 
 def generate_summary(session_id, get_last_session=False):
-    if not get_last_session:
-        unread_emails = get_gmail_comms(session_id=session_id)
-        unread_slack = get_slack_comms(session_id=session_id)
 
-    gpt_summary = get_gpt_summary(session_id=session_id)
+    with db_ops(model_names=['Session']) as (db, Session):
+        sess = Session.query.filter_by(session_id=session_id).first()
 
-    filepath, word_boundaries = generate_voice_file(gpt_summary)
+    if not sess:
+        if not get_last_session:
+            unread_emails = get_gmail_comms(session_id=session_id)
+            unread_slack = get_slack_comms(session_id=session_id)
+        gpt_summary = get_gpt_summary(session_id=session_id)
+    else:
+        gpt_summary = sess.summary
 
-    return gpt_summary, filepath, word_boundaries
+    with db_ops(model_names=['AudioFile']) as (db, AudioFile):
+        audio = AudioFile.query.filter_by(session_id=session_id).first()
+
+    if not audio:
+        file_path, word_boundaries = generate_voice_file(gpt_summary)
+    else:
+        file_path = audio.file_path
+        word_boundaries = json.loads(audio.word_boundaries)
+
+    return gpt_summary, file_path, word_boundaries

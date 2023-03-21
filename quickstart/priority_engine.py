@@ -2,6 +2,7 @@ import os
 import struct
 import pickle
 import numpy as np
+import openai
 
 from collections import OrderedDict
 from datetime import datetime
@@ -64,9 +65,11 @@ def create_priority_list(db, PriorityList, PriorityListMethod, platform_id, sess
 
 def create_priority_list_methods(db, PriorityListMethod, platform_id):
     script_path = 'quickstart.priority_method'
-    methods = [(script_path, 'ask_large_bloom')
-        , (script_path, 'toy_keyword_match')
-        , (script_path, 'sentiment_analysis')]
+    methods = [ (script_path, 'ask_gpt')
+        #  (script_path, 'ask_large_bloom')
+        # , (script_path, 'toy_keyword_match')
+        # , (script_path, 'sentiment_analysis')
+        ]
 
     for python_path, name in methods:
         plist_method_kwargs = OrderedDict([('platform_id', platform_id)
@@ -122,10 +125,24 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
         .filter_by(platform_id=platform_id).all()
     message_ids = [x.id for x in priority_messages]
     sentences = [x.input_text_value for x in priority_messages]
-    model_filepath = os.path.join('file_store', '2023-02-22-embedding-model')
-    model_pickle = open(model_filepath, 'rb')
-    embedding_model = pickle.load(model_pickle)
-    embedding_vectors = embedding_model.encode(sentences)
+
+    # local or openai
+    embedding_mode = 'openai'
+
+    if embedding_mode == 'local':
+        model_filepath = os.path.join('file_store', '2023-02-22-embedding-model')
+        model_pickle = open(model_filepath, 'rb')
+        embedding_model = pickle.load(model_pickle)
+        embedding_vectors = embedding_model.encode(sentences)
+    elif embedding_mode == 'openai':
+        openai.api_key = os.getenv("OPEN_AI_KEY")
+        embedding_vectors = []
+        for sentence in sentences:
+            model = 'text-embedding-ada-002'
+            text = sentence.replace('\n', ' ')
+            vector = openai.Embedding.create(input=text, model=model)['data'][0]['embedding']
+            embedding_vectors.append(vector)
+        embedding_vectors = np.array(embedding_vectors)
     assert len(embedding_vectors) == len(priority_messages)
     # todo: assert items correspond appropriately, not only by length of arrays but elementwise assertion
     for i in range(len(priority_messages)):
@@ -164,7 +181,7 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
 
     for priority_method_item in priority_method_items:
         priority_method_item.calculate_p_b_m_a()
-        
+
 
     db.session.commit()
     # todo optimise calculate_p_b cause it build the same KNearestNeighbors model each item
@@ -174,7 +191,7 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
         priority_item.calculate_p_b(nbrs, ids)
         priority_item.calculate_p_b_a()
         priority_item.calculate_p_a_b()
-        priority_item.calculate_p_a_c(TableName, columns_list)
-        priority_item.calculate_p_b_c(TableName, columns_list)
-        priority_item.calculate_p_a_b_c()
+        # priority_item.calculate_p_a_c(TableName, columns_list)
+        # priority_item.calculate_p_b_c(TableName, columns_list)
+        # priority_item.calculate_p_a_b_c()
     db.session.commit()

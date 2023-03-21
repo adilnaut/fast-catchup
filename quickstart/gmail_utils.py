@@ -172,7 +172,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
     return text_parts, num_processed
 
 
-def etl_gmail(service, db, session_id=None, max_messages=5, unread_only=True):
+def etl_gmail(service, db, session_id=None, max_messages=20, unread_only=True):
 
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
@@ -458,7 +458,7 @@ def get_list_data_by_g_id(gmail_message_id):
         subject_ = gmail_message.subject
         date_ = gmail_message.date
         if date_:
-            date_ = convert_to_utc(date_).strftime('%m/%d/%Y, %H:%M:%S')
+            date_ = convert_to_utc(date_).strftime('%m/%d/%Y, %H:%M')
 
         text_summary = GmailMessageText.query.filter_by(gmail_message_id=gmail_message_id) \
             .filter_by(is_summary=True).first()

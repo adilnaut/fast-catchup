@@ -1,5 +1,6 @@
 import os
 import uuid
+import json
 from datetime import datetime
 from sqlalchemy.sql import text
 
@@ -7,7 +8,9 @@ from flask import render_template, send_file, request, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
 from app.models import (User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod, PriorityItemMethod,
-    PriorityItem, PriorityMessage, PriorityList)
+    PriorityItem, PriorityMessage, PriorityList, Session, SlackChannel, SlackUser, SlackMessage, SlackAttachment,
+    SlackLink, GmailMessage, GmailLink, GmailUser, GmailAttachment, GmailMessageTag, GmailMessageText,
+    GmailMessageListMetadata, GmailMessageLabel)
 from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthDataForm
 
 
@@ -225,6 +228,105 @@ def remove_users():
     db.session.commit()
     return redirect(url_for('index'))
 
+@app.route('/clear_all_user_data', methods=['GET'])
+def delete_user_data():
+    user_id = current_user.get_id()
+    # print("Current user is" % current_user)
+    workspace = Workspace.query.filter_by(user_id=user_id).first()
+    workspace_id = workspace.id
+    # print("Found workspace %s" % workspace_id)
+    platforms = Platform.query.filter_by(workspace_id=workspace_id).all()
+    # print("To start iterating on platforms %s" % ', '.join(platforms))
+    for platf in platforms:
+        slack_channels = SlackChannel.query.filter_by(platform_id=platf.id).all()
+        # print("To start iterating on slack_channels %s" % ', '.join(slack_channels))
+        for sc in slack_channels:
+            slack_messages = SlackMessage.query.filter_by(slack_channel_id=sc.id).all()
+            # print("To start iterating on slack_messages %s" % ', '.join(slack_messages))
+            for sm in slack_messages:
+                slack_attch = SlackAttachment.query.filter_by(slack_message_ts=sm.ts).all()
+                # print("To start iterating on slack_attachments %s" % ', '.join(slack_attch))
+                for sa in slack_attch:
+                    filepath = sa.filepath
+                    if filepath and os.path.exists(filepath):
+                        os.remove(filepath)
+                    db.session.delete(sa)
+                slack_links = SlackLink.query.filter_by(slack_message_ts=sm.ts).all()
+                # print("To start deleting slack links %s" % ', '.join(slack_links))
+                for sl in slack_links:
+                    db.session.delete(sl)
+                db.session.delete(sm)
+            db.session.delete(sc)
+        slack_users = SlackChannel.query.filter_by(platform_id=platf.id).all()
+        for su in slack_users:
+            db.session.delete(su)
+
+        gmail_users = GmailUser.query.filter_by(platform_id=platf.id).all()
+        for gu in gmail_users:
+            gmail_messages = GmailMessage.query.filter_by(gmail_user_email=gu.email).all()
+            for gm in gmail_messages:
+                g_tags = GmailMessageTag.query.filter_by(gmail_message_id=gm.id).all()
+                for g_tag in g_tags:
+                    db.session.delete(g_tag)
+                g_list_metas = GmailMessageListMetadata.query.filter_by(gmail_message_id=gm.id).all()
+                for g_list_meta in g_list_metas:
+                    db.session.delete(g_list_meta)
+                g_m_texts = GmailMessageText.query.filter_by(gmail_message_id=gm.id).all()
+                for g_m_text in g_m_texts:
+                    db.session.delete(g_m_text)
+                g_m_labels = GmailMessageLabel.query.filter_by(gmail_message_id=gm.id).all()
+                for g_m_label in g_m_labels:
+                    db.session.delete(g_m_label)
+                g_links = GmailLink.query.filter_by(gmail_message_id=gm.id).all()
+                for g_link in g_links:
+                    db.session.delete(g_link)
+                g_attachments = GmailAttachment.query.filter_by(gmail_message_id=gm.id).all()
+                for g_a in g_attachments:
+                    filepath = g_a.filepath
+                    if filepath and os.path.exists(filepath):
+                        os.remove(filepath)
+                    db.session.delete(g_a)
+                db.session.delete(gm)
+            db.session.delete(gu)
+
+        auth_data = AuthData.query.filter_by(platform_id=platf.id).all()
+        for ad in auth_data:
+            if ad.is_path:
+                filepath = ad.file_path
+                if filepath and os.path.exists(filepath):
+                    os.remove(filepath)
+            db.session.delete(ad)
+        p_lists = PriorityList.query.filter_by(platform_id=platf.id).all()
+        for p_list in p_lists:
+            p_items = PriorityItem.query.filter_by(priority_list_id=p_list.id).all()
+            for p_item in p_items:
+                p_i_methods = PriorityItemMethod.query.filter_by(priority_item_id=p_item.id).all()
+                for p_i_m in p_i_methods:
+                    db.session.delete(p_i_m)
+                db.session.delete(p_item)
+            db.session.delete(p_list)
+        p_messages = PriorityMessage.query.filter_by(platform_id=platf.id).all()
+        for p_m in p_messages:
+            db.session.delete(p_m)
+        p_list_methods = PriorityListMethod.query.filter_by(platform_id=platf.id).all()
+        for p_l_m in p_list_methods:
+            db.session.delete(p_l_m)
+
+        db.session.delete(platf)
+    sessions = Session.query.filter_by(workspace_id=workspace_id).all()
+    for sess in sessions:
+        audio_file = AudioFile.query.filter_by(session_id=sess.session_id).first()
+        if audio_file:
+            filepath = audio_file.file_path
+            if filepath and os.path.exists(filepath):
+                os.remove(filepath)
+            db.session.delete(audio_file)
+        db.session.delete(sess)
+    db.session.delete(workspace)
+    db.session.delete(current_user)
+    db.session.commit()
+    flash('Successfully deleted all user data, message attachments, tokens and files!')
+    return redirect(url_for('login'))
 
 
 @app.route('/test_gmail_etl', methods=['GET'])
@@ -250,57 +352,29 @@ def test_clear_slack_table():
 @app.route('/generate_summary', methods=['GET'])
 @login_required
 def first():
-    unread_slack = []
-    unread_gmail = []
+    session_id = request.args.get('session_id')
 
-    gptin = {'slack_list': unread_slack,
-             'gmail_list': unread_gmail}
-    gptout = {'summary': ' Press Generate to generate summary'}
-
-    return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
-
-def get_seconds(duration):
-    # td = timedelta(hours=0, minutes=0, seconds=float(duration))
-    total_seconds = duration.total_seconds()
-    return total_seconds
-
-@app.route('/generate_summary', methods=['POST'])
-@login_required
-def gen_summary():
-    gptin = {}
     gptout = {}
-    session_id = uuid.uuid4().hex
 
-
-    get_last_session = request.form.get("session-checkbox") != None
-
-    if get_last_session:
-        session_id = db.session.execute(text('''
-            SELECT session_id FROM priority_list WHERE id = (SELECT max(id) FROM priority_list);''')).fetchone()
-        if session_id:
-            session_id = session_id[0]
-        else:
-            flash('No previous sessions found!')
-            redirect(url_for('first'))
-    gpt_summary, filepath, word_boundaries = generate_summary(session_id=session_id, get_last_session=get_last_session)
-
-
-    persist_audio = False
-    if persist_audio:
+    if not session_id:
+        gptout['summary'] = ' Press Generate to generate summary'
         user_id = current_user.get_id()
         workspace = Workspace.query.filter_by(user_id=user_id).one()
         workspace_id = workspace.id
-        timestamp = int(round(datetime.now().timestamp()))
-        audio_kwargs = {'workspace_id': workspace_id
-            , 'created': timestamp
-            , 'file_path': filepath}
+        past_sessions = Session.query.filter_by(workspace_id=workspace_id).all()
+        gptout['past_sessions'] = [(p_sess.session_id, p_sess.date) for p_sess in past_sessions]
+        return render_template('generate_summary.html', title='Summary', gptout=gptout)
 
-        audio_row = AudioFile(**audio_kwargs)
-        db.session.add(audio_row)
-        db.session.commit()
+    gpt_summary, filepath, word_boundaries = generate_summary(session_id=session_id)
 
     gptout['filepath'] = filepath
 
+    gptout = build_tags_for_audio_highlight(session_id, gpt_summary, word_boundaries, gptout)
+
+    return render_template('generate_summary.html', title='Summary', gptout=gptout)
+
+
+def build_tags_for_audio_highlight(session_id, gpt_summary, word_boundaries, gptout):
     timed_text = []
     p_tags = []
     a_tags = []
@@ -316,22 +390,64 @@ def gen_summary():
         # highlight_text = gpt_summary[start:end]
         # all_text = gpt_summary[:start] + ' <mark> ' + highlight_text + ' </mark> ' + gpt_summary[end:]
         # timed_text.append('%s | %s' % (wb['audio_offset'], all_text))
-        timed_text.append('%s | %s' % (wb['audio_offset'], get_seconds(wb['duration'])))
+        timed_text.append('%s | %s' % (wb['audio_offset'], wb['duration']))
 
     if not p_tags:
         p_tags.append(' '.join(a_tags))
 
     sorted_items = get_p_items_by_session(session_id=session_id)
-    print(sorted_items)
-    # print(timed_text)
     gptout['word_boundaries'] = '\n'.join(timed_text)
     gptout['p_tags'] = '<p>'+ '</p><p>'.join(p_tags) + '</p>'
     gptout['sorted_items'] = sorted_items
-    # gptout['word_boundaries'] = timed_text
+
+    user_id = current_user.get_id()
+    workspace = Workspace.query.filter_by(user_id=user_id).one()
+    workspace_id = workspace.id
+    past_sessions = Session.query.filter_by(workspace_id=workspace_id).all()
+    gptout['past_sessions'] = [(p_sess.session_id, p_sess.date) for p_sess in past_sessions]
+
+    return gptout
+
+def save_audio_data(session_id, word_boundaries, filepath):
+
+    timestamp = int(round(datetime.now().timestamp()))
+    audio_kwargs = {'session_id': session_id
+        , 'created': timestamp
+        , 'word_boundaries': json.dumps(word_boundaries)
+        , 'file_path': filepath}
+
+    audio_row = AudioFile(**audio_kwargs)
+    db.session.add(audio_row)
+    db.session.commit()
+
+@app.route('/generate_summary', methods=['POST'])
+@login_required
+def gen_summary():
+    gptout = {}
+    session_id = uuid.uuid4().hex
 
 
+    get_last_session = request.form.get("session-checkbox") != None
 
-    return render_template('generate_summary.html', title='Summary', gptin=gptin, gptout=gptout)
+    if get_last_session:
+        session_id = db.session.execute(text('''
+            SELECT session_id FROM priority_list WHERE id = (SELECT max(id) FROM priority_list);''')).fetchone()
+        if session_id:
+            session_id = session_id[0]
+        else:
+            flash('No previous sessions found!')
+            redirect(url_for('first'))
+
+    gpt_summary, filepath, word_boundaries = generate_summary(session_id=session_id, get_last_session=get_last_session)
+
+    save_audio_data(session_id, word_boundaries, filepath)
+
+    gptout['filepath'] = filepath
+
+    gptout = build_tags_for_audio_highlight(session_id, gpt_summary, word_boundaries, gptout)
+
+
+    return render_template('generate_summary.html', title='Summary', gptout=gptout)
 
 
 @app.route('/', methods=['POST', 'GET'])

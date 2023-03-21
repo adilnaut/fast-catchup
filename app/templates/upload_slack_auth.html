@@ -1,19 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Upload Slack Authentication</h1>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.slack_app_token.label }}<br>
-            {{ form.slack_app_token(size=128) }}<br>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <p> </p>
+        </div>
+        <div class="col-md-8">
+            <h1>Upload Slack Authentication</h1>
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                <p>
+                    {{ form.slack_app_token.label }}<br>
+                    {{ form.slack_app_token(size=128) }}<br>
 
-        </p>
-        <p>
-            {{ form.slack_signing_secret.label }}<br>
-            {{ form.slack_signing_secret(size=128) }}<br>
+                </p>
+                <p>
+                    {{ form.slack_signing_secret.label }}<br>
+                    {{ form.slack_signing_secret(size=128) }}<br>
 
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+                </p>
+                <p>{{ form.submit() }}</p>
+            </form>
+        </div>
+        <div class="col-md-2">
+            <p>  </p>
+        </div>
+    </div>
+</div>
 {% endblock %}

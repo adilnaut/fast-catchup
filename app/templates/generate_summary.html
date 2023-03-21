@@ -1,194 +1,212 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-	<h2 align="center"> Fast-catchup </h2>
-
-
-    <center>
-	<audio class="player" style="width: 80%" controls>
-  			<source src="{{ url_for('returnAudioFile', filepath=gptout.filepath) }}" type="audio/wav">
-  			Your browser does not support the audio element.
-	</audio>
-    </center>
-
-    <div class="lyrics" style="display: none">
-            {{ gptout.word_boundaries }}
-    </div>
-
-    <div class="input-group">
-      <h4 >
-        Summary:
-      </h4> <br>
-
-      <div class="summary" style="text-align: justify;">
-        {{ gptout.p_tags |safe}}
-
-      </div>
-
-    </div>
-
-    <form action = "/generate_summary" id="summary_form" method = "post">
-        <input type="checkbox" id="session_check" name="session-checkbox" value="Session-Cached" class="form-check-input">
-        <label for="session-checkbox" class="form-check-label"> Get last session summary </label> <br>
-        <br>
-        <input type="submit" value="Generate" class="btn btn-primary btn-lg btn-block" style="width: 100%" >
-    </form>
-
-    <br><br>
-
-    <script>
-    $( function() {
-      $( "#myList" ).sortable();
-      // $( "#myList" ).disableSelection();
-    } );
-    </script>
-
+<div class="container">
     <div class="row">
-      <div class="col-4">
-        <div class="list-group" id="myList" role="tablist">
-
-            {% for item in gptout.sorted_items %}
-                <a class="list-group-item" id="list-{{item.id}}-list" data-toggle="list" href="#list-{{item.id}}" role="tab"  draggable="true"  aria-controls="{{item.id}}">
-                    <div class="row">
-                        <div class="col-8">
-                            {{item.headline}}
-                        </div>
-                        <div class="col-2">
-                            {{item.score}}
-                        </div>
-                    </div>
-                </a>
+        <div class="col-md-2">
+            {% for sess_id, date in gptout.past_sessions %}
+                <a type="button" href="{{ url_for('first', session_id=sess_id) }}"> {{date}} </a>
             {% endfor %}
-
         </div>
-      </div>
-      <div class="col-8">
-        <div class="tab-content" id="nav-tabContent">
+        <div class="col-md-8">
 
-                  {% for item in gptout.sorted_items %}
-                        <div class="tab-pane fade" id="list-{{item.id}}" role="tabpanel" aria-labelledby="list-{{item.id}}-list">
-                            <div class="d-flex w-100 justify-content-between">
-                              <h5 class="mb-1"> {{item.subject}} </h5>
-                              <small class="text-muted">{{item.date}}</small>
+        	<h2 align="center"> Fast-catchup </h2>
+
+
+            <center>
+        	<audio class="player" style="width: 80%" controls>
+          			<source src="{{ url_for('returnAudioFile', filepath=gptout.filepath) }}" type="audio/wav">
+          			Your browser does not support the audio element.
+        	</audio>
+            </center>
+
+            <div class="lyrics" style="display: none">
+                    {{ gptout.word_boundaries }}
+            </div>
+
+            <div class="input-group">
+              <br>
+              <br>
+              <h4 >
+                Summary:
+              </h4> <br>
+
+              <div class="summary" style="text-align: justify;">
+                {{ gptout.p_tags |safe}}
+
+              </div>
+
+            </div>
+
+            <form action = "/generate_summary" id="summary_form" method = "post">
+                <input type="checkbox" id="session_check" name="session-checkbox" value="Session-Cached" class="form-check-input">
+                <label for="session-checkbox" class="form-check-label"> Get last session summary </label> <br>
+                <br>
+                <input type="submit" value="Generate" class="btn btn-primary btn-lg btn-block" style="width: 100%" >
+            </form>
+
+            <br><br>
+
+            <script>
+            $( function() {
+              $( "#myList" ).sortable();
+              // $( "#myList" ).disableSelection();
+            } );
+            </script>
+
+            <div class="row">
+              <div class="col-4">
+                <div class="list-group" id="myList" role="tablist">
+
+                    {% for item in gptout.sorted_items %}
+                        <a class="list-group-item" id="list-{{item.id}}-list" data-toggle="list" href="#list-{{item.id}}" role="tab"  draggable="true"  aria-controls="{{item.id}}">
+                            <div class="row">
+                                <div class="col-8">
+                                    {{item.headline}}
+                                </div>
+                                <div class="col-2">
+                                    {{item.score}}
+                                </div>
                             </div>
-                            <p class="mb-1" style="text-align: justify;"> {{item.text}} </p>
+                        </a>
+                    {% endfor %}
 
-                            <small class="text-muted" style="text-align: justify;"> {{ item.text_score }} {{item.model_justification}} </small>
-                            <br>
-                            <form id="priority_form-{{item.id}}" action="{{url_for('assign_priorities')}}" method="post">
-                                <label for="customRange-{{item.id}}" class="form-label"> Rate this message priority </label>
-                                <input type="range" class="priority-range form-range" id="customRange-{{item.id}}" value="{{item.score}}" min="1" max="100" oninput="this.nextElementSibling.value = this.value">
-                                <output> {{item.score}} </output>
-                            </form>
-                        </div>
-                  {% endfor %}
+                </div>
+              </div>
+              <div class="col-8">
+                <div class="tab-content" id="nav-tabContent">
+
+                          {% for item in gptout.sorted_items %}
+                                <div class="tab-pane fade" id="list-{{item.id}}" role="tabpanel" aria-labelledby="list-{{item.id}}-list">
+                                    <div class="d-flex w-100 justify-content-between">
+                                      <h5 class="mb-1"> {{item.subject}} </h5>
+                                      <small class="text-muted">{{item.date}}</small>
+                                    </div>
+                                    <p class="mb-1" style="text-align: justify;"> {{item.text}} </p>
+
+                                    <small class="text-muted" style="text-align: justify;"> {{ item.text_score }} {{item.model_justification}} </small>
+                                    <br>
+                                    <form id="priority_form-{{item.id}}" action="{{url_for('assign_priorities')}}" method="post">
+                                        <label for="customRange-{{item.id}}" class="form-label"> Rate this message priority </label>
+                                        <input type="range" class="priority-range form-range" id="customRange-{{item.id}}" value="{{item.score}}" min="1" max="100" oninput="this.nextElementSibling.value = this.value">
+                                        <output> {{item.score}} </output>
+                                    </form>
+                                </div>
+                          {% endfor %}
+
+                </div>
+              </div>
+
+            </div>
+
+            <br>
+            <br>
+            <br>
+            <br>
+
+            <div id="hint-window">
+                <span id="hint-message"></span>
+            </div>
+
+
+            <script>
+                var triggerTabList = [].slice.call(document.querySelectorAll('#myList a'))
+                triggerTabList.forEach(function (triggerEl) {
+                  var tabTrigger = new bootstrap.Tab(triggerEl)
+
+                  triggerEl.addEventListener('click', function (event) {
+                    event.preventDefault()
+                    tabTrigger.show()
+                  })
+                })
+            </script>
+
+            <script>
+                // $('#val').on('change', function() {
+                //     $.ajax({
+                //         url : this.form.action,
+                //         type: this.form.method,
+                //         data: {val: this.value}
+                //     });
+                // });
+            $(document).ready(function() {
+               // Create debounce function with a 500ms delay
+               function debounce(func, delay) {
+                 var timer = null;
+                 return function() {
+                   var context = this, args = arguments;
+                   clearTimeout(timer);
+                   timer = setTimeout(function() {
+                     func.apply(context, args);
+                   }, delay);
+                 };
+               }
+
+               // Attach debounced event listener to all elements with class 'priority-range'
+               $('.priority-range').each(function() {
+                 $(this).on('input', debounce(function() {
+                   // Get the item id and range value for this element
+                   var item_id = $(this).attr('id').split('-')[1];
+                   var range_value = $(this).val();
+                   var $aTag = $('#list-' + item_id.trim() + '-list');
+                   // console.log( $aTag.find('.col-2'))
+                   $aTag.find('.col-2').eq(0).text(range_value);
+
+                   // Send a POST request with item id and range value
+                   $.ajax({
+                     type: 'POST',
+                     url: '{{url_for("assign_priorities")}}',
+                     data: {
+                       item_id: item_id,
+                       range_value: range_value
+                     },
+                     success: function(response) {
+                        // Update the hint message text content with a success message
+                        $('#hint-message').text('Value recorded successfully.');
+                        // Show the hint window
+                        $('#hint-window').fadeIn();
+                        // Hide the hint window after 3 seconds
+                        setTimeout(function() {
+                          $('#hint-window').fadeOut();
+                        }, 3000);
+                      },
+                     error: function(xhr, status, error) {
+                        // Update the hint message text content with an error message
+                        $('#hint-message').text('An error occurred while recording the value.');
+                        // Show the hint window
+                        $('#hint-window').fadeIn();
+                        // Hide the hint window after 3 seconds
+                        setTimeout(function() {
+                          $('#hint-window').fadeOut();
+                        }, 3000);
+                      }
+                   });
+                 }, 500));
+               });
+             });
+            </script>
+
+            <style>
+              #hint-window {
+                 position: fixed;
+                 bottom: 50px;
+                 left: 50%;
+                 transform: translateX(-50%);
+                 background-color: white;
+                 border: 1px solid gray;
+                 padding: 10px;
+                 display: none;
+               }
+            </style>
+
+            <script src="{{url_for('.static', filename='summaryscript.js')}}"></script>
 
         </div>
-      </div>
-
+        <div class="col-md-2">
+            <p>  </p>
+        </div>
     </div>
+</div>
 
-    <br>
-    <br>
-    <br>
-    <br>
-
-    <div id="hint-window">
-        <span id="hint-message"></span>
-    </div>
-
-
-    <script>
-        var triggerTabList = [].slice.call(document.querySelectorAll('#myList a'))
-        triggerTabList.forEach(function (triggerEl) {
-          var tabTrigger = new bootstrap.Tab(triggerEl)
-
-          triggerEl.addEventListener('click', function (event) {
-            event.preventDefault()
-            tabTrigger.show()
-          })
-        })
-    </script>
-
-    <script>
-        // $('#val').on('change', function() {
-        //     $.ajax({
-        //         url : this.form.action,
-        //         type: this.form.method,
-        //         data: {val: this.value}
-        //     });
-        // });
-    $(document).ready(function() {
-       // Create debounce function with a 500ms delay
-       function debounce(func, delay) {
-         var timer = null;
-         return function() {
-           var context = this, args = arguments;
-           clearTimeout(timer);
-           timer = setTimeout(function() {
-             func.apply(context, args);
-           }, delay);
-         };
-       }
-
-       // Attach debounced event listener to all elements with class 'priority-range'
-       $('.priority-range').each(function() {
-         $(this).on('input', debounce(function() {
-           // Get the item id and range value for this element
-           var item_id = $(this).attr('id').split('-')[1];
-           var range_value = $(this).val();
-           var $aTag = $('#list-' + item_id.trim() + '-list');
-           // console.log( $aTag.find('.col-2'))
-           $aTag.find('.col-2').eq(0).text(range_value);
-
-           // Send a POST request with item id and range value
-           $.ajax({
-             type: 'POST',
-             url: '{{url_for("assign_priorities")}}',
-             data: {
-               item_id: item_id,
-               range_value: range_value
-             },
-             success: function(response) {
-                // Update the hint message text content with a success message
-                $('#hint-message').text('Value recorded successfully.');
-                // Show the hint window
-                $('#hint-window').fadeIn();
-                // Hide the hint window after 3 seconds
-                setTimeout(function() {
-                  $('#hint-window').fadeOut();
-                }, 3000);
-              },
-             error: function(xhr, status, error) {
-                // Update the hint message text content with an error message
-                $('#hint-message').text('An error occurred while recording the value.');
-                // Show the hint window
-                $('#hint-window').fadeIn();
-                // Hide the hint window after 3 seconds
-                setTimeout(function() {
-                  $('#hint-window').fadeOut();
-                }, 3000);
-              }
-           });
-         }, 500));
-       });
-     });
-    </script>
-
-    <style>
-      #hint-window {
-         position: fixed;
-         bottom: 50px;
-         left: 50%;
-         transform: translateX(-50%);
-         background-color: white;
-         border: 1px solid gray;
-         padding: 10px;
-         display: none;
-       }
-    </style>
-
-    <script src="{{url_for('.static', filename='summaryscript.js')}}"></script>
 
 {% endblock %}

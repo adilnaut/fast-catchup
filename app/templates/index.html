@@ -1,14 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ current_user.username }}!</h1>
-    <h3>Credentials:</h3>
-    {% for auth_obj in auth_data %}
-        <p> {{ auth_obj.name }} | 
-        <a href="{{url_for('delete_auth', auth_id=auth_obj.id)}}" > delete </a>  </p>
-    {% endfor  %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <p> </p>
+        </div>
+        <div class="col-md-8">
+            <h1>Hi, {{ current_user.username }}!</h1>
+            <h3>Credentials:</h3>
+            {% for auth_obj in auth_data %}
+                <p> {{ auth_obj.name }} |
+                <a href="{{url_for('delete_auth', auth_id=auth_obj.id)}}" > delete </a>  </p>
+            {% endfor  %}
 
-    <p>Add Slack Authentication <a href="{{ url_for('upload_slack_auth') }}">Click to Add!</a></p>
-    <p>Add Gmail Authentication <a href="{{ url_for('upload_gmail_auth') }}">Click to Add!</a></p>
+            <p>Add Slack Authentication <a href="{{ url_for('upload_slack_auth') }}">Click to Add!</a></p>
+            <p>Add Gmail Authentication <a href="{{ url_for('upload_gmail_auth') }}">Click to Add!</a></p>
 
+            <br>
+            <br>
+            <h3 style="color: red;"> Warning! This action can't be undone! </h3>
+            <a href="{{ url_for('delete_user_data') }}"> Delete all my data and logout </a>
+        </div>
+        <div class="col-md-2">
+            <p>  </p>
+        </div>
+    </div>
+</div>
 {% endblock %}
