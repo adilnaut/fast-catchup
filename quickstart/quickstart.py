@@ -42,11 +42,13 @@ def get_p_items_by_session(session_id=None):
                     .filter(PriorityItemMethod.model_justification != None).first()
                 if p_message:
                     message_id = p_message.message_id
+                    message_id = str(message_id)
                     if platform_name == 'slack':
-                        list_body= get_list_data_by_m_id(message_id)
+                        list_body = get_list_data_by_m_id(message_id)
                     elif platform_name == 'gmail':
                         list_body = get_list_data_by_g_id(message_id)
-                    # list_body['score'] = int(p_item.p_a_b_c*100.0)
+                    if not list_body:
+                        pass
                     if p_item.p_a:
                         list_body['score'] = int(p_item.p_a*100.0)
                     else:

@@ -365,13 +365,14 @@ def encapsulate_names_by_ids(text):
 
 
 def get_list_data_by_m_id(slack_message_ts):
-    with db_ops(model_names=['SlackMessage, SlackChannel, SlackUser']) as (db, SlackMessage, SlackChannel, SlackUser):
+    with db_ops(model_names=['SlackMessage', 'SlackChannel', 'SlackUser']) as (db, SlackMessage, SlackChannel, SlackUser):
         slack_message = SlackMessage.query.filter_by(ts=slack_message_ts).first()
         if not slack_message:
             return None
         text = slack_message.text
         user_id = slack_message.slack_user_id
         channel_id = slack_message.slack_channel_id
+        ts = slack_message.ts
 
         user_data = None
         user_name = None
@@ -411,10 +412,17 @@ def get_list_data_by_m_id(slack_message_ts):
             else:
                 headline += 'in dm'
         date_string = ts_to_formatted_date(ts)
+        # print("----------start---------")
         list_body = {}
+        # print(list_body)
         list_body['headline'] = headline
+        # print(headline)
         list_body['text'] = text
+        # print(text)
         list_body['date'] = date_string
+        # print(date_string)
+        # print(list_body)
+        # print("----------end--------")
         return list_body
 
 

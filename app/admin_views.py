@@ -1,6 +1,6 @@
 from app import admin, db
 from app.models import (GmailMessage, SlackMessage, PriorityList, PriorityListMethod,
-    PriorityItem, PriorityItemMethod, PriorityMessage, AuthData, Session, AudioFile)
+    PriorityItem, PriorityItemMethod, PriorityMessage, AuthData, Session, AudioFile, Platform, Workspace, User)
 from flask_admin.contrib.sqla import ModelView
 
 class MyModelView(ModelView):
@@ -24,3 +24,6 @@ admin.add_view(MyModelView(PriorityMessage, db.session))
 admin.add_view(MyModelView(AuthData, db.session))
 admin.add_view(MyModelView(Session, db.session))
 admin.add_view(MyModelView(AudioFile, db.session))
+admin.add_view(MyModelView(Platform, db.session))
+admin.add_view(MyModelView(Workspace, db.session))
+admin.add_view(MyModelView(User, db.session))

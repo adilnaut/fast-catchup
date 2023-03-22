@@ -161,6 +161,7 @@ def upload_slack_auth():
         db.session.execute(text(secret_query), secret_kwargs)
         db.session.commit()
 
+        slack_test_etl()
         return redirect(url_for('index'))
 
     return render_template('upload_slack_auth.html', form=form)
