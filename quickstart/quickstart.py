@@ -48,7 +48,7 @@ def get_p_items_by_session(session_id=None):
                         list_body = get_list_data_by_g_id(message_id)
                     # list_body['score'] = int(p_item.p_a_b_c*100.0)
                     if p_item.p_a:
-                        list_body['score'] = p_item.p_a
+                        list_body['score'] = int(p_item.p_a*100.0)
                     else:
                         list_body['score'] = int(p_item.p_a_b*100.0)
                     list_body['text_score'] = int(p_item.p_b_a*100.0)
