@@ -10,7 +10,7 @@ import shutil
 import uuid
 
 from collections import OrderedDict
-
+from bs4 import BeautifulSoup
 from urlextract import URLExtract
 from urllib.parse import urlparse
 
@@ -28,6 +28,25 @@ from quickstart.platform import get_abstract_for_gmail
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
+ef get_text_from_html(html_text):
+
+    soup = BeautifulSoup(html_text, features="html.parser")
+
+    # kill all script and style elements
+    for script in soup(["script", "style"]):
+        script.extract()    # rip it out
+
+    # get text
+    text = soup.get_text()
+
+    # break into lines and remove leading and trailing space on each
+    lines = (line.strip() for line in text.splitlines())
+    # break multi-headlines into a line each
+    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+    # drop blank lines
+    text = '\n'.join(chunk for chunk in chunks if chunk)
+    return text
 
 # todo parse with regex
 def get_guser_email(from_string):
@@ -92,6 +111,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
         if not data_0:
             return [], 0
         text = base64.urlsafe_b64decode(data_0).decode()
+        text = get_text_from_html(text) + '\n'
     elif mime_type_0 == 'text/html':
         data_0 = body_0.get('data')
         size_0 = body_0.get('size')
@@ -220,6 +240,7 @@ def etl_gmail(service, db, session_id=None, max_messages=5, unread_only=True):
         primary_text = None
         if data:
             primary_text =  base64.urlsafe_b64decode(data).decode()
+            primary_text = get_text_from_html(primary_text)
 
         show_parts = True
         num_parts = 0
@@ -504,17 +525,8 @@ def dumps_emails(gmail_messages):
 
     return result_text
 
-
-def get_gmail_comms(return_list=False, session_id=None):
-
-    platform_id = get_platform_id('gmail')
-    if not platform_id:
-        return None
-    service = auth_and_load_session_gmail()
-    with db_ops(model_names=[]) as (db, ):
-        etl_gmail(service, db, session_id=session_id)
-
-
+def build_priority_list(session_id=None):
+    # retrieve all messages fields
     gmail_messages = None
 
     with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailUser']) as \
@@ -528,9 +540,7 @@ def get_gmail_comms(return_list=False, session_id=None):
             .filter(GmailMessage.session_id == session_id) \
             .all()
 
-    if not gmail_messages and return_list:
-        return gmail_messages
-
+    # build priority list
     if gmail_messages:
         with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
             , 'PriorityItem', 'PriorityItemMethod', 'GmailMessage']) as (db, PriorityList, PriorityListMethod \
@@ -543,11 +553,23 @@ def get_gmail_comms(return_list=False, session_id=None):
             fill_priority_list(db, gmail_messages, get_abstract_for_gmail, plist_id, PriorityMessage, PriorityList, \
                 PriorityItem, PriorityItemMethod, PriorityListMethod, GmailMessage, columns_list)
 
-    if return_list:
-        return gmail_messages
+def get_gmail_comms(session_id=None):
 
-    result_text = dumps_emails(gmail_messages)
-    return result_text
+    # first check if auth method for this platform exist
+    platform_id = get_platform_id('gmail')
+    if not platform_id:
+        return None
+    service = auth_and_load_session_gmail()
+
+    # then download last n unread messages from inbox
+    with db_ops(model_names=[]) as (db, ):
+        etl_gmail(service, db, session_id=session_id)
+
+    # build priority list and summarize text
+    build_priority_list(session_id=session_id)
+
+
+
 
 def convert_to_utc(date_string):
     if not date_string:

@@ -515,16 +515,7 @@ def slack_test_etl():
     # except SlackApiError as err:
         # print(err)
 
-
-#  todo handle rate limited exception
-def get_slack_comms(return_list=False, session_id=None):
-    platform_id = get_platform_id('slack')
-    if not platform_id:
-        return None
-    app = auth_and_load_session_slack()
-    with db_ops(model_names=[]) as (db, ):
-        etl_messages(app, db, session_id=session_id)
-
+def build_priority_list(session_id=None):
     slack_messages = None
     with db_ops(model_names=['SlackMessage', 'SlackChannel']) as (db, SlackMessage, SlackChannel):
         slack_messages = db.session.query(SlackMessage) \
@@ -534,8 +525,6 @@ def get_slack_comms(return_list=False, session_id=None):
             .filter(SlackMessage.session_id == session_id) \
             .all()
 
-    if not slack_messages and return_list:
-        return slack_messages
 
     if slack_messages:
         with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
@@ -549,15 +538,23 @@ def get_slack_comms(return_list=False, session_id=None):
             fill_priority_list(db, slack_messages, get_abstract_for_slack, plist_id, PriorityMessage, PriorityList, \
                 PriorityItem, PriorityItemMethod, PriorityListMethod, SlackMessage, columns_list)
 
-    if return_list:
-        return slack_messages
+#  todo handle rate limited exception
+def get_slack_comms(session_id=None):
 
-    result = ''
-    for message in slack_messages:
-        formatted_message = format_slack_message(message)
-        result += '%s\n' % formatted_message
+    # check if auth methods exist for this platform
+    platform_id = get_platform_id('slack')
+    if not platform_id:
+        return None
 
-    return result
+    # retrieve unread messages from slack
+    app = auth_and_load_session_slack()
+    with db_ops(model_names=[]) as (db, ):
+        etl_messages(app, db, session_id=session_id)
+
+    # build priority lists with latest messages
+    build_priority_list(session_id=session_id)
+
+
 
 
 

@@ -122,16 +122,7 @@ def ask_instruct_bloom_raw(prompt, top_k=10, top_p=0.2):
                        early_stopping=True
                        # temperature=temperature
                        )[0])
-    # top k
-    # text_response = tokenizer.decode(model.generate(inputs["input_ids"],
-    #                    max_length=result_length,
-    #                    do_sample=True,
-    #                    top_k=top_k,
-    #                    top_p=top_p
-    #                    # num_beams=3,
-    #                    # no_repeat_ngram_size=2,
-    #                    # early_stopping=True
-    #                   )[0])
+
     text_response = text_response.replace(prompt, '')
     return text_response
 
@@ -150,12 +141,7 @@ def ask_instruct_bloom_helper(input_text, prompt=None, temperature=1.0, top_k=50
     prompt = prompt % input_text
     result_length = len(prompt) + 2
     inputs = tokenizer(prompt, return_tensors="pt")
-    # greedy
-    # text_response = tokenizer.decode(model.generate(inputs["input_ids"],
-    #                    max_length=result_length,
-    #                    temperature=temperature
-    #                    )[0])
-    # top k
+
     text_response = tokenizer.decode(model.generate(inputs["input_ids"],
                        max_length=result_length,
                        temperature=temperature,
@@ -182,12 +168,7 @@ def ask_bloom(input_text, temperature=1.0, top_k=50, top_p=0.9):
     '''
     prompt = prompt % input_text
     inputs = tokenizer(prompt, return_tensors="pt")
-    # greedy
-    # text_response = tokenizer.decode(model.generate(inputs["input_ids"],
-    #                    max_length=result_length,
-    #                    temperature=temperature
-    #                   )[0])
-    # top k
+
     text_response = tokenizer.decode(model.generate(inputs["input_ids"],
                        max_length=result_length,
                        temperature=temperature,

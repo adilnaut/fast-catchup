@@ -22,7 +22,7 @@ import azure.cognitiveservices.speech as speechsdk
 from quickstart.gmail_utils import get_gmail_comms, get_list_data_by_g_id
 from quickstart.slack_utils import get_slack_comms, get_list_data_by_m_id
 
-from quickstart.connection import db_ops, get_current_user
+from quickstart.connection import db_ops, get_current_user, clear_session_data
 from quickstart.sqlite_utils import get_insert_query
 
 def get_p_items_by_session(session_id=None):
@@ -202,15 +202,22 @@ def generate_voice_file(text_response, verbose=False):
             print("Did you update the subscription info?")
     return filepath, word_boundaries
 
+
 def generate_summary(session_id):
 
     with db_ops(model_names=['Session']) as (db, Session):
         sess = Session.query.filter_by(session_id=session_id).first()
 
     if not sess:
-        unread_emails = get_gmail_comms(session_id=session_id)
-        unread_slack = get_slack_comms(session_id=session_id)
-        gpt_summary = get_gpt_summary(session_id=session_id)
+        # do not catch them all - exceptions: openai rate etc., sql conflicts, parsing/converting type exception
+        try:
+            get_gmail_comms(session_id=session_id)
+            get_slack_comms(session_id=session_id)
+            gpt_summary = get_gpt_summary(session_id=session_id)
+        except:
+            # remove platform messages, clear priority tables, sessions and audio files
+            # by session_id
+            clear_session_data(session_id=session_id)
     else:
         gpt_summary = sess.summary
 

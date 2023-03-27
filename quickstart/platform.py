@@ -137,8 +137,11 @@ def get_abstract_for_gmail(gmail_message):
         gm_texts = GmailMessageText.query.filter_by(gmail_message_id=id_) \
             .filter_by(is_snippet=False).all()
         summaries = []
+        hashes = {}
         for gm_text in gm_texts:
-            summaries.append(build_abstract_for_unbounded_text_2(gm_text.text))
+            if gm_text.text_hash not in hashes:
+                summaries.append(build_abstract_for_unbounded_text_2(gm_text.text))
+            hashes[gm_text.text_hash] = 1
         if len(summaries) == 1:
             final_summary_ = summaries[0]
         else:
@@ -159,7 +162,7 @@ def get_abstract_for_gmail(gmail_message):
         name_ = gmail_user.name
     subject_ = gmail_message.subject
 
-    result_text += "Email from %s with a summary %s and subject %s\n" % (name_, final_summary_, subject_)
+    result_text += "Email from %s with a subject and a summary %s\n" % (name_, subject_, final_summary_)
 
     return result_text, id_
 
@@ -200,7 +203,7 @@ def summarize_with_gpt3(input_text):
     return text_response
 
 def build_abstract_for_unbounded_text_2(text, truncate=False):
-    chunk_length = 2000
+    chunk_length = 3000
     chunk_start = 0
     chunk_end = chunk_length
     tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
