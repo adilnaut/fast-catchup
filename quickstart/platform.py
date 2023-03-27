@@ -162,7 +162,7 @@ def get_abstract_for_gmail(gmail_message):
         name_ = gmail_user.name
     subject_ = gmail_message.subject
 
-    result_text += "Email from %s with a subject and a summary %s\n" % (name_, subject_, final_summary_)
+    result_text += "Email from %s with a subject %s and a summary %s\n" % (name_, subject_, final_summary_)
 
     return result_text, id_
 
@@ -203,7 +203,7 @@ def summarize_with_gpt3(input_text):
     return text_response
 
 def build_abstract_for_unbounded_text_2(text, truncate=False):
-    chunk_length = 3000
+    chunk_length = 2000
     chunk_start = 0
     chunk_end = chunk_length
     tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")

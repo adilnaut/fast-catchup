@@ -85,8 +85,7 @@ def clear_session_data(session_id=None):
 
     # messages and metadata
     for platf in platforms:
-        slack_channels = SlackChannel.query.filter_by(platform_id=platf.d) \
-            .filter_by(session_id=session_id).all()
+        slack_channels = SlackChannel.query.filter_by(platform_id=platf.id).all()
         # print("To start iterating on slack_channels %s" % ', '.join(slack_channels))
         for sc in slack_channels:
             slack_messages = SlackMessage.query.filter_by(slack_channel_id=sc.id) \
@@ -106,8 +105,7 @@ def clear_session_data(session_id=None):
                     db.session.delete(sl)
                 db.session.delete(sm)
 
-        gmail_users = GmailUser.query.filter_by(platform_id=platf.id) \
-            .filter_by(session_id=session_id).all()
+        gmail_users = GmailUser.query.filter_by(platform_id=platf.id).all()
         for gu in gmail_users:
             gmail_messages = GmailMessage.query.filter_by(gmail_user_email=gu.email) \
                 .filter_by(session_id=session_id).all()

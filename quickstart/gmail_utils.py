@@ -29,7 +29,7 @@ from quickstart.platform import get_abstract_for_gmail
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
-ef get_text_from_html(html_text):
+def get_text_from_html(html_text):
 
     soup = BeautifulSoup(html_text, features="html.parser")
 
@@ -192,7 +192,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
     return text_parts, num_processed
 
 
-def etl_gmail(service, db, session_id=None, max_messages=5, unread_only=True):
+def etl_gmail(service, db, session_id=None, max_messages=20, unread_only=True):
 
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
@@ -525,7 +525,7 @@ def dumps_emails(gmail_messages):
 
     return result_text
 
-def build_priority_list(session_id=None):
+def build_priority_list(session_id=None, platform_id=None):
     # retrieve all messages fields
     gmail_messages = None
 
@@ -566,7 +566,7 @@ def get_gmail_comms(session_id=None):
         etl_gmail(service, db, session_id=session_id)
 
     # build priority list and summarize text
-    build_priority_list(session_id=session_id)
+    build_priority_list(session_id=session_id, platform_id=platform_id)
 
 
 

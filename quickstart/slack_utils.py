@@ -515,7 +515,7 @@ def slack_test_etl():
     # except SlackApiError as err:
         # print(err)
 
-def build_priority_list(session_id=None):
+def build_priority_list(session_id=None, platform_id=None):
     slack_messages = None
     with db_ops(model_names=['SlackMessage', 'SlackChannel']) as (db, SlackMessage, SlackChannel):
         slack_messages = db.session.query(SlackMessage) \
@@ -552,7 +552,7 @@ def get_slack_comms(session_id=None):
         etl_messages(app, db, session_id=session_id)
 
     # build priority lists with latest messages
-    build_priority_list(session_id=session_id)
+    build_priority_list(session_id=session_id, platform_id=platform_id)
 
 
 

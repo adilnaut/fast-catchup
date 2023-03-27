@@ -214,9 +214,12 @@ def generate_summary(session_id):
             get_gmail_comms(session_id=session_id)
             get_slack_comms(session_id=session_id)
             gpt_summary = get_gpt_summary(session_id=session_id)
-        except:
+        except Exception as e:
+            print(e)
             # remove platform messages, clear priority tables, sessions and audio files
             # by session_id
+    
+            gpt_summary = "Sorry, there was an unknown error in the messages processing!"
             clear_session_data(session_id=session_id)
     else:
         gpt_summary = sess.summary
