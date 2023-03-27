@@ -13,7 +13,10 @@ import time
 import requests
 import hashlib
 
+from retry import retry
 from openai.error import RateLimitError
+from openai.error import Timeout
+from openai.error import APIConnectionError
 
 from PyPDF2 import PdfReader
 from nltk.tokenize import word_tokenize
@@ -45,10 +48,7 @@ def encapsulate_names_by_ids(text):
                 .filter_by(platform_id=platform_id) \
                 .first()
         if user_data:
-            # user_data = slack_users.get(middle)
             user_name = user_data.name
-            # user_data = slack_users.get(middle)
-            # user_name = user_data.get('name')
             text = text.replace('<@%s>' % middle, user_name)
     return text
 
@@ -139,9 +139,11 @@ def get_abstract_for_gmail(gmail_message):
         summaries = []
         for gm_text in gm_texts:
             summaries.append(build_abstract_for_unbounded_text_2(gm_text.text))
-        summary = '\n'.join(summaries)
-
-        final_summary_ = build_abstract_for_unbounded_text_2(summary)
+        if len(summaries) == 1:
+            final_summary_ = summaries[0]
+        else:
+            summary = '\n'.join(summaries)
+            final_summary_ = build_abstract_for_unbounded_text_2(summary)
 
         text_hash = hashlib.md5(final_summary_.encode('utf-8')).hexdigest()
         text_kwargs = OrderedDict([('gmail_message_id', id_)
@@ -161,38 +163,38 @@ def get_abstract_for_gmail(gmail_message):
 
     return result_text, id_
 
+@retry((Timeout, RateLimitError, APIConnectionError), tries=5, delay=1, backoff=2)
 def summarize_with_gpt3(input_text):
-    time.sleep(0.1)
+    time.sleep(0.05)
     ''' Prompt ChatGPT or GPT3 level of importance of one message directly
-        TODO: save not only parsed value but also explanation
         TODO: decice where None values should be handled and throw exception
     '''
     openai.api_key = os.getenv("OPEN_AI_KEY")
     # todo might be worth specifying what type of data a bit ( if not independent of metadata )
-    prompt = 'Please tell what is the most important in the following text: %s' % input_text
-    try:
+    prompt = '''Please tell what is the most important in the following text
+        and ignore html or other non-text formats: %s''' % input_text
 
-        system_prompt = '''
-            You are human work assistant, whose job is to get big chunk of texts
-            and to pick the most important points or abstract summaries from text.
-            You can either skip details or only get some details from the text,
-            depending on what you think is important or what could be urgent.
-            Especially if something in a text requires some action.
-            If the text contain boilerplate advertisements or news, newsletters -
-            you can safely tell that what the text is and give short abstractive summary.
-            The most important text is personal, work-related or document related stuff
-            - you should give abstractive summary and provide a note that
-            there could be more important details and one should skim the whole document.
-        '''
-        response = openai.ChatCompletion.create(
-              model="gpt-3.5-turbo",
-              messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
-                ]
-            )
-    except RateLimitError:
-        return "You exceeded your current quota, please check your plan and billing details."
+    system_prompt = '''
+        You are human work assistant, whose job is to get big chunk of texts
+        and to pick the most important points or abstract summaries from text.
+        You can either skip details or only get some details from the text,
+        depending on what you think is important or what could be urgent.
+        Especially if something in a text requires some action.
+        If the text contain boilerplate advertisements or news, newsletters -
+        you can safely tell that what the text is and give short abstractive summary.
+        The most important text is personal, work-related or document related stuff
+        - you should give abstractive summary and provide a note that
+        there could be more important details and one should skim the whole document.
+    '''
+    response = openai.ChatCompletion.create(
+          model="gpt-3.5-turbo",
+          messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+          timeout=10
+        )
+
     # print(response)
     text_response = response['choices'][0]['message']['content']
     return text_response

@@ -2,6 +2,12 @@ import os
 import re
 import time
 import openai
+
+from openai.error import RateLimitError
+from openai.error import Timeout
+from openai.error import APIConnectionError
+
+from retry import retry
 from transformers import pipeline
 import transformers
 from transformers import BloomForCausalLM
@@ -194,8 +200,9 @@ def ask_bloom(input_text, temperature=1.0, top_k=50, top_p=0.9):
     priority_score = parse_gpt_response(text_response)
     return priority_score, None
 
+@retry((Timeout, RateLimitError, APIConnectionError), tries=5, delay=1, backoff=2)
 def ask_gpt(input_text):
-    time.sleep(0.5)
+    time.sleep(0.05)
     ''' Prompt ChatGPT or GPT3 level of importance of one message directly
         TODO: save not only parsed value but also explanation
         TODO: decice where None values should be handled and throw exception
@@ -203,27 +210,27 @@ def ask_gpt(input_text):
     openai.api_key = os.getenv("OPEN_AI_KEY")
     # todo might be worth specifying what type of data a bit ( if not independent of metadata )
     prompt = 'Rate this message text from 0 to 100 by level of importance: %s' % input_text
-    try:
 
-        system_prompt = '''
-            You are assisting human with incoming messages prioritisation.
-            Please try to guess what emails are generic or sent automatically and
-            non-urgent and don't give them scores above 50.
-            Above 50 is for emails that need actions from receiving person.
-            Please keep advertisements under 20.
-            Slack messages are not less important than emails.
-            Work related slack messages and not requiring actions from 40 to 60.
-            And work related  slack messages and requiring actions from you should be around 80.
-        '''
-        response = openai.ChatCompletion.create(
-              model="gpt-3.5-turbo",
-              messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
-                ]
-            )
-    except RateLimitError:
-        return "You exceeded your current quota, please check your plan and billing details."
+    system_prompt = '''
+        You are assisting human with incoming messages prioritisation.
+        Please try to guess what emails are generic or sent automatically and
+        non-urgent and don't give them scores above 50.
+        Above 50 is for emails that need actions from receiving person.
+        Please keep advertisements under 20.
+        Slack messages are not less important than emails.
+        Work related slack messages and not requiring actions from 40 to 60.
+        And work related  slack messages and requiring actions from you should be around 80.
+    '''
+    response = openai.ChatCompletion.create(
+          model="gpt-3.5-turbo",
+          messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ]
+          , timeout=20
+          , max_tokens=100
+        )
+
     text_response = response['choices'][0]['message']['content']
 
     priority_score = parse_bloom_response(text_response)

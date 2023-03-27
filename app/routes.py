@@ -31,20 +31,17 @@ def favicon():
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/assign_priorities', methods=['POST'])
+@login_required
 def assign_priorities():
     item_id = request.form['item_id']
     range_value = request.form['range_value']
-    # print(item_id)
-    # print(range_value)
-    # Perform database update or other actions based on item_id and range_value
-    # p_message = PriorityMessage.query.filter_by(id=item_id).first()
     p_item = PriorityItem.query.filter_by(priority_message_id=item_id).first()
     p_item.p_a = int(range_value)*0.01
     db.session.commit()
-
     return 'Success!'
 
 @app.route('/upload_gmail_auth', methods=['GET', 'POST'])
+@login_required
 def upload_gmail_auth():
     form = GmailAuthDataForm()
 
@@ -185,6 +182,7 @@ def login():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
@@ -221,15 +219,8 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@app.route('/remove_users', methods=['GET'])
-def remove_users():
-    users = User.query.all()
-    for user in users:
-        db.session.delete(user)
-    db.session.commit()
-    return redirect(url_for('index'))
-
 @app.route('/clear_all_user_data', methods=['GET'])
+@login_required
 def delete_user_data():
     user_id = current_user.get_id()
     # print("Current user is" % current_user)
@@ -330,26 +321,6 @@ def delete_user_data():
     return redirect(url_for('login'))
 
 
-@app.route('/test_gmail_etl', methods=['GET'])
-def test_gmail_etl():
-    test_etl()
-    return redirect(url_for('index'))
-
-@app.route('/test_slack_etl', methods=['GET'])
-def test_slack_etl():
-    slack_test_etl()
-    return redirect(url_for('index'))
-
-@app.route('/clear_gmail_table', methods=['GET'])
-def test_clear_gmail_table():
-    clean_gmail_tables()
-    return redirect(url_for('index'))
-
-@app.route('/clear_slack_table', methods=['GET'])
-def test_clear_slack_table():
-    clear_slack_tables()
-    return redirect(url_for('index'))
-
 @app.route('/generate_summary', methods=['GET'])
 @login_required
 def first():
@@ -387,10 +358,6 @@ def build_tags_for_audio_highlight(session_id, gpt_summary, word_boundaries, gpt
             p_tags.append(' '.join(a_tags))
             a_tags = []
         a_tags.append('<a id=%s>%s</a>' % (wb['audio_offset'], a_text) )
-
-        # highlight_text = gpt_summary[start:end]
-        # all_text = gpt_summary[:start] + ' <mark> ' + highlight_text + ' </mark> ' + gpt_summary[end:]
-        # timed_text.append('%s | %s' % (wb['audio_offset'], all_text))
         timed_text.append('%s | %s' % (wb['audio_offset'], wb['duration']))
 
     if not p_tags:
@@ -427,19 +394,7 @@ def gen_summary():
     gptout = {}
     session_id = uuid.uuid4().hex
 
-
-    get_last_session = request.form.get("session-checkbox") != None
-
-    if get_last_session:
-        session_id = db.session.execute(text('''
-            SELECT session_id FROM priority_list WHERE id = (SELECT max(id) FROM priority_list);''')).fetchone()
-        if session_id:
-            session_id = session_id[0]
-        else:
-            flash('No previous sessions found!')
-            redirect(url_for('first'))
-
-    gpt_summary, filepath, word_boundaries = generate_summary(session_id=session_id, get_last_session=get_last_session)
+    gpt_summary, filepath, word_boundaries = generate_summary(session_id=session_id)
 
     save_audio_data(session_id, word_boundaries, filepath)
 
@@ -459,17 +414,18 @@ def index():
         .join(Platform) \
         .join(Workspace) \
         .filter(Workspace.user_id == current_user.get_id()).all()
-    # auth_data = AuthData.query.filter_by(platform_id=platform_id).all()
     return render_template('index.html',title='Home', auth_data=auth_data)
 
 @app.route('/setup', methods=['GET'])
 @login_required
 def setup_workspace():
-    setup_sentence_embeddings_model()
-    setup_sentiment_analysis_model()
+    # setup_sentence_embeddings_model()
+    # setup_sentiment_analysis_model()
     return redirect(url_for('index'))
 
+# todo: check that user assoiciated with auth_id is current user
 @app.route('/delete_auth/<auth_id>')
+@login_required
 def delete_auth(auth_id):
     auth_data = AuthData.query.filter_by(id=auth_id).first()
     db.session.delete(auth_data)
@@ -477,6 +433,7 @@ def delete_auth(auth_id):
     return redirect(url_for('index'))
 
 @app.route('/audio/<filepath>')
+@login_required
 def returnAudioFile(filepath):
     path_to_audio_file = os.path.join(os.getcwd(), filepath)
     return send_file(

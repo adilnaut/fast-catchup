@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import os
 import os.path
+import time
 
 import json
 import uuid
@@ -11,7 +12,9 @@ from datetime import datetime
 
 from collections import OrderedDict
 from openai.error import RateLimitError
-
+from openai.error import Timeout
+from openai.error import APIConnectionError
+from retry import retry
 
 import azure.cognitiveservices.speech as speechsdk
 
@@ -66,14 +69,54 @@ def get_p_items_by_session(session_id=None):
     )
     return sorted_results
 
+@retry((Timeout, RateLimitError, APIConnectionError), tries=5, delay=1, backoff=2)
+def gpt_request_wrapper(sorted_messages):
+    time.sleep(0.05)
+    input_text = '\n'.join(['text %s, score %s' % (text, int(score*100.0)) for score, text in sorted_messages])
 
+    prompt = '''Here is a list of incoming messages with their priority scores.
+        Please transform this list of message summaries to narrated text starting from most important
+        but don't include priority numbers in the answer.:
+        '''
+    prompt = '%s%s' % (prompt, input_text)
 
+    system_prompt = '''
+        You are communications catch-up assistant
+        whose task is to transform list of messages with assigned importance scores
+        to narrated text or summary of missed messages.
+        You just simply tell user what he missed.
+        In case of slack messages you should mention the sender and channel.
+        Do not return priority_scores.
+        Do not return email subjects.
+    '''
 
-# todo handle API exceptions and bad results
-def get_gpt_summary(session_id=None, verbose=True):
-    openai.api_key = os.getenv("OPEN_AI_KEY")
+    response = openai.ChatCompletion.create(
+          model="gpt-3.5-turbo",
+          messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+          timeout=50
+        )
 
+    text_response = response['choices'][0]['message']['content']
+    return text_response
 
+def save_session(text_response, session_id=None):
+    current_user = get_current_user()
+    user_id = current_user.get_id()
+    with db_ops(model_names=['Workspace']) as (db, Workspace):
+
+        workspace = Workspace.query.filter_by(user_id=user_id).one()
+        workspace_id = workspace.id
+        label_kwargs = OrderedDict([('session_id', session_id)
+            , ('workspace_id', workspace_id)
+            , ('date', datetime.now().strftime('%m/%d/%Y, %H:%M'))
+            , ('summary', text_response)])
+        label_query = get_insert_query('session', label_kwargs.keys())
+        db.session.execute(label_query, label_kwargs)
+
+def get_sorted_messages(session_id=None):
     message_texts = []
     with db_ops(model_names=['PriorityItem', 'PriorityList', 'PriorityMessage']) as (db, \
         PriorityItem, PriorityList, PriorityMessage):
@@ -90,52 +133,16 @@ def get_gpt_summary(session_id=None, verbose=True):
         key=lambda x: x[0],
         reverse=True
     )
-    # print(sorted_messages)
-    input_text = '\n'.join(['text %s, score %s' % (text, int(score*100.0)) for score, text in sorted_messages])
+    return sorted_messages
 
-    prompt = '''Here is a list of incoming messages with their priority scores.
-        Please transform this list of message summaries to narrated text starting from most important:
-        '''
-    prompt = '%s%s' % (prompt, input_text)
-
+def get_gpt_summary(session_id=None):
+    sorted_messages = get_sorted_messages(session_id=session_id)
     try:
-        system_prompt = '''
-            You are communications catch-up assistant
-            whose task is to transform list of messages with assigned importance scores
-            to narrated text or summary of missed messages.
-            You just simply tell user what he missed.
-            In case of slack messages you should mention the sender and channel.
-            Do not return priority_scores.
-            Do not return email subjects.
-        '''
-
-        response = openai.ChatCompletion.create(
-              model="gpt-3.5-turbo",
-              messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
-                ]
-            )
+        text_response = gpt_request_wrapper(sorted_messages)
     except RateLimitError:
-        return "You exceeded your current quota, please check your plan and billing details."
-    if verbose:
-        print(response)
-    text_response = response['choices'][0]['message']['content']
-    current_user = get_current_user()
-    user_id = current_user.get_id()
-    with db_ops(model_names=['Workspace']) as (db, Workspace):
-
-        workspace = Workspace.query.filter_by(user_id=user_id).one()
-        workspace_id = workspace.id
-        label_kwargs = OrderedDict([('session_id', session_id)
-            , ('workspace_id', workspace_id)
-            , ('date', datetime.now().strftime('%m/%d/%Y, %H:%M'))
-            , ('summary', text_response)])
-        label_query = get_insert_query('session', label_kwargs.keys())
-        db.session.execute(label_query, label_kwargs)
-
+        text_response = "OpenAI servers are currrently unavailable :("
+    save_session(text_response, session_id=session_id)
     return text_response
-
 
 
 def get_seconds(duration):
@@ -143,10 +150,7 @@ def get_seconds(duration):
     total_seconds = duration.total_seconds()
     return total_seconds
 
-# generates file.wav
-# todo:
-#   generate audio with random name
-#   return audio filepath/random name
+
 def generate_voice_file(text_response, verbose=False):
 
     # Creates an instance of a speech config with specified subscription key and service region.
@@ -198,15 +202,14 @@ def generate_voice_file(text_response, verbose=False):
             print("Did you update the subscription info?")
     return filepath, word_boundaries
 
-def generate_summary(session_id, get_last_session=False):
+def generate_summary(session_id):
 
     with db_ops(model_names=['Session']) as (db, Session):
         sess = Session.query.filter_by(session_id=session_id).first()
 
     if not sess:
-        if not get_last_session:
-            unread_emails = get_gmail_comms(session_id=session_id)
-            unread_slack = get_slack_comms(session_id=session_id)
+        unread_emails = get_gmail_comms(session_id=session_id)
+        unread_slack = get_slack_comms(session_id=session_id)
         gpt_summary = get_gpt_summary(session_id=session_id)
     else:
         gpt_summary = sess.summary

@@ -33,7 +33,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 def get_guser_email(from_string):
     return from_string.split(' ')[-1].replace('<', '').replace('>', '')
 def get_guser_name(from_string):
-    return from_string.replace(get_guser_email(from_string), '')
+    return from_string.replace(get_guser_email(from_string), '').replace('<', '').replace('>', '').replace('\"', '')
 
 def extract_links(text):
     extractor = URLExtract()
@@ -172,7 +172,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
     return text_parts, num_processed
 
 
-def etl_gmail(service, db, session_id=None, max_messages=20, unread_only=True):
+def etl_gmail(service, db, session_id=None, max_messages=5, unread_only=True):
 
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
