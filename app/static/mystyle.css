@@ -1,0 +1,12 @@
+.list-g-attached {
+    display: none;
+    /* position: fixed; */
+    /* top: 10%; /* adjust this value as needed */
+    /* right: 2%; */
+    /* z-index: 9999; /* make sure it's on top of other elements */
+}
+
+.list-scrollable {
+  /* width: 15%; /* Set the fixed height to your desired value */
+  overflow-y: scrollable; /* Enable vertical scrolling */
+}

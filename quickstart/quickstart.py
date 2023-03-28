@@ -102,19 +102,24 @@ def gpt_request_wrapper(sorted_messages):
     text_response = response['choices'][0]['message']['content']
     return text_response
 
-def save_session(text_response, session_id=None):
+def save_session(text_response, session_id=None, msg_out=None):
     current_user = get_current_user()
     user_id = current_user.get_id()
     with db_ops(model_names=['Workspace']) as (db, Workspace):
 
         workspace = Workspace.query.filter_by(user_id=user_id).one()
         workspace_id = workspace.id
+        # print(json.dumps(msg_out))
         label_kwargs = OrderedDict([('session_id', session_id)
             , ('workspace_id', workspace_id)
             , ('date', datetime.now().strftime('%m/%d/%Y, %H:%M'))
-            , ('summary', text_response)])
+            , ('summary', text_response)
+            , ('neighbors', json.dumps(msg_out))])
+        # print(label_kwargs)
         label_query = get_insert_query('session', label_kwargs.keys())
-        db.session.execute(label_query, label_kwargs)
+        # print(label_query)
+        status = db.session.execute(label_query, label_kwargs)
+        # print(status)
 
 def get_sorted_messages(session_id=None):
     message_texts = []
@@ -135,13 +140,14 @@ def get_sorted_messages(session_id=None):
     )
     return sorted_messages
 
-def get_gpt_summary(session_id=None):
+def get_gpt_summary(session_id=None, msg_out=None):
     sorted_messages = get_sorted_messages(session_id=session_id)
     try:
         text_response = gpt_request_wrapper(sorted_messages)
     except RateLimitError:
         text_response = "OpenAI servers are currrently unavailable :("
-    save_session(text_response, session_id=session_id)
+    save_session(text_response, session_id=session_id, msg_out=msg_out)
+
     return text_response
 
 
@@ -211,14 +217,14 @@ def generate_summary(session_id):
     if not sess:
         # do not catch them all - exceptions: openai rate etc., sql conflicts, parsing/converting type exception
         try:
-            get_gmail_comms(session_id=session_id)
-            get_slack_comms(session_id=session_id)
-            gpt_summary = get_gpt_summary(session_id=session_id)
+            msg_gmail = get_gmail_comms(session_id=session_id)
+            msg_slack = get_slack_comms(session_id=session_id)
+            gpt_summary = get_gpt_summary(session_id=session_id, msg_out={'slack': msg_slack, 'gmail': msg_gmail})
         except Exception as e:
             print(e)
             # remove platform messages, clear priority tables, sessions and audio files
             # by session_id
-    
+
             gpt_summary = "Sorry, there was an unknown error in the messages processing!"
             clear_session_data(session_id=session_id)
     else:

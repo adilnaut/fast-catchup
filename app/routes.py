@@ -17,6 +17,7 @@ from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthD
 from werkzeug.utils import secure_filename
 from werkzeug.urls import url_parse
 
+from quickstart.connection import clear_session_data
 from quickstart.quickstart import generate_summary, get_p_items_by_session
 from quickstart.slack_utils import get_slack_comms, clear_slack_tables, slack_test_etl
 from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables
@@ -320,6 +321,13 @@ def delete_user_data():
     flash('Successfully deleted all user data, message attachments, tokens and files!')
     return redirect(url_for('login'))
 
+@app.route('/remove_session', methods=['GET'])
+@login_required
+def remove_session():
+    session_id = request.args.get('session_id')
+    clear_session_data(session_id=session_id)
+    return redirect(url_for('first'))
+
 
 @app.route('/generate_summary', methods=['GET'])
 @login_required
@@ -340,6 +348,7 @@ def first():
     gpt_summary, filepath, word_boundaries = generate_summary(session_id=session_id)
 
     gptout['filepath'] = filepath
+    gptout['sess_id'] = session_id
 
     gptout = build_tags_for_audio_highlight(session_id, gpt_summary, word_boundaries, gptout)
 
@@ -399,12 +408,30 @@ def gen_summary():
     save_audio_data(session_id, word_boundaries, filepath)
 
     gptout['filepath'] = filepath
+    gptout['sess_id'] = session_id
 
     gptout = build_tags_for_audio_highlight(session_id, gpt_summary, word_boundaries, gptout)
 
 
     return render_template('generate_summary.html', title='Summary', gptout=gptout)
 
+@app.route('/get_neighbors', methods=['GET'])
+@login_required
+def get_neighbors():
+    session_id = request.args.get('session_id', None)
+    p_item_id = request.args.get('p_item_id', None)
+    sess = Session.query.filter_by(session_id=session_id).first()
+    n_s = json.loads(sess.neighbors)['slack']
+    n_g = json.loads(sess.neighbors)['gmail']
+    if n_s and n_g:
+        nbrs_dict = n_s | n_g
+    elif n_s:
+        nbrs_dict = n_s
+    elif n_g:
+        nbrs_dict = n_g
+    else:
+        nbrs_dict = {}
+    return nbrs_dict[p_item_id] if p_item_id in nbrs_dict else []
 
 @app.route('/', methods=['POST', 'GET'])
 @app.route('/index')

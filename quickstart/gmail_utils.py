@@ -550,8 +550,9 @@ def build_priority_list(session_id=None, platform_id=None):
             update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
             # but should probably be replaced with update_p_m_a calls
             columns_list = ['id', 'GmailMessageLabel.label', 'gmail_user_email', 'content_type']
-            fill_priority_list(db, gmail_messages, get_abstract_for_gmail, plist_id, PriorityMessage, PriorityList, \
-                PriorityItem, PriorityItemMethod, PriorityListMethod, GmailMessage, columns_list)
+            msg_out = fill_priority_list(db, gmail_messages, get_abstract_for_gmail, plist_id, PriorityMessage \
+                , PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod, GmailMessage, columns_list)
+            return msg_out
 
 def get_gmail_comms(session_id=None):
 
@@ -566,8 +567,8 @@ def get_gmail_comms(session_id=None):
         etl_gmail(service, db, session_id=session_id)
 
     # build priority list and summarize text
-    build_priority_list(session_id=session_id, platform_id=platform_id)
-
+    msg_out = build_priority_list(session_id=session_id, platform_id=platform_id)
+    return msg_out
 
 
 

@@ -3,12 +3,13 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-lg-2">
             {% for sess_id, date in gptout.past_sessions %}
                 <a type="button" href="{{ url_for('first', session_id=sess_id) }}"> {{date}} </a>
+                <!-- <a type="button" href="{{ url_for('remove_session', session_id=sess_id)}}"> delete </a> -->
             {% endfor %}
         </div>
-        <div class="col-md-8">
+        <div class="col-lg-8">
 
         	<h2 align="center"> Fast-catchup </h2>
 
@@ -117,6 +118,32 @@
                   triggerEl.addEventListener('click', function (event) {
                     event.preventDefault()
                     tabTrigger.show()
+                    var session_id = "{{gptout.sess_id}}";
+                    var p_item_id = $(this).attr('id').split('-')[1];;
+
+                    // Make the AJAX request to the Flask endpoint
+                    $.ajax({
+                        url: '/get_neighbors',
+                        method: 'GET',
+                        data: {
+                            session_id: session_id,
+                            p_item_id: p_item_id
+                        },
+                        success: function(response) {
+                            var disableListCheckbox = document.getElementById('disableListCheckbox');
+                            if (disableListCheckbox.checked) {
+                              return;
+                            }
+                            // console.log(response)
+                            // var neighbors = JSON.parse(response);
+                            var list = '';
+                            response.forEach(function(neighbor) {
+                                list += '<li class="list-group-item">' + neighbor + '</li>';
+                            });
+                            document.querySelector('#list-g').innerHTML = list;
+                            document.querySelector('#list-g').style.display = "block";
+                        }
+                    });
                   })
                 })
             </script>
@@ -202,9 +229,44 @@
             <script src="{{url_for('.static', filename='summaryscript.js')}}"></script>
 
         </div>
-        <div class="col-md-2">
-            <p>  </p>
+        <div class="col-lg-2">
+                <h4> Similar messages:</h4>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="disableListCheckbox">
+                  <label class="form-check-label" for="disableListCheckbox">Toggle off</label>
+                </div>
+                <ul class="list-group list-g-attached list-scrollable" id="list-g">
+                </ul>
         </div>
+        <script>
+            // Get the close button element
+            var disableListCheckbox = document.getElementById('disableListCheckbox');
+            var listContainer = document.querySelector('.list-scrollable');
+
+            function displayList() {
+              if (disableListCheckbox.checked) {
+                return;
+              }
+
+              // Set the display property to "block"
+              listContainer.style.display = 'block';
+            }
+            // Add a change event listener to the checkbox
+            disableListCheckbox.addEventListener('change', function() {
+              if (disableListCheckbox.checked) {
+                // Set the display property to "none" when the checkbox is checked
+                listContainer.style.display = 'none';
+              } else {
+                // Display the list when the checkbox is unchecked
+                displayList();
+              }
+            });
+
+            // Display the list initially
+            displayList();
+        </script>
+
+
     </div>
 </div>
 

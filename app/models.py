@@ -108,6 +108,7 @@ class Session(db.Model):
     workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
     date = db.Column(db.Text())
     summary = db.Column(db.Text())
+    neighbors = db.Column(db.Text())
 
 
 class PriorityList(db.Model):
@@ -249,8 +250,8 @@ class PriorityItem(db.Model):
             X = np.array(all_vectors)
             # we want to build NN algorithm for any number of samples present
             # but initially there would not be many
-            # let's set this up to 2 for now
-            nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(X)
+            # let's set this up to 3 for now
+            nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree').fit(X)
 
         p_m_result = PriorityMessage.query.filter_by(id=self.priority_message_id).first()
         p_m_vector = p_m_result.embedding_vector
@@ -272,6 +273,7 @@ class PriorityItem(db.Model):
             self.p_b_c = 0.2
         db.session.commit()
 
+
     def calculate_p_b(self, nbrs, ids):
         # get priority_message vector
     	# get first k neighbors sample
@@ -284,7 +286,7 @@ class PriorityItem(db.Model):
         p_m_vector = np.frombuffer(p_m_vector, dtype='<f4')
         p_m_vector = np.array([p_m_vector])
 
-
+        nbrs_out = []
         if nbrs:
             distances, indices = nbrs.kneighbors(p_m_vector)
             p_as = []
@@ -293,11 +295,13 @@ class PriorityItem(db.Model):
                 n_id = ids[n_i]
                 n_item = PriorityItem.query.filter_by(priority_message_id=n_id).one()
                 if n_item and n_item.p_a:
+                    nbrs_out.append(n_item.priority_message_id)
                     p_as.append(n_item.p_a)
             self.p_b = np.array(p_as).mean()
         else:
             self.p_b = None
         db.session.commit()
+        return nbrs_out
 
     def calculate_p_b_a(self):
         # get all priority_item methods and sum over

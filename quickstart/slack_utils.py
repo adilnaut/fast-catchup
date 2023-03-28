@@ -535,9 +535,9 @@ def build_priority_list(session_id=None, platform_id=None):
             update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
             # but should probably be replaced with update_p_m_a calls
             columns_list = ['ts', 'slack_channel_id', 'slack_user_id']
-            fill_priority_list(db, slack_messages, get_abstract_for_slack, plist_id, PriorityMessage, PriorityList, \
-                PriorityItem, PriorityItemMethod, PriorityListMethod, SlackMessage, columns_list)
-
+            msg_out = fill_priority_list(db, slack_messages, get_abstract_for_slack, plist_id, PriorityMessage \
+                , PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod, SlackMessage, columns_list)
+            return msg_out
 #  todo handle rate limited exception
 def get_slack_comms(session_id=None):
 
@@ -552,8 +552,8 @@ def get_slack_comms(session_id=None):
         etl_messages(app, db, session_id=session_id)
 
     # build priority lists with latest messages
-    build_priority_list(session_id=session_id, platform_id=platform_id)
-
+    msg_out = build_priority_list(session_id=session_id, platform_id=platform_id)
+    return msg_out
 
 
 

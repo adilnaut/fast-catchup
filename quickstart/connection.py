@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 from pathlib import Path
 from sqlalchemy import exc
-
+import os
 
 
 import sys
@@ -134,21 +134,21 @@ def clear_session_data(session_id=None):
                 db.session.delete(gm)
 
 
-    # delete priority tables
-    p_lists = PriorityList.query.filter_by(platform_id=platf.id) \
-        .filter_by(session_id=session_id).all()
-    for p_list in p_lists:
-        p_items = PriorityItem.query.filter_by(priority_list_id=p_list.id).all()
-        for p_item in p_items:
-            p_i_methods = PriorityItemMethod.query.filter_by(priority_item_id=p_item.id).all()
-            for p_i_m in p_i_methods:
-                db.session.delete(p_i_m)
-            db.session.delete(p_item)
-        db.session.delete(p_list)
-    p_messages = PriorityMessage.query.filter_by(platform_id=platf.id) \
-        .filter_by(session_id=session_id).all()
-    for p_m in p_messages:
-        db.session.delete(p_m)
+        # delete priority tables
+        p_lists = PriorityList.query.filter_by(platform_id=platf.id) \
+            .filter_by(session_id=session_id).all()
+        for p_list in p_lists:
+            p_items = PriorityItem.query.filter_by(priority_list_id=p_list.id).all()
+            for p_item in p_items:
+                p_i_methods = PriorityItemMethod.query.filter_by(priority_item_id=p_item.id).all()
+                for p_i_m in p_i_methods:
+                    db.session.delete(p_i_m)
+                db.session.delete(p_item)
+            db.session.delete(p_list)
+        p_messages = PriorityMessage.query.filter_by(platform_id=platf.id) \
+            .filter_by(session_id=session_id).all()
+        for p_m in p_messages:
+            db.session.delete(p_m)
 
     # attempt to delete session and audio if exists
     session = Session.query.filter_by(session_id=session_id).first()
