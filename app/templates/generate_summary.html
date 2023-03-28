@@ -120,7 +120,10 @@
                     tabTrigger.show()
                     var session_id = "{{gptout.sess_id}}";
                     var p_item_id = $(this).attr('id').split('-')[1];;
-
+                    var disableListCheckbox = document.getElementById('disableListCheckbox');
+                    if (disableListCheckbox.checked) {
+                      return;
+                    }
                     // Make the AJAX request to the Flask endpoint
                     $.ajax({
                         url: '/get_neighbors',
@@ -130,10 +133,7 @@
                             p_item_id: p_item_id
                         },
                         success: function(response) {
-                            var disableListCheckbox = document.getElementById('disableListCheckbox');
-                            if (disableListCheckbox.checked) {
-                              return;
-                            }
+
                             // console.log(response)
                             // var neighbors = JSON.parse(response);
                             var list = '';

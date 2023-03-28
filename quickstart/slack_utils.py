@@ -398,17 +398,17 @@ def get_list_data_by_m_id(slack_message_ts):
         headline = ""
         if channel_data and channel_is_channel:
             if channel_name and user_name:
-                headline += '%s in %s' % (user_name, channel_name)
+                headline += '@%s in #%s' % (user_name, channel_name)
             elif channel_name:
-                headline += 'unknown in %s' % channel_name
+                headline += 'unknown in #%s' % channel_name
         elif channel_data and channel_is_group:
             if user_name:
-                headline += '%s in group' % user_name
+                headline += '@%s in group' % user_name
             else:
                 headline += 'unknown in group'
         elif channel_data and channel_is_im:
             if user_name:
-                headline += '%s dm' % user_name
+                headline += '@%s dm' % user_name
             else:
                 headline += 'in dm'
         date_string = ts_to_formatted_date(ts)
@@ -418,6 +418,7 @@ def get_list_data_by_m_id(slack_message_ts):
         list_body['headline'] = headline
         # print(headline)
         list_body['text'] = text
+        list_body['subject'] = headline
         # print(text)
         list_body['date'] = date_string
         # print(date_string)

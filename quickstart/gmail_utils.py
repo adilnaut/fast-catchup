@@ -475,7 +475,7 @@ def get_list_data_by_g_id(gmail_message_id):
             .filter_by(platform_id=platform_id) \
             .one()
 
-        name_ = gmail_user.name
+        name_ = gmail_user.name if gmail_user.name else email_
         subject_ = gmail_message.subject
         date_ = gmail_message.date
         if date_:

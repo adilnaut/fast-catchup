@@ -421,6 +421,8 @@ def get_neighbors():
     session_id = request.args.get('session_id', None)
     p_item_id = request.args.get('p_item_id', None)
     sess = Session.query.filter_by(session_id=session_id).first()
+    if not sess or not sess.neighbors:
+        return []
     n_s = json.loads(sess.neighbors)['slack']
     n_g = json.loads(sess.neighbors)['gmail']
     if n_s and n_g:
