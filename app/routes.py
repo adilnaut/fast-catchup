@@ -412,8 +412,11 @@ def gen_summary():
 
     gptout = build_tags_for_audio_highlight(session_id, gpt_summary, word_boundaries, gptout)
 
-
     return render_template('generate_summary.html', title='Summary', gptout=gptout)
+    # return redirect(url_for('first', session_id=session_id), code=302)
+
+
+    # return render_template('generate_summary.html', title='Summary', gptout=gptout)
 
 @app.route('/get_neighbors', methods=['GET'])
 @login_required

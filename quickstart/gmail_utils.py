@@ -375,7 +375,7 @@ def etl_gmail(service, db, session_id=None, max_messages=20, unread_only=True):
 #  when  tokens don't exist in database
 #  when cred don't exist in database
 #  when shutil couldn't find or copy file
-def auth_and_load_session_gmail():
+def auth_and_load_session_gmail(loop=True):
     """Shows basic usage of the Gmail API.
     Lists the user's Gmail labels.
     """
@@ -401,13 +401,11 @@ def auth_and_load_session_gmail():
             .filter_by(name='token.json') \
             .filter_by(is_path=True) \
             .first()
-        # print(token_row)
         cred_row = AuthData.query \
             .filter_by(platform_id=platform_id) \
             .filter_by(name='credentials.json') \
             .filter_by(is_path=True) \
             .first()
-        # print(cred_row)
         tempdir = tempfile.gettempdir()
 
         if token_row:
@@ -431,14 +429,31 @@ def auth_and_load_session_gmail():
             except RefreshError as error:
                 print("Caught Refresh token error")
                 # os.remove('quickstart/token.json')
-                exit()
+                # print(tokenpath)
+                # print(os.path.exists(tokenpath))
+                # if token_row:
+                    # print(token_row.file_path)
+                if token_row and os.path.exists(token_row.file_path):
+                    os.remove(token_row.file_path)
+                # exit()
+                with db_ops(model_names=['AuthData']) as (db, AuthData):
+                    # auth_data = AuthData.query.filter_by(id=auth_id).first()
+                    auth_data = AuthData.query \
+                        .filter_by(platform_id=platform_id) \
+                        .filter_by(name='token.json') \
+                        .filter_by(is_path=True) \
+                        .first()
+                    db.session.delete(auth_data)
+                    db.session.commit()
+                # if loop:
+                    # auth_and_load_session_gmail(loop=False)
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 credpath, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        if tokenpath and os.path.exists(tokenpath):
-            os.remove(tokenpath)
+        # if tokenpath and os.path.exists(tokenpath):
+        # os.remove(tokenpath)
         filename = '%s-%s' % (uuid.uuid4().hex, 'token.json')
         new_tokenpath = os.path.join('file_store', filename)
         with open(new_tokenpath, 'w') as token:

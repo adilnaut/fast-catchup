@@ -6,7 +6,7 @@
         <div class="col-lg-2">
             {% for sess_id, date in gptout.past_sessions %}
                 <a type="button" href="{{ url_for('first', session_id=sess_id) }}"> {{date}} </a>
-                <!-- <a type="button" href="{{ url_for('remove_session', session_id=sess_id)}}"> delete </a> -->
+                <a type="button" href="{{ url_for('remove_session', session_id=sess_id)}}"> delete </a>
             {% endfor %}
         </div>
         <div class="col-lg-8">
@@ -15,7 +15,7 @@
 
 
             <center>
-        	<audio class="player" style="width: 80%" controls>
+        	<audio id="mainPlayer" class="player" style="width: 80%" controls>
           			<source src="{{ url_for('returnAudioFile', filepath=gptout.filepath) }}" type="audio/wav">
           			Your browser does not support the audio element.
         	</audio>
@@ -32,19 +32,50 @@
                 Summary:
               </h4> <br>
 
-              <div class="summary" style="text-align: justify;">
+              <div class="summary" style="text-align: justify;" >
                 {{ gptout.p_tags |safe}}
 
               </div>
 
+
+
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                </div>
+                <div class="col-sm-4">
+                    <div id="summary_result" >
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                </div>
+
             </div>
 
+            <script>
+                function generateSummary() {
+                  // disable the button to prevent multiple submissions
+                  document.getElementById("summary_form").getElementsByTagName("input")[0].disabled = true;
+                  document.getElementById("summary_result").innerHTML = "<center> <div class=\"loader\"></div> <br> Generating summary... </center>";
+                }
+            </script>
+
+<!--
             <form action = "/generate_summary" id="summary_form" method = "post">
-                <!-- <input type="checkbox" id="session_check" name="session-checkbox" value="Session-Cached" class="form-check-input"> -->
-                <!-- <label for="session-checkbox" class="form-check-label"> Get last session summary </label> <br> -->
                 <br>
-                <input type="submit" value="Generate" class="btn btn-primary btn-lg btn-block" style="width: 100%" >
+                <input type="submit" value="Generate" class="btn btn-primary btn-lg btn-block" style="width: 100%" onclick="generateSummary()"  >
+            </form> -->
+
+            <form action = "/generate_summary" id="summary_form" method = "post">
+                <br>
+                <input type="submit" value="Generate" class="btn btn-primary btn-lg btn-block" style="width: 100%">
             </form>
+
+
+
+
+
+
 
             <br><br>
 

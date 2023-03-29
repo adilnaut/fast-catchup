@@ -1,4 +1,8 @@
 window.onload = function() {
+
+    var vid = document.getElementById("mainPlayer");
+    vid.playbackRate = 1.25;
+
     const player = document.querySelector('.player')
     const lyrics = document.querySelector('.lyrics')
     const summary = document.querySelector('.summary')

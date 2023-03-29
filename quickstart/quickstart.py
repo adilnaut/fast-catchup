@@ -72,6 +72,7 @@ def get_p_items_by_session(session_id=None):
 @retry((Timeout, RateLimitError, APIConnectionError), tries=5, delay=1, backoff=2)
 def gpt_request_wrapper(sorted_messages):
     time.sleep(0.05)
+    openai.api_key = os.getenv("OPEN_AI_KEY")
     input_text = '\n'.join(['text %s, score %s' % (text, int(score*100.0)) for score, text in sorted_messages])
 
     prompt = '''Here is a list of incoming messages with their priority scores.
@@ -221,10 +222,10 @@ def generate_summary(session_id):
             msg_slack = get_slack_comms(session_id=session_id)
             gpt_summary = get_gpt_summary(session_id=session_id, msg_out={'slack': msg_slack, 'gmail': msg_gmail})
         except Exception as e:
-            print(e)
-            # remove platform messages, clear priority tables, sessions and audio files
-            # by session_id
-
+            # print(e)
+        #     # remove platform messages, clear priority tables, sessions and audio files
+        #     # by session_id
+        #
             gpt_summary = "Sorry, there was an unknown error in the messages processing!"
             clear_session_data(session_id=session_id)
     else:
