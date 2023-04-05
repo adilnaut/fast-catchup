@@ -222,7 +222,7 @@ def generate_summary(session_id):
             msg_slack = get_slack_comms(session_id=session_id)
             gpt_summary = get_gpt_summary(session_id=session_id, msg_out={'slack': msg_slack, 'gmail': msg_gmail})
         except Exception as e:
-            # print(e)
+            print(e)
         #     # remove platform messages, clear priority tables, sessions and audio files
         #     # by session_id
         #

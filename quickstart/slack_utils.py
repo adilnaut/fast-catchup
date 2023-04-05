@@ -16,7 +16,7 @@ from quickstart.connection import db_ops, get_current_user, get_platform_id, get
 from quickstart.gmail_utils import extract_domain
 from quickstart.sqlite_utils import get_upsert_query
 from quickstart.priority_engine import create_priority_list, update_priority_list_methods, fill_priority_list
-from quickstart.platform import get_abstract_for_slack
+from quickstart.platform_ import get_abstract_for_slack
 
 
 

@@ -24,7 +24,7 @@ from google.auth.exceptions import RefreshError
 from quickstart.connection import db_ops, get_current_user, get_platform_id
 from quickstart.sqlite_utils import get_upsert_query, get_insert_query
 from quickstart.priority_engine import create_priority_list, update_priority_list_methods, fill_priority_list
-from quickstart.platform import get_abstract_for_gmail
+from quickstart.platform_ import get_abstract_for_gmail
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']

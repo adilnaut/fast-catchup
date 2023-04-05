@@ -284,7 +284,7 @@ class PriorityItem(db.Model):
         p_m_result = PriorityMessage.query.filter_by(id=self.priority_message_id).first()
         p_m_vector = p_m_result.embedding_vector
         p_m_vector = np.frombuffer(p_m_vector, dtype='<f4')
-        p_m_vector = np.array([p_m_vector])
+        p_m_vector = np.array([p_m_vector], dtype=np.float64)
 
         nbrs_out = []
         if nbrs:

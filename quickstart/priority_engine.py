@@ -30,6 +30,7 @@ def build_knn(PriorityList, PriorityItem, PriorityMessage, p_item):
             ids.append(_.id)
             # emb_vector = struct.unpack('<q', b'\x15\x00\x00\x00\x00\x00\x00\x00')
             emb_vector = np.frombuffer(_.embedding_vector, dtype='<f4')
+            emb_vector = np.array(emb_vector, dtype=np.float64)
             all_vectors.append(emb_vector)
 
     if all_vectors:
@@ -37,7 +38,10 @@ def build_knn(PriorityList, PriorityItem, PriorityMessage, p_item):
         # we want to build NN algorithm for any number of samples present
         # but initially there would not be many
         # let's set this up to 3 for now
-        nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree').fit(X)
+        nbrs = NearestNeighbors(n_neighbors=3,
+                         metric='cosine',
+                         algorithm='brute',
+                         n_jobs=-1).fit(X)
     return nbrs, ids
 
 def create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id):
@@ -141,7 +145,7 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
             model = 'text-embedding-ada-002'
             text = sentence.replace('\n', ' ')
             vector = openai.Embedding.create(input=text, model=model)['data'][0]['embedding']
-            embedding_vectors.append(vector)
+            embedding_vectors.append(np.array(vector).tobytes())
         embedding_vectors = np.array(embedding_vectors)
     assert len(embedding_vectors) == len(priority_messages)
     # todo: assert items correspond appropriately, not only by length of arrays but elementwise assertion
