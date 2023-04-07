@@ -10,8 +10,8 @@ from app import app, db
 from app.models import (User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod, PriorityItemMethod,
     PriorityItem, PriorityMessage, PriorityList, Session, SlackChannel, SlackUser, SlackMessage, SlackAttachment,
     SlackLink, GmailMessage, GmailLink, GmailUser, GmailAttachment, GmailMessageTag, GmailMessageText,
-    GmailMessageListMetadata, GmailMessageLabel)
-from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthDataForm
+    GmailMessageListMetadata, GmailMessageLabel, Setting, PlatformColumn)
+from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthDataForm, DevModeForm
 
 
 from werkzeug.utils import secure_filename
@@ -79,6 +79,21 @@ def upload_gmail_auth():
                 .one()
         platform_id = platform_row.id
 
+        # initial priority order
+        columns_list = ['id', 'GmailMessageLabel.label', 'gmail_user_email', 'content_type']
+
+        pcolumns_query = '''INSERT OR IGNORE INTO platform_column (platform_id, order_num, column_name)
+            VALUES (:platform_id, :order_num, :column_name)
+            ON CONFLICT(platform_id, column_name)
+            DO UPDATE SET order_num=excluded.order_num;'''
+
+        for i in range(len(columns_list)):
+            pcolumns_kwargs = {'platform_id': platform_id
+                , 'order_num': i
+                , 'column_name': columns_list[i]}
+            db.session.execute(text(pcolumns_query), pcolumns_kwargs)
+
+
         credfile_query = '''INSERT INTO auth_data (platform_id, name, is_path, is_blob, is_data, file_path)
             VALUES(:platform_id, :name, :is_path, :is_blob, :is_data, :file_path)
             ON CONFLICT(platform_id, name)
@@ -130,6 +145,20 @@ def upload_slack_auth():
                 .one()
         platform_id = platform_row.id
 
+        # initial priority order
+        columns_list = ['ts', 'slack_channel_id', 'slack_user_id']
+
+        pcolumns_query = '''INSERT OR IGNORE INTO platform_column (platform_id, order_num, column_name)
+            VALUES (:platform_id, :order_num, :column_name)
+            ON CONFLICT(platform_id, column_name)
+            DO UPDATE SET order_num=excluded.order_num;'''
+
+        for i in range(len(columns_list)):
+            pcolumns_kwargs = {'platform_id': platform_id
+                , 'order_num': i
+                , 'column_name': columns_list[i]}
+            db.session.execute(text(pcolumns_query), pcolumns_kwargs)
+
         token_query = '''INSERT INTO auth_data (platform_id, name, is_data, is_path, is_blob, file_data)
             VALUES(:platform_id, :name, :is_data, :is_path, :is_blob, :file_data)
             ON CONFLICT(platform_id, name)
@@ -159,6 +188,7 @@ def upload_slack_auth():
         db.session.execute(text(secret_query), secret_kwargs)
         db.session.commit()
 
+        # upload current channels and users
         slack_test_etl()
         return redirect(url_for('index'))
 
@@ -181,6 +211,83 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
+@app.route('/save_settings', methods=['GET', 'POST'])
+@login_required
+def save_settings():
+    setting = Setting.query.filter_by(user_id=current_user.id).first()
+    form = DevModeForm(pscore_method=setting.pscore_method, embedding_method=setting.embeddings
+        , num_neighbors=setting.num_neighbors, num_gmail_msg=setting.num_gmail_msg
+        , num_days_slack=setting.num_days_slack)
+    # is_submitted() if no validation to trigger
+    if form.validate_on_submit():
+        pscore_method_val = form.pscore_method.data
+        embedding_method_val = form.embedding_method.data
+        num_neighbors_val = int(form.num_neighbors.data)
+        num_gmail_msg_val = int(form.num_gmail_msg.data)
+        num_days_slack_val = int(form.num_days_slack.data)
+
+        # to get not form platform column data
+        # request.form.get('field') instead of form.field.data
+        # cause it's easier to manually define fields
+        workspace = Workspace.query.filter_by(user_id=current_user.id).first()
+        platforms = Platform.query.filter_by(workspace_id=workspace.id).all()
+        for platform in platforms:
+            pc_order = request.form.getlist('%s_order[]' % platform.name)
+            if not pc_order:
+                continue
+            for i in range(len(pc_order)):
+                pc_query = ''' INSERT
+                    INTO platform_column (platform_id, order_num, column_name)
+                    VALUES (:platform_id, :order_num, :column_name)
+                    ON CONFLICT (platform_id, column_name)
+                    DO UPDATE SET platform_id=excluded.platform_id
+                        , column_name=excluded.column_name
+                        , order_num=excluded.order_num;'''
+                pc_kwargs = {'platform_id': platform.id
+                    , 'order_num': i+1
+                    , 'column_name': pc_order[i]}
+                db.session.execute(text(pc_query), pc_kwargs)
+                db.session.commit()
+
+        # update settings
+        setting_query = ''' INSERT
+            INTO setting (user_id, pscore_method, embeddings, num_neighbors, num_gmail_msg, num_days_slack)
+            VALUES (:user_id, :pscore_method, :embeddings, :num_neighbors, :num_gmail_msg, :num_days_slack)
+            ON CONFLICT(user_id)
+            DO UPDATE SET user_id=excluded.user_id
+                , pscore_method=excluded.pscore_method
+                , embeddings=excluded.embeddings
+                , num_neighbors=excluded.num_neighbors
+                , num_gmail_msg=excluded.num_gmail_msg
+                , num_days_slack=excluded.num_days_slack;'''
+        setting_kwargs = {'user_id': current_user.id
+            , 'pscore_method': pscore_method_val
+            , 'embeddings': embedding_method_val
+            , 'num_neighbors': num_neighbors_val
+            , 'num_gmail_msg': num_gmail_msg_val
+            , 'num_days_slack': num_days_slack_val}
+
+        db.session.execute(text(setting_query), setting_kwargs)
+        db.session.commit()
+        flash('Values recorded Successfully!')
+        redirect(url_for('index'))
+    workspace = Workspace.query.filter_by(user_id=current_user.id).first()
+    platforms = Platform.query.filter_by(workspace_id=workspace.id).all()
+    # platforms is a list of dict objects with name and body keys
+    # each platform body element is a coulmns dict with column_name and column_order_num keys
+    platform_list = []
+    for platform in platforms:
+        p_dict = {}
+        p_dict['name'] = platform.name
+        body_list = []
+        platform_columns = PlatformColumn.query.filter_by(platform_id=platform.id).all()
+        columns_list = [(pc.order_num, pc.column_name) for pc in platform_columns]
+        columns_list = sorted(columns_list, key=lambda x: x[0])
+        for c_order_num, c_name in columns_list[1:]:
+            body_list.append({'column_name': c_name, 'column_order_num': c_order_num})
+        p_dict['body'] = body_list
+        platform_list.append(p_dict)
+    return render_template('dev_mode.html', title='Settings', form=form, platforms=platform_list)
 
 @app.route('/logout')
 @login_required
@@ -214,12 +321,29 @@ def register():
         db.session.execute(text(workspace_query), workspace_kwargs)
         db.session.commit()
 
+        # create initial settings
+        setting_query = ''' INSERT OR IGNORE
+            INTO setting (user_id, pscore_method, embeddings, num_neighbors, num_gmail_msg, num_days_slack)
+            VALUES (:user_id, :pscore_method, :embeddings, :num_neighbors, :num_gmail_msg, :num_days_slack);
+        '''
+
+        setting_kwargs = {'user_id': user.id
+            , 'pscore_method': 'raw_llm'
+            , 'embeddings': 'openai_ada_v2'
+            , 'num_neighbors': 5
+            , 'num_gmail_msg': 8
+            , 'num_days_slack': 1}
+        db.session.execute(text(setting_query), setting_kwargs)
+        db.session.commit()
+
 
 
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
 
+
+# replace with on cascade and make sure that appropriate file_store files would be deleted
 @app.route('/clear_all_user_data', methods=['GET'])
 @login_required
 def delete_user_data():

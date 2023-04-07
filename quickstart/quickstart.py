@@ -26,12 +26,12 @@ from quickstart.connection import db_ops, get_current_user, clear_session_data
 from quickstart.sqlite_utils import get_insert_query
 
 def get_p_items_by_session(session_id=None):
-
     # we need short information to show on tabs
     # and summary to show on the right views
     list_body_l = []
-    with db_ops(model_names=['PriorityItem', 'PriorityList', 'PriorityMessage', 'Platform', 'PriorityItemMethod']) \
-        as (db, PriorityItem, PriorityList, PriorityMessage, Platform, PriorityItemMethod):
+    with db_ops(model_names=['PriorityItem', 'PriorityList', 'PriorityMessage', 'Platform', 'PriorityItemMethod', \
+        'Setting']) as (db, PriorityItem, PriorityList, PriorityMessage, Platform, PriorityItemMethod, Setting):
+        setting = db.session.query(Setting).filter_by(user_id=get_current_user().id).first()
         # get a priority list instance for each platform
         p_lists = PriorityList.query.filter_by(session_id=session_id).all()
         for p_list in p_lists:
@@ -52,10 +52,16 @@ def get_p_items_by_session(session_id=None):
                         list_body = get_list_data_by_g_id(message_id)
                     if not list_body:
                         pass
+                    # to show manually tuned priority changes - check if they exist and show then instead of est val
                     if p_item.p_a:
                         list_body['score'] = int(p_item.p_a*100.0)
                     else:
-                        list_body['score'] = int(p_item.p_a_b*100.0)
+                        if setting.pscore_method == 'raw_llm':
+                            list_body['score'] = int(p_item.p_b_a*100.0)
+                        elif setting.pscore_method == 'bayes':
+                            list_body['score'] = int(p_item.p_a_b*100.0)
+                        elif setting.pscore_method == 'bayes_meta':
+                            list_body['score'] = int(p_item.p_a_b_c*100.0)
                     list_body['text_score'] = int(p_item.p_b_a*100.0)
                     list_body['id'] = p_message.id
                     if p_i_m:
@@ -217,17 +223,23 @@ def generate_summary(session_id):
 
     if not sess:
         # do not catch them all - exceptions: openai rate etc., sql conflicts, parsing/converting type exception
-        try:
+        safe = False
+        if safe:
+            try:
+                msg_gmail = get_gmail_comms(session_id=session_id)
+                msg_slack = get_slack_comms(session_id=session_id)
+                gpt_summary = get_gpt_summary(session_id=session_id, msg_out={'slack': msg_slack, 'gmail': msg_gmail})
+            except Exception as e:
+                print(e)
+            #     # remove platform messages, clear priority tables, sessions and audio files
+            #     # by session_id
+            #
+                gpt_summary = "Sorry, there was an unknown error in the messages processing!"
+                clear_session_data(session_id=session_id)
+        else:
             msg_gmail = get_gmail_comms(session_id=session_id)
             msg_slack = get_slack_comms(session_id=session_id)
             gpt_summary = get_gpt_summary(session_id=session_id, msg_out={'slack': msg_slack, 'gmail': msg_gmail})
-        except Exception as e:
-            print(e)
-        #     # remove platform messages, clear priority tables, sessions and audio files
-        #     # by session_id
-        #
-            gpt_summary = "Sorry, there was an unknown error in the messages processing!"
-            clear_session_data(session_id=session_id)
     else:
         gpt_summary = sess.summary
 

@@ -2,7 +2,7 @@ from app import admin, db
 from app.models import (User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod, PriorityItemMethod,
     PriorityItem, PriorityMessage, PriorityList, Session, SlackChannel, SlackUser, SlackMessage, SlackAttachment,
     SlackLink, GmailMessage, GmailLink, GmailUser, GmailAttachment, GmailMessageTag, GmailMessageText,
-    GmailMessageListMetadata, GmailMessageLabel)
+    GmailMessageListMetadata, GmailMessageLabel, Setting, PlatformColumn)
 from flask_admin.contrib.sqla import ModelView
 
 class MyModelView(ModelView):
@@ -30,3 +30,5 @@ admin.add_view(MyModelView(AudioFile, db.session))
 admin.add_view(MyModelView(Platform, db.session))
 admin.add_view(MyModelView(Workspace, db.session))
 admin.add_view(MyModelView(User, db.session))
+admin.add_view(MyModelView(Setting, db.session))
+admin.add_view(MyModelView(PlatformColumn, db.session))

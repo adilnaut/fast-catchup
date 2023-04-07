@@ -8,9 +8,10 @@ from collections import OrderedDict
 from datetime import datetime
 from sklearn.neighbors import NearestNeighbors
 
+from quickstart.connection import get_current_user
 from quickstart.sqlite_utils import get_insert_query
 
-def build_knn(PriorityList, PriorityItem, PriorityMessage, p_item):
+def build_knn(db, Setting, PriorityList, PriorityItem, PriorityMessage, p_item):
     # ideally we should have 10 nearest neighbors classifiers object fitted on all previous data
     # but for now we can train it right there
     result = PriorityList.query.filter_by(id=p_item.priority_list_id).first()
@@ -33,12 +34,15 @@ def build_knn(PriorityList, PriorityItem, PriorityMessage, p_item):
             emb_vector = np.array(emb_vector, dtype=np.float64)
             all_vectors.append(emb_vector)
 
+
+    setting = db.session.query(Setting).filter_by(user_id=get_current_user().id).first()
+
     if all_vectors:
         X = np.array(all_vectors)
         # we want to build NN algorithm for any number of samples present
         # but initially there would not be many
         # let's set this up to 3 for now
-        nbrs = NearestNeighbors(n_neighbors=3,
+        nbrs = NearestNeighbors(n_neighbors=setting.num_neighbors,
                          metric='cosine',
                          algorithm='brute',
                          n_jobs=-1).fit(X)
@@ -106,7 +110,7 @@ def update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id):
 # todo: replace with named tuple
 def fill_priority_list(db, messages, get_abstract_func, plist_id, \
         PriorityMessage, PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod \
-        , TableName, columns_list):
+        , TableName, columns_list, Setting):
     # iterate over records of variable platform
     message_ids = []
     item_ids = []
@@ -131,6 +135,11 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
     sentences = [x.input_text_value for x in priority_messages]
 
     # local or openai
+    # this could be changed to handle get_current_user().setting.embeddings
+    # but this would require compatibility of embeddings
+    # or re-vectorisation of whole summary history
+    # with the support of multiple embeddings stored at the same time
+    # for now better to stick to openai ada
     embedding_mode = 'openai'
 
     if embedding_mode == 'local':
@@ -189,17 +198,21 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
 
     db.session.commit()
     nbrs_out = {}
+
     # todo optimise calculate_p_b cause it build the same KNearestNeighbors model each item
     # priority_items = db.session.query(PriorityItem).filter(PriorityItem.id.in_(tuple(item_ids))).all()
     for priority_item in priority_items:
-        nbrs, ids = build_knn(PriorityList, PriorityItem, PriorityMessage, priority_item)
+        # todo - this isn't optimized per settings restrictions
+        # calculate everything at this stage, and use setting only in representation
+        # later design repr so that consequent change in setting would allow different reprs
+        nbrs, ids = build_knn(db, Setting, PriorityList, PriorityItem, PriorityMessage, priority_item)
         nbr = priority_item.calculate_p_b(nbrs, ids)
         nbrs_out[priority_item.priority_message_id] = nbr
         priority_item.calculate_p_b_a()
         priority_item.calculate_p_a_b()
-        # priority_item.calculate_p_a_c(TableName, columns_list)
-        # priority_item.calculate_p_b_c(TableName, columns_list)
-        # priority_item.calculate_p_a_b_c()
+        priority_item.calculate_p_a_c(TableName, columns_list)
+        priority_item.calculate_p_b_c(TableName, columns_list)
+        priority_item.calculate_p_a_b_c()
     db.session.commit()
 
     if nbrs_out:

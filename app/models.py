@@ -8,6 +8,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sklearn.neighbors import NearestNeighbors
 from sentence_transformers import SentenceTransformer
 import numpy as np
+from flask_login import current_user
+
 import importlib
 import pickle
 
@@ -26,15 +28,12 @@ def smart_filtering(TableName, columns_list, m_item, query, max_samples=10, min_
     _ = query.all()
     if len(_) <= max_samples:
         return _
-    # todo
     # TableName is message table
     # where query have query of PriorityItem elements
     result_query = None
     for column_name in columns_list[1:]:
-        # print(column_name)
         if '.' in column_name:
             meta_table, meta_column = column_name.split('.')
-            # MetaTable = getattr(models, meta_table)
             MetaTable = globals()[meta_table]
             # todo
             # here we should get MetaTable instance of m_item
@@ -55,16 +54,10 @@ def smart_filtering(TableName, columns_list, m_item, query, max_samples=10, min_
                     .join(TableName, getattr(TableName, columns_list[0]) == PriorityMessage.message_id) \
                     .join(MetaTable) \
                     .filter(getattr(MetaTable, meta_column) == getattr(MetaTable, meta_column))
-                # result = result_query.all()
                 results_list.append(result_query)
                 i += 1
             result_query = union(*results_list)
-            # result_query = union(results_list[0], results_list[1])
-            # print(result_query)
-            # result = result_query
-            # result_query = result_query.select()
             result = db.session.execute(result_query).fetchall()
-            # result = result.all()
             result = cast_tuples_to_p_items(result)
         else:
             result_query = query.join(PriorityMessage) \
@@ -219,8 +212,7 @@ class PriorityItem(db.Model):
 
     # expensive, we build knn model for each item
     def calculate_p_b_c(self, TableName, columns_list):
-        # ideally we should have 10 nearest neighbors classifiers object fitted on all previous data
-        # but for now we can train it right there
+        
         result = PriorityList.query.filter_by(id=self.priority_list_id).first()
         platform_id = result.platform_id
 
@@ -239,24 +231,31 @@ class PriorityItem(db.Model):
         nbrs = None
 
         for p_item in p_items:
-            # p_methods = PriorityListMethod.query.filter_by(priority_list_id=p_list.id).all()
             _ = PriorityMessage.query.filter_by(id=p_item.priority_message_id).first()
             ids.append(_.id)
-            # emb_vector = struct.unpack('<q', b'\x15\x00\x00\x00\x00\x00\x00\x00')
             emb_vector = np.frombuffer(_.embedding_vector, dtype='<f4')
+            emb_vector = np.array(emb_vector, dtype=np.float64)
             all_vectors.append(emb_vector)
+
+        # todo - if doesn't work call get_id() and then get user by db session query
+
+        setting = db.session.query(Setting).filter_by(user_id=current_user.id).first()
+        days_ago = setting.num_days_slack
 
         if all_vectors:
             X = np.array(all_vectors)
             # we want to build NN algorithm for any number of samples present
             # but initially there would not be many
             # let's set this up to 3 for now
-            nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree').fit(X)
+            nbrs = NearestNeighbors(n_neighbors=setting.num_neighbors
+                , metric='cosine'
+                , algorithm='brute'
+                ).fit(X)
 
         p_m_result = PriorityMessage.query.filter_by(id=self.priority_message_id).first()
         p_m_vector = p_m_result.embedding_vector
         p_m_vector = np.frombuffer(p_m_vector, dtype='<f4')
-        p_m_vector = np.array([p_m_vector])
+        p_m_vector = np.array([p_m_vector], dtype=np.float64)
 
 
         if nbrs:
@@ -427,11 +426,32 @@ class AudioFile(db.Model):
     file_path = db.Column(db.Text())
     word_boundaries = db.Column(db.Text())
 
+
+class Setting(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    # can be either raw_llm, bayes, bayes_meta
+    pscore_method = db.Column(db.Text())
+    # can be local_bart or openai_ada_v2
+    embeddings = db.Column(db.Text())
+    # range 1 - 10 (?)
+    num_neighbors = db.Column(db.Integer)
+    # how many messages check if they are unread in gmail range 1 - 50 (?)
+    num_gmail_msg = db.Column(db.Integer)
+    # how many days of messages should it retrieve
+    # maybe allow last night/ 12 hours / hours generally
+    # think about it
+    num_days_slack = db.Column(db.Integer)
+
+
+
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    setting = db.relationship('Setting', backref='s_user', lazy='dynamic')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -457,7 +477,17 @@ class Platform(db.Model):
     workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
     auth_method = db.Column(db.Text())
     auth_records = db.relationship('AuthData', backref='platform', lazy='dynamic')
+    columns = db.relationship('PlatformColumn', backref='platform', lazy='dynamic')
     __table_args__ = (db.UniqueConstraint('workspace_id', 'name', name='_unique_constraint_uc'),
+        )
+
+class PlatformColumn(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
+    order_num = db.Column(db.Integer)
+    column_name = db.Column(db.Text())
+
+    __table_args__ = (db.UniqueConstraint('platform_id', 'column_name', name='_unique_constraint_plat_col'),
         )
 
 class AuthData(db.Model):
@@ -706,6 +736,7 @@ class SlackAttachment(db.Model):
 
     def __repr__(self):
         return '<s-attachment with filename {}>'.format(self.filename)
+
 
 class SlackLink(db.Model):
     id = db.Column(db.Integer, primary_key=True)

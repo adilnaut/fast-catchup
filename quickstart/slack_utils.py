@@ -159,13 +159,16 @@ def etl_users(app, db):
             db.session.execute(su_query, su_kwargs)
 
 
-def etl_messages(app, db, session_id=None, days_ago=1, max_pages=1,  verbose=False):
+def etl_messages(app, db, session_id=None, max_pages=1, verbose=False):
     # don't overwhelm API rate
     slack_channels = None
     platform_id = get_platform_id('slack')
 
-    with db_ops(model_names=['SlackChannel']) as (db_sess, SlackChannel):
+
+    with db_ops(model_names=['SlackChannel', 'Setting']) as (db_sess, SlackChannel, Setting):
         slack_channels = SlackChannel.query.filter_by(platform_id=platform_id).all()
+        setting = db.session.query(Setting).filter_by(user_id=get_current_user().id).first()
+        days_ago = setting.num_days_slack
 
     yesterday = datetime.utcnow() - timedelta(days=days_ago)
     unix_time = time.mktime(yesterday.timetuple())
@@ -529,15 +532,21 @@ def build_priority_list(session_id=None, platform_id=None):
 
     if slack_messages:
         with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
-            , 'PriorityItem', 'PriorityItemMethod', 'SlackMessage']) as (db, PriorityList, PriorityListMethod \
-            , PriorityMessage, PriorityItem, PriorityItemMethod, SlackMessage):
+            , 'PriorityItem', 'PriorityItemMethod', 'SlackMessage', 'Setting']) \
+            as (db, PriorityList, PriorityListMethod, PriorityMessage, PriorityItem, PriorityItemMethod, SlackMessage \
+            , Setting):
             plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
             # this should go to add_auth_method_now
             update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
             # but should probably be replaced with update_p_m_a calls
-            columns_list = ['ts', 'slack_channel_id', 'slack_user_id']
+            # columns_list = ['ts', 'slack_channel_id', 'slack_user_id']
+            platform_columns = PlatformColumn.query.filter_by(platform_id=platform_id).all()
+            columns_list = [(pc.order_num, pc.column_name) for pc in platform_columns]
+            columns_list = sorted(columns_list, key=lambda x: x[0])
+            columns_list = [x[1] for x in columns_list]
             msg_out = fill_priority_list(db, slack_messages, get_abstract_for_slack, plist_id, PriorityMessage \
-                , PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod, SlackMessage, columns_list)
+                , PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod, SlackMessage, columns_list \
+                , Setting)
             return msg_out
 #  todo handle rate limited exception
 def get_slack_comms(session_id=None):

@@ -192,8 +192,10 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
     return text_parts, num_processed
 
 
-def etl_gmail(service, db, session_id=None, max_messages=20, unread_only=True):
-
+def etl_gmail(service, db, session_id=None, unread_only=True):
+    with db_ops(model_names=['Setting']) as (db_s, Setting):
+        setting = db.session.query(Setting).filter_by(user_id=get_current_user().id).first()
+    max_messages = setting.num_gmail_msg
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
     m_data = []
@@ -558,15 +560,21 @@ def build_priority_list(session_id=None, platform_id=None):
     # build priority list
     if gmail_messages:
         with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
-            , 'PriorityItem', 'PriorityItemMethod', 'GmailMessage']) as (db, PriorityList, PriorityListMethod \
-            , PriorityMessage, PriorityItem, PriorityItemMethod, GmailMessage):
+            , 'PriorityItem', 'PriorityItemMethod', 'GmailMessage', 'PlatformColumn', 'Setting']) \
+            as (db, PriorityList, PriorityListMethod, PriorityMessage, PriorityItem, PriorityItemMethod \
+            , GmailMessage, PlatformColumn, Setting):
             plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
             # this should go to add_auth_method_now
             update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
             # but should probably be replaced with update_p_m_a calls
-            columns_list = ['id', 'GmailMessageLabel.label', 'gmail_user_email', 'content_type']
+            platform_columns = PlatformColumn.query.filter_by(platform_id=platform_id).all()
+            columns_list = [(pc.order_num, pc.column_name) for pc in platform_columns]
+            columns_list = sorted(columns_list, key=lambda x: x[0])
+            columns_list = [x[1] for x in columns_list]
+            # columns_list = ['id', 'GmailMessageLabel.label', 'gmail_user_email', 'content_type']
             msg_out = fill_priority_list(db, gmail_messages, get_abstract_for_gmail, plist_id, PriorityMessage \
-                , PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod, GmailMessage, columns_list)
+                , PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod, GmailMessage, columns_list \
+                , Setting)
             return msg_out
 
 def get_gmail_comms(session_id=None):
