@@ -1,6 +1,7 @@
 .venv
 .flaskenv
 .vs
+.ipynb_checkpoints
 *.pyc
 app.db
 quickstart/credentials.json
@@ -8,4 +9,7 @@ quickstart/token.json
 quickstart/tests/
 file_store/
 distilbert/
+__pycache__
+app/__pycache__
 models/
+app.log

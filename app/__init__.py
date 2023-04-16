@@ -6,6 +6,7 @@ from sqlalchemy import MetaData
 from flask_login import LoginManager
 from flask_admin import Admin
 
+import logging
 
 
 import sqlite3
@@ -26,6 +27,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 admin = Admin(app, name='fast-catchup', template_mode='bootstrap3')
+logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
 

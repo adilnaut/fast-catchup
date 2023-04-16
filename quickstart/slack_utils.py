@@ -532,9 +532,9 @@ def build_priority_list(session_id=None, platform_id=None):
 
     if slack_messages:
         with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
-            , 'PriorityItem', 'PriorityItemMethod', 'SlackMessage', 'Setting']) \
+            , 'PriorityItem', 'PriorityItemMethod', 'SlackMessage', 'PlatformColumn', 'Setting']) \
             as (db, PriorityList, PriorityListMethod, PriorityMessage, PriorityItem, PriorityItemMethod, SlackMessage \
-            , Setting):
+            , PlatformColumn, Setting):
             plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
             # this should go to add_auth_method_now
             update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)

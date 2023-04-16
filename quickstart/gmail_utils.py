@@ -413,10 +413,8 @@ def auth_and_load_session_gmail(loop=True):
         if token_row:
             tokenpath = os.path.join(tempdir, token_row.name)
             shutil.copyfile(token_row.file_path, tokenpath)
-            # print('shutil')
         # else:
         #     tokenpath = os.path.join(tempdir, 'token.json')
-        #     print('ne shutil')
         if cred_row:
             credpath = os.path.join(tempdir, cred_row.name)
             shutil.copyfile(cred_row.file_path, credpath)
@@ -482,7 +480,9 @@ def get_list_data_by_g_id(gmail_message_id):
     with db_ops(model_names=['GmailUser', 'GmailMessage', 'GmailMessageText']) as \
         (db, GmailUser, GmailMessage, GmailMessageText):
         gmail_message = GmailMessage.query.filter_by(id=gmail_message_id).first()
-
+        if not gmail_message:
+            return None
+            
         id_ = gmail_message.id
         email_ = gmail_message.gmail_user_email
         name_ = None
@@ -578,7 +578,6 @@ def build_priority_list(session_id=None, platform_id=None):
             return msg_out
 
 def get_gmail_comms(session_id=None):
-
     # first check if auth method for this platform exist
     platform_id = get_platform_id('gmail')
     if not platform_id:

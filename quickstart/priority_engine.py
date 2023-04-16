@@ -163,7 +163,6 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
     db.session.commit()
 
 
-
     for message_id in message_ids:
         p_item_kwargs = OrderedDict([('priority_list_id', plist_id)
             , ('priority_message_id', message_id)])
@@ -172,13 +171,10 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
     db.session.commit()
 
     priority_items = db.session.query(PriorityItem).filter_by(priority_list_id=plist_id).all()
-    # print('priority_items: %s' % priority_items)
     item_ids = [x.id for x in priority_items]
-    # print('item_ids: %s' % item_ids)
 
     for item_id in item_ids:
         for method_id in method_ids:
-            # print("Attempt to create priority_item_method")
             pi_method_kwargs = OrderedDict([('priority_item_id', item_id)
                 , ('priority_list_method_id', method_id)])
             pi_method_query = get_insert_query('priority_item_method', pi_method_kwargs.keys())
@@ -198,7 +194,6 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
 
     db.session.commit()
     nbrs_out = {}
-
     # todo optimise calculate_p_b cause it build the same KNearestNeighbors model each item
     # priority_items = db.session.query(PriorityItem).filter(PriorityItem.id.in_(tuple(item_ids))).all()
     for priority_item in priority_items:
@@ -206,18 +201,21 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
         # calculate everything at this stage, and use setting only in representation
         # later design repr so that consequent change in setting would allow different reprs
         nbrs, ids = build_knn(db, Setting, PriorityList, PriorityItem, PriorityMessage, priority_item)
-        nbr = priority_item.calculate_p_b(nbrs, ids)
-        nbrs_out[priority_item.priority_message_id] = nbr
+
+        priority_item.calculate_p_b(nbrs, ids)
+        # nbr = priority_item.calculate_p_b(nbrs, ids)
+        # nbrs_out[priority_item.priority_message_id] = nbr
         priority_item.calculate_p_b_a()
         priority_item.calculate_p_a_b()
         priority_item.calculate_p_a_c(TableName, columns_list)
-        priority_item.calculate_p_b_c(TableName, columns_list)
+        nbr = priority_item.calculate_p_b_c(TableName, columns_list)
+        nbrs_out[priority_item.priority_message_id] = nbr
         priority_item.calculate_p_a_b_c()
     db.session.commit()
 
+
     if nbrs_out:
         msg_out = {}
-        # print(nbrs_out)
         for p_id, nbr_list in nbrs_out.items():
             msg_out[p_id] = []
             for nbr in nbr_list:

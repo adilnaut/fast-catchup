@@ -201,7 +201,8 @@ class PriorityItem(db.Model):
             .filter(PriorityList.platform_id == platform_id) \
             .filter(PriorityList.id != self.id)
 
-        items = smart_filtering(TableName, columns_list, m_item, items_query)
+        setting = db.session.query(Setting).filter_by(user_id=current_user.id).first()
+        items = smart_filtering(TableName, columns_list, m_item, items_query, min_samples=setting.num_neighbors)
         # average real importance of message
         p_as = []
         for item in items:
@@ -212,7 +213,7 @@ class PriorityItem(db.Model):
 
     # expensive, we build knn model for each item
     def calculate_p_b_c(self, TableName, columns_list):
-        
+
         result = PriorityList.query.filter_by(id=self.priority_list_id).first()
         platform_id = result.platform_id
 
@@ -223,8 +224,8 @@ class PriorityItem(db.Model):
         m_item = TableName.query \
             .join(PriorityMessage, getattr(TableName, columns_list[0]) == PriorityMessage.message_id) \
             .filter(PriorityMessage.id == self.priority_message_id).first()
-
-        p_items = smart_filtering(TableName, columns_list, m_item, p_items_query)
+        setting = db.session.query(Setting).filter_by(user_id=current_user.id).first()
+        p_items = smart_filtering(TableName, columns_list, m_item, p_items_query, min_samples=setting.num_neighbors)
 
         ids = []
         all_vectors = []
@@ -257,7 +258,7 @@ class PriorityItem(db.Model):
         p_m_vector = np.frombuffer(p_m_vector, dtype='<f4')
         p_m_vector = np.array([p_m_vector], dtype=np.float64)
 
-
+        nbrs_out = []
         if nbrs:
             distances, indices = nbrs.kneighbors(p_m_vector)
             p_as = []
@@ -266,11 +267,13 @@ class PriorityItem(db.Model):
                 n_id = ids[n_i]
                 n_item = PriorityItem.query.filter_by(priority_message_id=n_id).one()
                 if n_item and n_item.p_a:
+                    nbrs_out.append(n_item.priority_message_id)
                     p_as.append(n_item.p_a)
             self.p_b_c = np.array(p_as).mean()
         else:
             self.p_b_c = 0.2
         db.session.commit()
+        return nbrs_out
 
 
     def calculate_p_b(self, nbrs, ids):

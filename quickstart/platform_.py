@@ -12,6 +12,7 @@ import pytz
 import time
 import requests
 import hashlib
+import logging
 
 from retry import retry
 from openai.error import RateLimitError
@@ -127,6 +128,7 @@ def get_abstract_for_gmail(gmail_message):
     name_ = None
     snippet_ = None
     final_summary_ = None
+
     with db_ops(model_names=['GmailUser', 'GmailMessageText']) as \
         (db, GmailUser, GmailMessageText):
         platform_id = get_platform_id('gmail')
@@ -168,6 +170,7 @@ def get_abstract_for_gmail(gmail_message):
 
 @retry((Timeout, RateLimitError, APIConnectionError), tries=5, delay=1, backoff=2)
 def summarize_with_gpt3(input_text):
+    print('Summarize call with input length %s' % len(input_text))
     time.sleep(0.05)
     ''' Prompt ChatGPT or GPT3 level of importance of one message directly
         TODO: decice where None values should be handled and throw exception
@@ -195,7 +198,7 @@ def summarize_with_gpt3(input_text):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt}
             ],
-          timeout=10
+          timeout=50
         )
 
     # print(response)

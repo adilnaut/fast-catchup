@@ -51,7 +51,7 @@ def get_p_items_by_session(session_id=None):
                     elif platform_name == 'gmail':
                         list_body = get_list_data_by_g_id(message_id)
                     if not list_body:
-                        pass
+                        continue
                     # to show manually tuned priority changes - check if they exist and show then instead of est val
                     if p_item.p_a:
                         list_body['score'] = int(p_item.p_a*100.0)
@@ -116,17 +116,13 @@ def save_session(text_response, session_id=None, msg_out=None):
 
         workspace = Workspace.query.filter_by(user_id=user_id).one()
         workspace_id = workspace.id
-        # print(json.dumps(msg_out))
         label_kwargs = OrderedDict([('session_id', session_id)
             , ('workspace_id', workspace_id)
             , ('date', datetime.now().strftime('%m/%d/%Y, %H:%M'))
             , ('summary', text_response)
             , ('neighbors', json.dumps(msg_out))])
-        # print(label_kwargs)
         label_query = get_insert_query('session', label_kwargs.keys())
-        # print(label_query)
         status = db.session.execute(label_query, label_kwargs)
-        # print(status)
 
 def get_sorted_messages(session_id=None):
     message_texts = []
@@ -176,23 +172,16 @@ def generate_voice_file(text_response, verbose=False):
     # Set either the `SpeechSynthesisVoiceName` or `SpeechSynthesisLanguage`.
     speech_config.speech_synthesis_language = "en-US"
     speech_config.speech_synthesis_voice_name = "en-US-JennyNeural"
-    # speech_config.speech_synthesis_voice_name = "en-US-AIGenerate2Neural"
 
     filename = '%s-%s' % (uuid.uuid4().hex, 'audio.wav')
     filepath = os.path.join('file_store', filename)
 
     audio_config = speechsdk.audio.AudioOutputConfig(filename=filepath)
-    # audio_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
-    # Receives a text from console input.
 
     # Creates a speech synthesizer using the default speaker as audio output.
     speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
 
     word_boundaries = []
-    # speech_synthesizer.synthesis_word_boundary.connect(lambda evt: print(
-    #     "Word boundary event received: {}, audio offset in ms: {}ms".format(evt, evt.audio_offset / 10000)))
-    # print(text_response)
-    # SpeechSynthesisWordBoundaryEventArgs(audio_offset=329750000, duration=0:00:00.100000, text_offset=562, word_length=1)
     speech_synthesizer.synthesis_word_boundary.connect(lambda evt: word_boundaries.append({'audio_offset': evt.audio_offset / 10000000 \
         , 'text_offset': evt.text_offset, 'word_length': evt.word_length, 'duration': get_seconds(evt.duration) }) )
     # Synthesizes the received text to speech.
@@ -217,7 +206,6 @@ def generate_voice_file(text_response, verbose=False):
 
 
 def generate_summary(session_id):
-
     with db_ops(model_names=['Session']) as (db, Session):
         sess = Session.query.filter_by(session_id=session_id).first()
 
@@ -242,10 +230,8 @@ def generate_summary(session_id):
             gpt_summary = get_gpt_summary(session_id=session_id, msg_out={'slack': msg_slack, 'gmail': msg_gmail})
     else:
         gpt_summary = sess.summary
-
     with db_ops(model_names=['AudioFile']) as (db, AudioFile):
         audio = AudioFile.query.filter_by(session_id=session_id).first()
-
     if not audio:
         file_path, word_boundaries = generate_voice_file(gpt_summary)
     else:
