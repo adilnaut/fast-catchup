@@ -179,7 +179,7 @@ def etl_messages(app, db, session_id=None, max_pages=1, verbose=False):
             # don't overwhelm API rate
             time.sleep(0.2)
             if verbose:
-                print("channel %s, id %s, request number %s" % (channel.name,
+                logging.debug("channel %s, id %s, request number %s" % (channel.name,
                     channel.id, i))
             if next_cursor:
                 response = app.client.conversations_history(channel=channel.id, oldest=unix_time,
@@ -195,7 +195,7 @@ def etl_messages(app, db, session_id=None, max_pages=1, verbose=False):
 
             messages = response.get('messages')
             if verbose:
-                print("Has more %s, messages %s" % (has_more, len(messages)))
+                logging.debug("Has more %s, messages %s" % (has_more, len(messages)))
             if status and messages:
                 for message in messages:
                     type = message.get('type')
@@ -224,8 +224,8 @@ def etl_messages(app, db, session_id=None, max_pages=1, verbose=False):
                         block_id = block.get('block_id')
 
                         if verbose:
-                            print("DEBUG block_type %s" % block_type)
-                            print("DEBUG block id %s" % block_id)
+                            logging.debug("DEBUG block_type %s" % block_type)
+                            logging.debug("DEBUG block id %s" % block_id)
                         # this is a list of elements
                         block_sub_elements = block.get('elements')
                         for sub_element in block_sub_elements:
@@ -239,9 +239,9 @@ def etl_messages(app, db, session_id=None, max_pages=1, verbose=False):
                                 # cause they are already being processed
                                 # in the text part
                                 if verbose:
-                                    print("DEBUG: element_type %s" % element_type)
-                                    print("DEBUG: element_text %s" % element_text)
-                                    print("DEBUG: element_url %s" % element_url)
+                                    logging.debug("DEBUG: element_type %s" % element_type)
+                                    logging.debug("DEBUG: element_text %s" % element_text)
+                                    logging.debug("DEBUG: element_url %s" % element_url)
 
                                 if not element_url:
                                     continue
@@ -268,14 +268,14 @@ def etl_messages(app, db, session_id=None, max_pages=1, verbose=False):
                         # get url_private_download from one_file_data
                         file_url = one_file_data.get('url_private')
                         if verbose:
-                            print("Downloaded " + file_name)
+                            logging.debug("Downloaded " + file_name)
 
                         # download file with authorized request (slack_token) to temp store
                         r = requests.get(file_url, headers={'Authorization': 'Bearer %s' % slack_app_token})
                         r.raise_for_status
                         file_data = r.content   # get binary content
                         if verbose:
-                            print('File size: %s' % len(file_data))
+                            logging.debug('File size: %s' % len(file_data))
 
                         # check bytes content md5 hash first without writing to disk
                         file_md5 = hashlib.md5(file_data).hexdigest()
@@ -415,18 +415,11 @@ def get_list_data_by_m_id(slack_message_ts):
             else:
                 headline += 'in dm'
         date_string = ts_to_formatted_date(ts)
-        # print("----------start---------")
         list_body = {}
-        # print(list_body)
         list_body['headline'] = headline
-        # print(headline)
         list_body['text'] = text
         list_body['subject'] = headline
-        # print(text)
         list_body['date'] = date_string
-        # print(date_string)
-        # print(list_body)
-        # print("----------end--------")
         return list_body
 
 
@@ -516,8 +509,7 @@ def slack_test_etl():
         time.sleep(1)
         etl_messages(app, db)
 
-    # except SlackApiError as err:
-        # print(err)
+
 
 def build_priority_list(session_id=None, platform_id=None):
     slack_messages = None

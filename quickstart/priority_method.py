@@ -2,6 +2,7 @@ import os
 import re
 import time
 import openai
+import logging
 
 from openai.error import RateLimitError
 from openai.error import Timeout
@@ -25,7 +26,6 @@ def ask_large_bloom_raw(prompt, temperature=1.0, do_sample=True, top_k=20, top_p
 
     def query(payload):
         response = requests.post(API_URL, headers=headers, json=payload)
-        # print(response)
         return response.json()
 
     output = query({
@@ -37,8 +37,8 @@ def ask_large_bloom_raw(prompt, temperature=1.0, do_sample=True, top_k=20, top_p
     })
     if 'error' in output:
         # ask_instruct_bloom(input_text)
-        print(output)
-        print('Error in large bloom')
+        logging.debug(output)
+        logging.error('Error in large bloom')
         exit()
     else:
         out_text = output[0]['generated_text']
@@ -104,9 +104,9 @@ def ask_instruct_bloom(inp_text):
     {id:3, text: \"%s\", priority:
     '''
     response = ask_instruct_bloom_helper(inp_text, prompt, top_k=50, top_p=0.2)
-    print(response)
+    logging.debug(response)
     priority_score = parse_bloom_response(response)
-    print("Score: %s " % priority_score)
+    logging.debug("Score: %s " % priority_score)
     return priority_score
 
 def ask_instruct_bloom_raw(prompt, top_k=10, top_p=0.2):
@@ -177,7 +177,7 @@ def ask_bloom(input_text, temperature=1.0, top_k=50, top_p=0.9):
                        top_p=top_p
                       )[0])
     text_response = text_response.replace(prompt, '')
-    print('Text response for <<%s>> is <<%s>>' % (input_text, text_response))
+    logging.debug('Text response for <<%s>> is <<%s>>' % (input_text, text_response))
     priority_score = parse_gpt_response(text_response)
     return priority_score, None
 
@@ -241,9 +241,9 @@ def sentiment_analysis(input_text):
     result = sentiment_pipeline(data)
     label = result[0].get('label')
     score = result[0].get('score')
-    print('sentiment')
-    print(label)
-    print(score)
+    logging.debug('sentiment')
+    logging.debug(label)
+    logging.debug(score)
     if label == 'NEGATIVE':
         return score, None
     else:

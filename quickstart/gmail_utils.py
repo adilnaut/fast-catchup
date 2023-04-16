@@ -8,6 +8,7 @@ import hashlib
 import tempfile
 import shutil
 import uuid
+import logging
 
 from collections import OrderedDict
 from bs4 import BeautifulSoup
@@ -126,7 +127,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
         size_0 = body_0.get('size')
         attachment_id_0 = body_0.get('attachmentId')
         if verbose:
-            print("We have a file with filename-%s" % filename_0)
+            logging.debug("We have a file with filename-%s" % filename_0)
         # handle attachment here:
         # messageId is id
         # attachmentID is attachment_id_0
@@ -136,7 +137,6 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
         file_response = service.users().messages().attachments().get(
             userId='me', messageId=id, id=attachment_id_0).execute()
         # If successful, the response body contains an instance of MessagePartBody.
-        # print(file_response)
         file_data = file_response.get('data', '')
         file_size = file_response.get('size', '')
 
@@ -144,7 +144,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
         file_extension = mime_type_0.split('/')[1]
 
         if verbose:
-            print('file size: %s' % file_size)
+            logging.debug('file size: %s' % file_size)
         file_attachment_id = file_response.get('attachmentId', '')
         while file_attachment_id:
             # handle more chunks of file
@@ -178,7 +178,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
         db.session.execute(ga_query, ga_kwargs)
     else:
         if verbose:
-            print('This type of content %s is not supported yet' % mime_type_0)
+            logging.debug('This type of content %s is not supported yet' % mime_type_0)
     if text:
         text_parts.append(text)
         num_processed += 1
@@ -427,17 +427,10 @@ def auth_and_load_session_gmail(loop=True):
             try:
                 creds.refresh(Request())
             except RefreshError as error:
-                print("Caught Refresh token error")
-                # os.remove('quickstart/token.json')
-                # print(tokenpath)
-                # print(os.path.exists(tokenpath))
-                # if token_row:
-                    # print(token_row.file_path)
+                logging.critical("Caught Refresh token error")
                 if token_row and os.path.exists(token_row.file_path):
                     os.remove(token_row.file_path)
-                # exit()
                 with db_ops(model_names=['AuthData']) as (db, AuthData):
-                    # auth_data = AuthData.query.filter_by(id=auth_id).first()
                     auth_data = AuthData.query \
                         .filter_by(platform_id=platform_id) \
                         .filter_by(name='token.json') \
@@ -473,8 +466,7 @@ def auth_and_load_session_gmail(loop=True):
 
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
-        pass
-        # print(f'An error occurred: {error}')
+        logging.critical('An error occurred: %s' % error)
 
 def get_list_data_by_g_id(gmail_message_id):
     with db_ops(model_names=['GmailUser', 'GmailMessage', 'GmailMessageText']) as \
@@ -482,7 +474,7 @@ def get_list_data_by_g_id(gmail_message_id):
         gmail_message = GmailMessage.query.filter_by(id=gmail_message_id).first()
         if not gmail_message:
             return None
-            
+
         id_ = gmail_message.id
         email_ = gmail_message.gmail_user_email
         name_ = None

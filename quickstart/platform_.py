@@ -5,6 +5,7 @@ import os
 import hashlib
 import openai
 
+
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil import parser
@@ -170,7 +171,7 @@ def get_abstract_for_gmail(gmail_message):
 
 @retry((Timeout, RateLimitError, APIConnectionError), tries=5, delay=1, backoff=2)
 def summarize_with_gpt3(input_text):
-    print('Summarize call with input length %s' % len(input_text))
+    logging.debug('Summarize call with input length %s' % len(input_text))
     time.sleep(0.05)
     ''' Prompt ChatGPT or GPT3 level of importance of one message directly
         TODO: decice where None values should be handled and throw exception
@@ -201,7 +202,6 @@ def summarize_with_gpt3(input_text):
           timeout=50
         )
 
-    # print(response)
     text_response = response['choices'][0]['message']['content']
     return text_response
 
@@ -250,7 +250,6 @@ def build_abstract_for_unbounded_text(text, truncate=False):
         summary_batch = [tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in summary_id]
         summary_batch_lst.append(summary_batch[0])
     summary_all = '\n'.join(summary_batch_lst)
-    # print(summary_all)
     return summary_all
 
 def test_doc_summary(filepath):
@@ -258,10 +257,10 @@ def test_doc_summary(filepath):
     summaries = []
     for text in texts:
         summaries.append(build_abstract_for_unbounded_text(text))
-    print(summaries)
+    logging.debug(summaries)
     summary = '\n'.join(summaries)
     final_summary = build_abstract_for_unbounded_text(summary)
-    print(final_summary)
+    logging.debug(final_summary)
 
 
 def extract_text_from_pdf(filepath):

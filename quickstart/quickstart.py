@@ -7,6 +7,7 @@ import time
 import json
 import uuid
 import openai
+import logging
 
 from datetime import datetime
 
@@ -191,17 +192,17 @@ def generate_voice_file(text_response, verbose=False):
     # Checks result.
     if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
         if verbose:
-            print("Speech synthesized to speaker for text [{}]".format(text_response))
+            logging.debug("Speech synthesized to speaker for text [{}]".format(text_response))
     elif result.reason == speechsdk.ResultReason.Canceled:
         cancellation_details = result.cancellation_details
         if verbose:
-            print("Speech synthesis canceled: {}".format(cancellation_details.reason))
+            logging.debug("Speech synthesis canceled: {}".format(cancellation_details.reason))
         if cancellation_details.reason == speechsdk.CancellationReason.Error:
             if cancellation_details.error_details:
                 if verbose:
-                    print("Error details: {}".format(cancellation_details.error_details))
+                    logging.error("Error details: {}".format(cancellation_details.error_details))
         if verbose:
-            print("Did you update the subscription info?")
+            logging.debug("Did you update the subscription info?")
     return filepath, word_boundaries
 
 
@@ -218,7 +219,7 @@ def generate_summary(session_id):
                 msg_slack = get_slack_comms(session_id=session_id)
                 gpt_summary = get_gpt_summary(session_id=session_id, msg_out={'slack': msg_slack, 'gmail': msg_gmail})
             except Exception as e:
-                print(e)
+                logging.error(e)
             #     # remove platform messages, clear priority tables, sessions and audio files
             #     # by session_id
             #

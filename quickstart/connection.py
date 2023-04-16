@@ -86,21 +86,17 @@ def clear_session_data(session_id=None):
     # messages and metadata
     for platf in platforms:
         slack_channels = SlackChannel.query.filter_by(platform_id=platf.id).all()
-        # print("To start iterating on slack_channels %s" % ', '.join(slack_channels))
         for sc in slack_channels:
             slack_messages = SlackMessage.query.filter_by(slack_channel_id=sc.id) \
                 .filter_by(session_id=session_id).all()
-            # print("To start iterating on slack_messages %s" % ', '.join(slack_messages))
             for sm in slack_messages:
                 slack_attch = SlackAttachment.query.filter_by(slack_message_ts=sm.ts).all()
-                # print("To start iterating on slack_attachments %s" % ', '.join(slack_attch))
                 for sa in slack_attch:
                     filepath = sa.filepath
                     if filepath and os.path.exists(filepath):
                         os.remove(filepath)
                     db.session.delete(sa)
                 slack_links = SlackLink.query.filter_by(slack_message_ts=sm.ts).all()
-                # print("To start deleting slack links %s" % ', '.join(slack_links))
                 for sl in slack_links:
                     db.session.delete(sl)
                 db.session.delete(sm)
