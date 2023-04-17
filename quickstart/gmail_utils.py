@@ -8,9 +8,10 @@ import hashlib
 import tempfile
 import shutil
 import uuid
+import logging
 
 from collections import OrderedDict
-
+from bs4 import BeautifulSoup
 from urlextract import URLExtract
 from urllib.parse import urlparse
 
@@ -24,16 +25,35 @@ from google.auth.exceptions import RefreshError
 from quickstart.connection import db_ops, get_current_user, get_platform_id
 from quickstart.sqlite_utils import get_upsert_query, get_insert_query
 from quickstart.priority_engine import create_priority_list, update_priority_list_methods, fill_priority_list
-from quickstart.platform import get_abstract_for_gmail
+from quickstart.platform_ import get_abstract_for_gmail
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
+def get_text_from_html(html_text):
+
+    soup = BeautifulSoup(html_text, features="html.parser")
+
+    # kill all script and style elements
+    for script in soup(["script", "style"]):
+        script.extract()    # rip it out
+
+    # get text
+    text = soup.get_text()
+
+    # break into lines and remove leading and trailing space on each
+    lines = (line.strip() for line in text.splitlines())
+    # break multi-headlines into a line each
+    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+    # drop blank lines
+    text = '\n'.join(chunk for chunk in chunks if chunk)
+    return text
 
 # todo parse with regex
 def get_guser_email(from_string):
     return from_string.split(' ')[-1].replace('<', '').replace('>', '')
 def get_guser_name(from_string):
-    return from_string.replace(get_guser_email(from_string), '')
+    return from_string.replace(get_guser_email(from_string), '').replace('<', '').replace('>', '').replace('\"', '')
 
 def extract_links(text):
     extractor = URLExtract()
@@ -92,6 +112,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
         if not data_0:
             return [], 0
         text = base64.urlsafe_b64decode(data_0).decode()
+        text = get_text_from_html(text) + '\n'
     elif mime_type_0 == 'text/html':
         data_0 = body_0.get('data')
         size_0 = body_0.get('size')
@@ -106,7 +127,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
         size_0 = body_0.get('size')
         attachment_id_0 = body_0.get('attachmentId')
         if verbose:
-            print("We have a file with filename-%s" % filename_0)
+            logging.debug("We have a file with filename-%s" % filename_0)
         # handle attachment here:
         # messageId is id
         # attachmentID is attachment_id_0
@@ -116,7 +137,6 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
         file_response = service.users().messages().attachments().get(
             userId='me', messageId=id, id=attachment_id_0).execute()
         # If successful, the response body contains an instance of MessagePartBody.
-        # print(file_response)
         file_data = file_response.get('data', '')
         file_size = file_response.get('size', '')
 
@@ -124,7 +144,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
         file_extension = mime_type_0.split('/')[1]
 
         if verbose:
-            print('file size: %s' % file_size)
+            logging.debug('file size: %s' % file_size)
         file_attachment_id = file_response.get('attachmentId', '')
         while file_attachment_id:
             # handle more chunks of file
@@ -158,7 +178,7 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
         db.session.execute(ga_query, ga_kwargs)
     else:
         if verbose:
-            print('This type of content %s is not supported yet' % mime_type_0)
+            logging.debug('This type of content %s is not supported yet' % mime_type_0)
     if text:
         text_parts.append(text)
         num_processed += 1
@@ -172,8 +192,10 @@ def parse_email_part(part, id, service, db, handle_subparts=False, extract_text_
     return text_parts, num_processed
 
 
-def etl_gmail(service, db, session_id=None, max_messages=5, unread_only=True):
-
+def etl_gmail(service, db, session_id=None, unread_only=True):
+    with db_ops(model_names=['Setting']) as (db_s, Setting):
+        setting = db.session.query(Setting).filter_by(user_id=get_current_user().id).first()
+    max_messages = setting.num_gmail_msg
     results = service.users().messages().list(userId='me', labelIds='INBOX').execute()
     messages = results.get('messages', [])
     m_data = []
@@ -220,6 +242,7 @@ def etl_gmail(service, db, session_id=None, max_messages=5, unread_only=True):
         primary_text = None
         if data:
             primary_text =  base64.urlsafe_b64decode(data).decode()
+            primary_text = get_text_from_html(primary_text)
 
         show_parts = True
         num_parts = 0
@@ -354,7 +377,7 @@ def etl_gmail(service, db, session_id=None, max_messages=5, unread_only=True):
 #  when  tokens don't exist in database
 #  when cred don't exist in database
 #  when shutil couldn't find or copy file
-def auth_and_load_session_gmail():
+def auth_and_load_session_gmail(loop=True):
     """Shows basic usage of the Gmail API.
     Lists the user's Gmail labels.
     """
@@ -380,22 +403,18 @@ def auth_and_load_session_gmail():
             .filter_by(name='token.json') \
             .filter_by(is_path=True) \
             .first()
-        # print(token_row)
         cred_row = AuthData.query \
             .filter_by(platform_id=platform_id) \
             .filter_by(name='credentials.json') \
             .filter_by(is_path=True) \
             .first()
-        # print(cred_row)
         tempdir = tempfile.gettempdir()
 
         if token_row:
             tokenpath = os.path.join(tempdir, token_row.name)
             shutil.copyfile(token_row.file_path, tokenpath)
-            # print('shutil')
         # else:
         #     tokenpath = os.path.join(tempdir, 'token.json')
-        #     print('ne shutil')
         if cred_row:
             credpath = os.path.join(tempdir, cred_row.name)
             shutil.copyfile(cred_row.file_path, credpath)
@@ -408,16 +427,26 @@ def auth_and_load_session_gmail():
             try:
                 creds.refresh(Request())
             except RefreshError as error:
-                print("Caught Refresh token error")
-                # os.remove('quickstart/token.json')
-                exit()
+                logging.critical("Caught Refresh token error")
+                if token_row and os.path.exists(token_row.file_path):
+                    os.remove(token_row.file_path)
+                with db_ops(model_names=['AuthData']) as (db, AuthData):
+                    auth_data = AuthData.query \
+                        .filter_by(platform_id=platform_id) \
+                        .filter_by(name='token.json') \
+                        .filter_by(is_path=True) \
+                        .first()
+                    db.session.delete(auth_data)
+                    db.session.commit()
+                # if loop:
+                    # auth_and_load_session_gmail(loop=False)
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 credpath, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        if tokenpath and os.path.exists(tokenpath):
-            os.remove(tokenpath)
+        # if tokenpath and os.path.exists(tokenpath):
+        # os.remove(tokenpath)
         filename = '%s-%s' % (uuid.uuid4().hex, 'token.json')
         new_tokenpath = os.path.join('file_store', filename)
         with open(new_tokenpath, 'w') as token:
@@ -437,8 +466,47 @@ def auth_and_load_session_gmail():
 
     except HttpError as error:
         # TODO(developer) - Handle errors from gmail API.
-        pass
-        # print(f'An error occurred: {error}')
+        logging.critical('An error occurred: %s' % error)
+
+def get_list_data_by_g_id(gmail_message_id):
+    with db_ops(model_names=['GmailUser', 'GmailMessage', 'GmailMessageText']) as \
+        (db, GmailUser, GmailMessage, GmailMessageText):
+        gmail_message = GmailMessage.query.filter_by(id=gmail_message_id).first()
+        if not gmail_message:
+            return None
+
+        id_ = gmail_message.id
+        email_ = gmail_message.gmail_user_email
+        name_ = None
+
+        platform_id = get_platform_id('gmail')
+        gmail_user = GmailUser.query.filter_by(email=email_) \
+            .filter_by(platform_id=platform_id) \
+            .one()
+
+        name_ = gmail_user.name if gmail_user.name else email_
+        subject_ = gmail_message.subject
+        date_ = gmail_message.date
+        if date_:
+            date_ = convert_to_utc(date_).strftime('%m/%d/%Y, %H:%M')
+
+        text_summary = GmailMessageText.query.filter_by(gmail_message_id=gmail_message_id) \
+            .filter_by(is_summary=True).first()
+        snippet = GmailMessageText.query.filter_by(gmail_message_id=gmail_message_id) \
+            .filter_by(is_snippet=True).first()
+        if text_summary:
+            text_summary = text_summary.text
+        elif snippet:
+            text_summary = snippet.text
+        else:
+            text_summary = subject_
+
+        list_body = {}
+        list_body['headline'] = name_
+        list_body['text'] = text_summary
+        list_body['subject'] = subject_
+        list_body['date'] = date_
+        return list_body
 
 def dumps_emails(gmail_messages):
     result_text = ""
@@ -460,22 +528,14 @@ def dumps_emails(gmail_messages):
             snippet_ = gm_snippet.text
         subject_ = row.subject
         date_ = row.date
-        date_ = convert_to_utc(date_).strftime('%m%d')
+        if date_:
+            date_ = convert_to_utc(date_).strftime('%m%d')
         result_text += "%s emailed you %s with subject %s on %s\n" % (name_, snippet_, subject_, date_)
 
     return result_text
 
-
-def get_gmail_comms(return_list=False, session_id=None):
-
-    platform_id = get_platform_id('gmail')
-    if not platform_id:
-        return None
-    service = auth_and_load_session_gmail()
-    with db_ops(model_names=[]) as (db, ):
-        etl_gmail(service, db, session_id=session_id)
-
-
+def build_priority_list(session_id=None, platform_id=None):
+    # retrieve all messages fields
     gmail_messages = None
 
     with db_ops(model_names=['GmailMessage', 'GmailMessageLabel', 'GmailUser']) as \
@@ -489,28 +549,46 @@ def get_gmail_comms(return_list=False, session_id=None):
             .filter(GmailMessage.session_id == session_id) \
             .all()
 
-    if not gmail_messages and return_list:
-        return gmail_messages
-
+    # build priority list
     if gmail_messages:
         with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
-            , 'PriorityItem', 'PriorityItemMethod', 'GmailMessage']) as (db, PriorityList, PriorityListMethod \
-            , PriorityMessage, PriorityItem, PriorityItemMethod, GmailMessage):
+            , 'PriorityItem', 'PriorityItemMethod', 'GmailMessage', 'PlatformColumn', 'Setting']) \
+            as (db, PriorityList, PriorityListMethod, PriorityMessage, PriorityItem, PriorityItemMethod \
+            , GmailMessage, PlatformColumn, Setting):
             plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
             # this should go to add_auth_method_now
             update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
             # but should probably be replaced with update_p_m_a calls
-            columns_list = ['id', 'GmailMessageLabel.label', 'gmail_user_email', 'content_type']
-            fill_priority_list(db, gmail_messages, get_abstract_for_gmail, plist_id, PriorityMessage, PriorityList, \
-                PriorityItem, PriorityItemMethod, PriorityListMethod, GmailMessage, columns_list)
+            platform_columns = PlatformColumn.query.filter_by(platform_id=platform_id).all()
+            columns_list = [(pc.order_num, pc.column_name) for pc in platform_columns]
+            columns_list = sorted(columns_list, key=lambda x: x[0])
+            columns_list = [x[1] for x in columns_list]
+            # columns_list = ['id', 'GmailMessageLabel.label', 'gmail_user_email', 'content_type']
+            msg_out = fill_priority_list(db, gmail_messages, get_abstract_for_gmail, plist_id, PriorityMessage \
+                , PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod, GmailMessage, columns_list \
+                , Setting)
+            return msg_out
 
-    if return_list:
-        return gmail_messages
+def get_gmail_comms(session_id=None):
+    # first check if auth method for this platform exist
+    platform_id = get_platform_id('gmail')
+    if not platform_id:
+        return None
+    service = auth_and_load_session_gmail()
 
-    result_text = dumps_emails(gmail_messages)
-    return result_text
+    # then download last n unread messages from inbox
+    with db_ops(model_names=[]) as (db, ):
+        etl_gmail(service, db, session_id=session_id)
+
+    # build priority list and summarize text
+    msg_out = build_priority_list(session_id=session_id, platform_id=platform_id)
+    return msg_out
+
+
 
 def convert_to_utc(date_string):
+    if not date_string:
+        return ''
     dt = parser.parse(date_string)
     dt = dt.astimezone(pytz.UTC)
     return dt

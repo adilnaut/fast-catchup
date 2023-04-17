@@ -2,6 +2,13 @@ import os
 import re
 import time
 import openai
+import logging
+
+from openai.error import RateLimitError
+from openai.error import Timeout
+from openai.error import APIConnectionError
+
+from retry import retry
 from transformers import pipeline
 import transformers
 from transformers import BloomForCausalLM
@@ -19,7 +26,6 @@ def ask_large_bloom_raw(prompt, temperature=1.0, do_sample=True, top_k=20, top_p
 
     def query(payload):
         response = requests.post(API_URL, headers=headers, json=payload)
-        # print(response)
         return response.json()
 
     output = query({
@@ -31,8 +37,8 @@ def ask_large_bloom_raw(prompt, temperature=1.0, do_sample=True, top_k=20, top_p
     })
     if 'error' in output:
         # ask_instruct_bloom(input_text)
-        print(output)
-        print('Error in large bloom')
+        logging.debug(output)
+        logging.error('Error in large bloom')
         exit()
     else:
         out_text = output[0]['generated_text']
@@ -41,17 +47,21 @@ def ask_large_bloom_raw(prompt, temperature=1.0, do_sample=True, top_k=20, top_p
 
 def ask_large_bloom(input_text):
 
+    justification = ""
     # first ask the reasons why email is important
     prompt = '%s The thing that makes this email important is'
     prompt = prompt % input_text
 
     out_text = ask_large_bloom_raw(prompt)
+    justification += 'The thing that makes this email important is' + out_text
 
     prompt += out_text
 
     # then ask the reason why email is not important
     second_prompt = '%s The thing that makes this email not important is'
     out_text = ask_large_bloom_raw(second_prompt % input_text)
+
+    justification += 'The thing that makes this email not important is' + out_text
     prompt += second_prompt + out_text
 
     # then ask to classify
@@ -59,11 +69,10 @@ def ask_large_bloom(input_text):
     # prompt += 'With all that in mind the email importance class (\'not important\', \'less than medium\', \'medium\', \'more than medium\', \'very important\') is '
     out_text = ask_large_bloom_raw(prompt)
 
-    # print(prompt)
-    # print(out_text)
     priority_score = parse_bloom_response(out_text)
-    # print("Score: %s " % priority_score)
-    return int(priority_score)*0.1 if priority_score else None
+    priority_score = int(priority_score)*0.1 if priority_score else None
+
+    return priority_score, justification
 
 
 
@@ -95,9 +104,9 @@ def ask_instruct_bloom(inp_text):
     {id:3, text: \"%s\", priority:
     '''
     response = ask_instruct_bloom_helper(inp_text, prompt, top_k=50, top_p=0.2)
-    print(response)
+    logging.debug(response)
     priority_score = parse_bloom_response(response)
-    print("Score: %s " % priority_score)
+    logging.debug("Score: %s " % priority_score)
     return priority_score
 
 def ask_instruct_bloom_raw(prompt, top_k=10, top_p=0.2):
@@ -113,16 +122,7 @@ def ask_instruct_bloom_raw(prompt, top_k=10, top_p=0.2):
                        early_stopping=True
                        # temperature=temperature
                        )[0])
-    # top k
-    # text_response = tokenizer.decode(model.generate(inputs["input_ids"],
-    #                    max_length=result_length,
-    #                    do_sample=True,
-    #                    top_k=top_k,
-    #                    top_p=top_p
-    #                    # num_beams=3,
-    #                    # no_repeat_ngram_size=2,
-    #                    # early_stopping=True
-    #                   )[0])
+
     text_response = text_response.replace(prompt, '')
     return text_response
 
@@ -141,12 +141,7 @@ def ask_instruct_bloom_helper(input_text, prompt=None, temperature=1.0, top_k=50
     prompt = prompt % input_text
     result_length = len(prompt) + 2
     inputs = tokenizer(prompt, return_tensors="pt")
-    # greedy
-    # text_response = tokenizer.decode(model.generate(inputs["input_ids"],
-    #                    max_length=result_length,
-    #                    temperature=temperature
-    #                    )[0])
-    # top k
+
     text_response = tokenizer.decode(model.generate(inputs["input_ids"],
                        max_length=result_length,
                        temperature=temperature,
@@ -173,12 +168,7 @@ def ask_bloom(input_text, temperature=1.0, top_k=50, top_p=0.9):
     '''
     prompt = prompt % input_text
     inputs = tokenizer(prompt, return_tensors="pt")
-    # greedy
-    # text_response = tokenizer.decode(model.generate(inputs["input_ids"],
-    #                    max_length=result_length,
-    #                    temperature=temperature
-    #                   )[0])
-    # top k
+
     text_response = tokenizer.decode(model.generate(inputs["input_ids"],
                        max_length=result_length,
                        temperature=temperature,
@@ -187,12 +177,13 @@ def ask_bloom(input_text, temperature=1.0, top_k=50, top_p=0.9):
                        top_p=top_p
                       )[0])
     text_response = text_response.replace(prompt, '')
-    print('Text response for <<%s>> is <<%s>>' % (input_text, text_response))
+    logging.debug('Text response for <<%s>> is <<%s>>' % (input_text, text_response))
     priority_score = parse_gpt_response(text_response)
-    return priority_score
+    return priority_score, None
 
+@retry((Timeout, RateLimitError, APIConnectionError), tries=5, delay=1, backoff=2)
 def ask_gpt(input_text):
-    time.sleep(0.5)
+    time.sleep(0.05)
     ''' Prompt ChatGPT or GPT3 level of importance of one message directly
         TODO: save not only parsed value but also explanation
         TODO: decice where None values should be handled and throw exception
@@ -200,53 +191,43 @@ def ask_gpt(input_text):
     openai.api_key = os.getenv("OPEN_AI_KEY")
     # todo might be worth specifying what type of data a bit ( if not independent of metadata )
     prompt = 'Rate this message text from 0 to 100 by level of importance: %s' % input_text
-    try:
-        # at this stage as text-davinci-003
-        # however
-        # response = openai.Completion.create(
-        #         model="text-davinci-003",
-        #         prompt=prompt,
-        #         temperature=0.3,
-        #         max_tokens=150,
-        #         top_p=1,
-        #         frequency_penalty=0,
-        #         presence_penalty=0
-        #         )
-        system_prompt = '''
-            You are assisting human with incoming messages prioritisation.
-            Please try to guess what emails are generic or sent automatically and
-            non-urgent and don't give them scores above 50.
-            Above 50 is for emails that need actions from receiving person.
-            Please keep advertisements under 20.
-            Slack messages are not less important than emails.
-            Work related slack messages and not requiring actions from 40 to 60.
-            And work related  slack messages and requiring actions from you should be around 80.
-        '''
-        response = openai.ChatCompletion.create(
-              model="gpt-3.5-turbo",
-              messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
-                ]
-            )
-    except RateLimitError:
-        return "You exceeded your current quota, please check your plan and billing details."
-    # print(response)
+
+    system_prompt = '''
+        You are assisting human with incoming messages prioritisation.
+        Please try to guess what emails are generic or sent automatically and
+        non-urgent and don't give them scores above 50.
+        Above 50 is for emails that need actions from receiving person.
+        Please keep advertisements under 20.
+        Slack messages are not less important than emails.
+        Work related slack messages and not requiring actions from 40 to 60.
+        And work related  slack messages and requiring actions from you should be around 80.
+    '''
+    response = openai.ChatCompletion.create(
+          model="gpt-3.5-turbo",
+          messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ]
+          , timeout=20
+          , max_tokens=100
+        )
+
     text_response = response['choices'][0]['message']['content']
-    # print(text_response)
-    # priority_score = parse_gpt_response(text_response)
+
     priority_score = parse_bloom_response(text_response)
-    return int(priority_score)*0.01 if priority_score else None
+    model_justification = text_response.replace('%s ' % priority_score, '')
+    priority_score = int(priority_score)*0.01 if priority_score else None
+    return priority_score, model_justification
 
 
 def toy_keyword_match(input_text):
     ''' if match hardcoded keywords return 1 else 0
     '''
     keywords = ['urgent', 'important', 'billing', 'asap']
-    if input_text.lower() in keywords:
-        return 1
-    else:
-        return 0
+    for keyword in keywords:
+        if keyword in input_text.lower():
+            return 1, None
+    return 0, None
 
 def sentiment_analysis(input_text):
     ''' get transformered sentiment analysis value
@@ -260,10 +241,10 @@ def sentiment_analysis(input_text):
     result = sentiment_pipeline(data)
     label = result[0].get('label')
     score = result[0].get('score')
-    print('sentiment')
-    print(label)
-    print(score)
+    logging.debug('sentiment')
+    logging.debug(label)
+    logging.debug(score)
     if label == 'NEGATIVE':
-        return score
+        return score, None
     else:
-        return 0
+        return 0, None

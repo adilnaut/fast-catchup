@@ -2,14 +2,16 @@ import os
 import struct
 import pickle
 import numpy as np
+import openai
 
 from collections import OrderedDict
 from datetime import datetime
 from sklearn.neighbors import NearestNeighbors
 
+from quickstart.connection import get_current_user
 from quickstart.sqlite_utils import get_insert_query
 
-def build_knn(PriorityList, PriorityItem, PriorityMessage, p_item):
+def build_knn(db, Setting, PriorityList, PriorityItem, PriorityMessage, p_item):
     # ideally we should have 10 nearest neighbors classifiers object fitted on all previous data
     # but for now we can train it right there
     result = PriorityList.query.filter_by(id=p_item.priority_list_id).first()
@@ -29,14 +31,21 @@ def build_knn(PriorityList, PriorityItem, PriorityMessage, p_item):
             ids.append(_.id)
             # emb_vector = struct.unpack('<q', b'\x15\x00\x00\x00\x00\x00\x00\x00')
             emb_vector = np.frombuffer(_.embedding_vector, dtype='<f4')
+            emb_vector = np.array(emb_vector, dtype=np.float64)
             all_vectors.append(emb_vector)
+
+
+    setting = db.session.query(Setting).filter_by(user_id=get_current_user().id).first()
 
     if all_vectors:
         X = np.array(all_vectors)
         # we want to build NN algorithm for any number of samples present
         # but initially there would not be many
-        # let's set this up to 2 for now
-        nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(X)
+        # let's set this up to 3 for now
+        nbrs = NearestNeighbors(n_neighbors=setting.num_neighbors,
+                         metric='cosine',
+                         algorithm='brute',
+                         n_jobs=-1).fit(X)
     return nbrs, ids
 
 def create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id):
@@ -64,9 +73,11 @@ def create_priority_list(db, PriorityList, PriorityListMethod, platform_id, sess
 
 def create_priority_list_methods(db, PriorityListMethod, platform_id):
     script_path = 'quickstart.priority_method'
-    methods = [(script_path, 'ask_large_bloom')
-        , (script_path, 'toy_keyword_match')
-        , (script_path, 'sentiment_analysis')]
+    methods = [ (script_path, 'ask_gpt')
+        #  (script_path, 'ask_large_bloom')
+        # , (script_path, 'toy_keyword_match')
+        # , (script_path, 'sentiment_analysis')
+        ]
 
     for python_path, name in methods:
         plist_method_kwargs = OrderedDict([('platform_id', platform_id)
@@ -99,7 +110,7 @@ def update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id):
 # todo: replace with named tuple
 def fill_priority_list(db, messages, get_abstract_func, plist_id, \
         PriorityMessage, PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod \
-        , TableName, columns_list):
+        , TableName, columns_list, Setting):
     # iterate over records of variable platform
     message_ids = []
     item_ids = []
@@ -122,16 +133,34 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
         .filter_by(platform_id=platform_id).all()
     message_ids = [x.id for x in priority_messages]
     sentences = [x.input_text_value for x in priority_messages]
-    model_filepath = os.path.join('file_store', '2023-02-22-embedding-model')
-    model_pickle = open(model_filepath, 'rb')
-    embedding_model = pickle.load(model_pickle)
-    embedding_vectors = embedding_model.encode(sentences)
+
+    # local or openai
+    # this could be changed to handle get_current_user().setting.embeddings
+    # but this would require compatibility of embeddings
+    # or re-vectorisation of whole summary history
+    # with the support of multiple embeddings stored at the same time
+    # for now better to stick to openai ada
+    embedding_mode = 'openai'
+
+    if embedding_mode == 'local':
+        model_filepath = os.path.join('file_store', '2023-02-22-embedding-model')
+        model_pickle = open(model_filepath, 'rb')
+        embedding_model = pickle.load(model_pickle)
+        embedding_vectors = embedding_model.encode(sentences)
+    elif embedding_mode == 'openai':
+        openai.api_key = os.getenv("OPEN_AI_KEY")
+        embedding_vectors = []
+        for sentence in sentences:
+            model = 'text-embedding-ada-002'
+            text = sentence.replace('\n', ' ')
+            vector = openai.Embedding.create(input=text, model=model)['data'][0]['embedding']
+            embedding_vectors.append(np.array(vector).tobytes())
+        embedding_vectors = np.array(embedding_vectors)
     assert len(embedding_vectors) == len(priority_messages)
     # todo: assert items correspond appropriately, not only by length of arrays but elementwise assertion
     for i in range(len(priority_messages)):
         priority_messages[i].embedding_vector = embedding_vectors[i]
     db.session.commit()
-
 
 
     for message_id in message_ids:
@@ -142,13 +171,10 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
     db.session.commit()
 
     priority_items = db.session.query(PriorityItem).filter_by(priority_list_id=plist_id).all()
-    print('priority_items: %s' % priority_items)
     item_ids = [x.id for x in priority_items]
-    print('item_ids: %s' % item_ids)
 
     for item_id in item_ids:
         for method_id in method_ids:
-            print("Attempt to create priority_item_method")
             pi_method_kwargs = OrderedDict([('priority_item_id', item_id)
                 , ('priority_list_method_id', method_id)])
             pi_method_query = get_insert_query('priority_item_method', pi_method_kwargs.keys())
@@ -165,15 +191,35 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
     for priority_method_item in priority_method_items:
         priority_method_item.calculate_p_b_m_a()
 
+
     db.session.commit()
+    nbrs_out = {}
     # todo optimise calculate_p_b cause it build the same KNearestNeighbors model each item
     # priority_items = db.session.query(PriorityItem).filter(PriorityItem.id.in_(tuple(item_ids))).all()
     for priority_item in priority_items:
-        nbrs, ids = build_knn(PriorityList, PriorityItem, PriorityMessage, priority_item)
+        # todo - this isn't optimized per settings restrictions
+        # calculate everything at this stage, and use setting only in representation
+        # later design repr so that consequent change in setting would allow different reprs
+        nbrs, ids = build_knn(db, Setting, PriorityList, PriorityItem, PriorityMessage, priority_item)
+
         priority_item.calculate_p_b(nbrs, ids)
+        # nbr = priority_item.calculate_p_b(nbrs, ids)
+        # nbrs_out[priority_item.priority_message_id] = nbr
         priority_item.calculate_p_b_a()
         priority_item.calculate_p_a_b()
         priority_item.calculate_p_a_c(TableName, columns_list)
-        priority_item.calculate_p_b_c(TableName, columns_list)
+        nbr = priority_item.calculate_p_b_c(TableName, columns_list)
+        nbrs_out[priority_item.priority_message_id] = nbr
         priority_item.calculate_p_a_b_c()
     db.session.commit()
+
+
+    if nbrs_out:
+        msg_out = {}
+        for p_id, nbr_list in nbrs_out.items():
+            msg_out[p_id] = []
+            for nbr in nbr_list:
+                msg = PriorityMessage.query.filter_by(id=nbr).first()
+                if msg:
+                    msg_out[p_id].append(msg.input_text_value)
+        return msg_out

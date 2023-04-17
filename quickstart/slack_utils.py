@@ -16,7 +16,7 @@ from quickstart.connection import db_ops, get_current_user, get_platform_id, get
 from quickstart.gmail_utils import extract_domain
 from quickstart.sqlite_utils import get_upsert_query
 from quickstart.priority_engine import create_priority_list, update_priority_list_methods, fill_priority_list
-from quickstart.platform import get_abstract_for_slack
+from quickstart.platform_ import get_abstract_for_slack
 
 
 
@@ -159,13 +159,16 @@ def etl_users(app, db):
             db.session.execute(su_query, su_kwargs)
 
 
-def etl_messages(app, db, session_id=None, days_ago=1, max_pages=1,  verbose=False):
+def etl_messages(app, db, session_id=None, max_pages=1, verbose=False):
     # don't overwhelm API rate
     slack_channels = None
     platform_id = get_platform_id('slack')
 
-    with db_ops(model_names=['SlackChannel']) as (db_sess, SlackChannel):
+
+    with db_ops(model_names=['SlackChannel', 'Setting']) as (db_sess, SlackChannel, Setting):
         slack_channels = SlackChannel.query.filter_by(platform_id=platform_id).all()
+        setting = db.session.query(Setting).filter_by(user_id=get_current_user().id).first()
+        days_ago = setting.num_days_slack
 
     yesterday = datetime.utcnow() - timedelta(days=days_ago)
     unix_time = time.mktime(yesterday.timetuple())
@@ -176,7 +179,7 @@ def etl_messages(app, db, session_id=None, days_ago=1, max_pages=1,  verbose=Fal
             # don't overwhelm API rate
             time.sleep(0.2)
             if verbose:
-                print("channel %s, id %s, request number %s" % (channel.name,
+                logging.debug("channel %s, id %s, request number %s" % (channel.name,
                     channel.id, i))
             if next_cursor:
                 response = app.client.conversations_history(channel=channel.id, oldest=unix_time,
@@ -192,7 +195,7 @@ def etl_messages(app, db, session_id=None, days_ago=1, max_pages=1,  verbose=Fal
 
             messages = response.get('messages')
             if verbose:
-                print("Has more %s, messages %s" % (has_more, len(messages)))
+                logging.debug("Has more %s, messages %s" % (has_more, len(messages)))
             if status and messages:
                 for message in messages:
                     type = message.get('type')
@@ -221,8 +224,8 @@ def etl_messages(app, db, session_id=None, days_ago=1, max_pages=1,  verbose=Fal
                         block_id = block.get('block_id')
 
                         if verbose:
-                            print("DEBUG block_type %s" % block_type)
-                            print("DEBUG block id %s" % block_id)
+                            logging.debug("DEBUG block_type %s" % block_type)
+                            logging.debug("DEBUG block id %s" % block_id)
                         # this is a list of elements
                         block_sub_elements = block.get('elements')
                         for sub_element in block_sub_elements:
@@ -236,9 +239,9 @@ def etl_messages(app, db, session_id=None, days_ago=1, max_pages=1,  verbose=Fal
                                 # cause they are already being processed
                                 # in the text part
                                 if verbose:
-                                    print("DEBUG: element_type %s" % element_type)
-                                    print("DEBUG: element_text %s" % element_text)
-                                    print("DEBUG: element_url %s" % element_url)
+                                    logging.debug("DEBUG: element_type %s" % element_type)
+                                    logging.debug("DEBUG: element_text %s" % element_text)
+                                    logging.debug("DEBUG: element_url %s" % element_url)
 
                                 if not element_url:
                                     continue
@@ -265,14 +268,14 @@ def etl_messages(app, db, session_id=None, days_ago=1, max_pages=1,  verbose=Fal
                         # get url_private_download from one_file_data
                         file_url = one_file_data.get('url_private')
                         if verbose:
-                            print("Downloaded " + file_name)
+                            logging.debug("Downloaded " + file_name)
 
                         # download file with authorized request (slack_token) to temp store
                         r = requests.get(file_url, headers={'Authorization': 'Bearer %s' % slack_app_token})
                         r.raise_for_status
                         file_data = r.content   # get binary content
                         if verbose:
-                            print('File size: %s' % len(file_data))
+                            logging.debug('File size: %s' % len(file_data))
 
                         # check bytes content md5 hash first without writing to disk
                         file_md5 = hashlib.md5(file_data).hexdigest()
@@ -363,6 +366,64 @@ def encapsulate_names_by_ids(text):
             text = text.replace('<@%s>' % middle, user_name)
     return text
 
+
+def get_list_data_by_m_id(slack_message_ts):
+    with db_ops(model_names=['SlackMessage', 'SlackChannel', 'SlackUser']) as (db, SlackMessage, SlackChannel, SlackUser):
+        slack_message = SlackMessage.query.filter_by(ts=slack_message_ts).first()
+        if not slack_message:
+            return None
+        text = slack_message.text
+        user_id = slack_message.slack_user_id
+        channel_id = slack_message.slack_channel_id
+        ts = slack_message.ts
+
+        user_data = None
+        user_name = None
+        platform_id = get_platform_id('slack')
+        if platform_id:
+            user_data = SlackUser.query.filter_by(id=user_id)  \
+                .filter_by(platform_id=platform_id) \
+                .first()
+        if user_data:
+            user_name = user_data.name
+            # user_pic = user_data.profile_image_32
+        if platform_id:
+            channel_data = SlackChannel.query.filter_by(id=channel_id) \
+                .filter_by(platform_id=platform_id) \
+                .first()
+        if channel_data:
+            channel_name = channel_data.name
+            channel_is_channel = channel_data.is_channel
+            channel_is_group = channel_data.is_group
+            channel_is_im = channel_data.is_im
+
+        text = encapsulate_names_by_ids(text)
+        headline = ""
+        if channel_data and channel_is_channel:
+            if channel_name and user_name:
+                headline += '@%s in #%s' % (user_name, channel_name)
+            elif channel_name:
+                headline += 'unknown in #%s' % channel_name
+        elif channel_data and channel_is_group:
+            if user_name:
+                headline += '@%s in group' % user_name
+            else:
+                headline += 'unknown in group'
+        elif channel_data and channel_is_im:
+            if user_name:
+                headline += '@%s dm' % user_name
+            else:
+                headline += 'in dm'
+        date_string = ts_to_formatted_date(ts)
+        list_body = {}
+        list_body['headline'] = headline
+        list_body['text'] = text
+        list_body['subject'] = headline
+        list_body['date'] = date_string
+        return list_body
+
+
+
 # (message, slack_users, slack_conversation)
 def format_slack_message(slack_message, date_string=False, channel_misc=False):
     text = slack_message.text
@@ -402,7 +463,7 @@ def format_slack_message(slack_message, date_string=False, channel_misc=False):
 
     # encapsulate all mentions to real names by id
     text = encapsulate_names_by_ids(text)
-    
+
 
     result = 'Slack message:'
     result += ' with text \'%s\' ' % text
@@ -448,19 +509,9 @@ def slack_test_etl():
         time.sleep(1)
         etl_messages(app, db)
 
-    # except SlackApiError as err:
-        # print(err)
 
 
-#  todo handle rate limited exception
-def get_slack_comms(return_list=False, session_id=None):
-    platform_id = get_platform_id('slack')
-    if not platform_id:
-        return None
-    app = auth_and_load_session_slack()
-    with db_ops(model_names=[]) as (db, ):
-        etl_messages(app, db, session_id=session_id)
-
+def build_priority_list(session_id=None, platform_id=None):
     slack_messages = None
     with db_ops(model_names=['SlackMessage', 'SlackChannel']) as (db, SlackMessage, SlackChannel):
         slack_messages = db.session.query(SlackMessage) \
@@ -470,30 +521,42 @@ def get_slack_comms(return_list=False, session_id=None):
             .filter(SlackMessage.session_id == session_id) \
             .all()
 
-    if not slack_messages and return_list:
-        return slack_messages
 
     if slack_messages:
         with db_ops(model_names=['PriorityList', 'PriorityListMethod', 'PriorityMessage' \
-            , 'PriorityItem', 'PriorityItemMethod', 'SlackMessage']) as (db, PriorityList, PriorityListMethod \
-            , PriorityMessage, PriorityItem, PriorityItemMethod, SlackMessage):
+            , 'PriorityItem', 'PriorityItemMethod', 'SlackMessage', 'PlatformColumn', 'Setting']) \
+            as (db, PriorityList, PriorityListMethod, PriorityMessage, PriorityItem, PriorityItemMethod, SlackMessage \
+            , PlatformColumn, Setting):
             plist_id = create_priority_list(db, PriorityList, PriorityListMethod, platform_id, session_id)
             # this should go to add_auth_method_now
             update_priority_list_methods(db, PriorityListMethod, platform_id, plist_id)
             # but should probably be replaced with update_p_m_a calls
-            columns_list = ['ts', 'slack_channel_id', 'slack_user_id']
-            fill_priority_list(db, slack_messages, get_abstract_for_slack, plist_id, PriorityMessage, PriorityList, \
-                PriorityItem, PriorityItemMethod, PriorityListMethod, SlackMessage, columns_list)
+            # columns_list = ['ts', 'slack_channel_id', 'slack_user_id']
+            platform_columns = PlatformColumn.query.filter_by(platform_id=platform_id).all()
+            columns_list = [(pc.order_num, pc.column_name) for pc in platform_columns]
+            columns_list = sorted(columns_list, key=lambda x: x[0])
+            columns_list = [x[1] for x in columns_list]
+            msg_out = fill_priority_list(db, slack_messages, get_abstract_for_slack, plist_id, PriorityMessage \
+                , PriorityList, PriorityItem, PriorityItemMethod, PriorityListMethod, SlackMessage, columns_list \
+                , Setting)
+            return msg_out
+#  todo handle rate limited exception
+def get_slack_comms(session_id=None):
 
-    if return_list:
-        return slack_messages
+    # check if auth methods exist for this platform
+    platform_id = get_platform_id('slack')
+    if not platform_id:
+        return None
 
-    result = ''
-    for message in slack_messages:
-        formatted_message = format_slack_message(message)
-        result += '%s\n' % formatted_message
+    # retrieve unread messages from slack
+    app = auth_and_load_session_slack()
+    with db_ops(model_names=[]) as (db, ):
+        etl_messages(app, db, session_id=session_id)
 
-    return result
+    # build priority lists with latest messages
+    msg_out = build_priority_list(session_id=session_id, platform_id=platform_id)
+    return msg_out
+
 
 
 

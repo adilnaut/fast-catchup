@@ -1,44 +1,305 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-2">
+            {% for sess_id, date in gptout.past_sessions %}
+                <a type="button" href="{{ url_for('first', session_id=sess_id) }}"> {{date}} </a>
+                <a type="button" href="{{ url_for('remove_session', session_id=sess_id)}}"> delete </a>
+            {% endfor %}
+        </div>
+        <div class="col-lg-8">
 
-	<h2> Fast-catchup work communications summary prototype </h2>
+        	<h2 align="center"> Fast-catchup </h2>
 
 
-	<audio controls>
-  			<source src="{{ url_for('returnAudioFile', filepath=gptout.filepath) }}" type="audio/wav">
-  			Your browser does not support the audio element.
-	</audio>
+            <center>
+        	<audio id="mainPlayer" class="player" style="width: 80%" controls>
+          			<source src="{{ url_for('returnAudioFile', filepath=gptout.filepath) }}" type="audio/wav">
+          			Your browser does not support the audio element.
+        	</audio>
+            </center>
+
+            <div class="lyrics" style="display: none">
+                    {{ gptout.word_boundaries }}
+            </div>
+
+            <div class="input-group">
+              <br>
+              <br>
+              <h4 >
+                Summary:
+              </h4> <br>
+
+              <div class="summary" style="text-align: justify;" >
+                {{ gptout.p_tags |safe}}
+
+              </div>
 
 
-    <div class="input-group">
-      <div class="input-group-prepend">
-        <span class="input-group-text">Summary:</span>
-      </div>
-      <textarea name="prompt" form="summary_form" class="form-control" aria-label="With textarea" >
-        Summary: {{ gptout.summary }}
-      </textarea>
+
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                </div>
+                <div class="col-sm-4">
+                    <div id="summary_result" >
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                </div>
+
+            </div>
+
+            <script>
+                function generateSummary() {
+                  // disable the button to prevent multiple submissions
+                  document.getElementById("summary_form").getElementsByTagName("input")[0].disabled = true;
+                  document.getElementById("summary_result").innerHTML = "<center> <div class=\"loader\"></div> <br> Generating summary... </center>";
+                }
+            </script>
+
+<!--
+            <form action = "/generate_summary" id="summary_form" method = "post">
+                <br>
+                <input type="submit" value="Generate" class="btn btn-primary btn-lg btn-block" style="width: 100%" onclick="generateSummary()"  >
+            </form> -->
+
+            <form action = "/generate_summary" id="summary_form" method = "post">
+                <br>
+                <input type="submit" value="Generate" class="btn btn-primary btn-lg btn-block" style="width: 100%">
+            </form>
+
+
+
+
+
+
+
+            <br><br>
+
+            <script>
+            $( function() {
+              $( "#myList" ).sortable();
+              // $( "#myList" ).disableSelection();
+            } );
+            </script>
+
+            <div class="row">
+              <div class="col-4">
+                <div class="list-group" id="myList" role="tablist">
+
+                    {% for item in gptout.sorted_items %}
+                        <a class="list-group-item" id="list-{{item.id}}-list" data-toggle="list" href="#list-{{item.id}}" role="tab"  draggable="true"  aria-controls="{{item.id}}">
+                            <div class="row">
+                                <div class="col-8">
+                                    {{item.headline}}
+                                </div>
+                                <div class="col-2">
+                                    {{item.score}}
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+
+                </div>
+              </div>
+              <div class="col-8">
+                <div class="tab-content" id="nav-tabContent">
+
+                          {% for item in gptout.sorted_items %}
+                                <div class="tab-pane fade" id="list-{{item.id}}" role="tabpanel" aria-labelledby="list-{{item.id}}-list">
+                                    <div class="d-flex w-100 justify-content-between">
+                                      <h5 class="mb-1"> {{item.subject}} </h5>
+                                      <small class="text-muted">{{item.date}}</small>
+                                    </div>
+                                    <p class="mb-1" style="text-align: justify;"> {{item.text}} </p>
+
+                                    <small class="text-muted" style="text-align: justify;"> {{ item.text_score }} {{item.model_justification}} </small>
+                                    <br>
+                                    <form id="priority_form-{{item.id}}" action="{{url_for('assign_priorities')}}" method="post">
+                                        <label for="customRange-{{item.id}}" class="form-label"> Rate this message priority </label>
+                                        <input type="range" class="priority-range form-range" id="customRange-{{item.id}}" value="{{item.score}}" min="1" max="100" oninput="this.nextElementSibling.value = this.value">
+                                        <output> {{item.score}} </output>
+                                    </form>
+                                </div>
+                          {% endfor %}
+
+                </div>
+              </div>
+
+            </div>
+
+            <br>
+            <br>
+            <br>
+            <br>
+
+            <div id="hint-window">
+                <span id="hint-message"></span>
+            </div>
+
+
+            <script>
+                var triggerTabList = [].slice.call(document.querySelectorAll('#myList a'))
+                triggerTabList.forEach(function (triggerEl) {
+                  var tabTrigger = new bootstrap.Tab(triggerEl)
+
+                  triggerEl.addEventListener('click', function (event) {
+                    event.preventDefault()
+                    tabTrigger.show()
+                    var session_id = "{{gptout.sess_id}}";
+                    var p_item_id = $(this).attr('id').split('-')[1];;
+                    var disableListCheckbox = document.getElementById('disableListCheckbox');
+                    if (disableListCheckbox.checked) {
+                      return;
+                    }
+                    // Make the AJAX request to the Flask endpoint
+                    $.ajax({
+                        url: '/get_neighbors',
+                        method: 'GET',
+                        data: {
+                            session_id: session_id,
+                            p_item_id: p_item_id
+                        },
+                        success: function(response) {
+
+                            // console.log(response)
+                            // var neighbors = JSON.parse(response);
+                            var list = '';
+                            response.forEach(function(neighbor) {
+                                list += '<li class="list-group-item list-nbr">' + neighbor + '</li>';
+                            });
+                            document.querySelector('#list-g').innerHTML = list;
+                            document.querySelector('#list-g').style.display = "block";
+                        }
+                    });
+                  })
+                })
+            </script>
+
+            <script>
+                // $('#val').on('change', function() {
+                //     $.ajax({
+                //         url : this.form.action,
+                //         type: this.form.method,
+                //         data: {val: this.value}
+                //     });
+                // });
+            $(document).ready(function() {
+               // Create debounce function with a 500ms delay
+               function debounce(func, delay) {
+                 var timer = null;
+                 return function() {
+                   var context = this, args = arguments;
+                   clearTimeout(timer);
+                   timer = setTimeout(function() {
+                     func.apply(context, args);
+                   }, delay);
+                 };
+               }
+
+               // Attach debounced event listener to all elements with class 'priority-range'
+               $('.priority-range').each(function() {
+                 $(this).on('input', debounce(function() {
+                   // Get the item id and range value for this element
+                   var item_id = $(this).attr('id').split('-')[1];
+                   var range_value = $(this).val();
+                   var $aTag = $('#list-' + item_id.trim() + '-list');
+                   // console.log( $aTag.find('.col-2'))
+                   $aTag.find('.col-2').eq(0).text(range_value);
+
+                   // Send a POST request with item id and range value
+                   $.ajax({
+                     type: 'POST',
+                     url: '{{url_for("assign_priorities")}}',
+                     data: {
+                       item_id: item_id,
+                       range_value: range_value
+                     },
+                     success: function(response) {
+                        // Update the hint message text content with a success message
+                        $('#hint-message').text('Value recorded successfully.');
+                        // Show the hint window
+                        $('#hint-window').fadeIn();
+                        // Hide the hint window after 3 seconds
+                        setTimeout(function() {
+                          $('#hint-window').fadeOut();
+                        }, 3000);
+                      },
+                     error: function(xhr, status, error) {
+                        // Update the hint message text content with an error message
+                        $('#hint-message').text('An error occurred while recording the value.');
+                        // Show the hint window
+                        $('#hint-window').fadeIn();
+                        // Hide the hint window after 3 seconds
+                        setTimeout(function() {
+                          $('#hint-window').fadeOut();
+                        }, 3000);
+                      }
+                   });
+                 }, 500));
+               });
+             });
+            </script>
+
+            <style>
+              #hint-window {
+                 position: fixed;
+                 bottom: 50px;
+                 left: 50%;
+                 transform: translateX(-50%);
+                 background-color: white;
+                 border: 1px solid gray;
+                 padding: 10px;
+                 display: none;
+               }
+            </style>
+
+            <script src="{{url_for('.static', filename='summaryscript.js')}}"></script>
+
+        </div>
+        <div class="col-lg-2">
+                <h4> Similar messages:</h4>
+                <div class="form-check form-switch">
+                  <input type="checkbox" class="form-check-input" id="disableListCheckbox">
+                  <label class="form-check-label" for="disableListCheckbox">Toggle off</label>
+                </div>
+                <ul class="list-group list-g-attached list-scrollable" id="list-g">
+                </ul>
+        </div>
+        <script>
+            // Get the close button element
+            var disableListCheckbox = document.getElementById('disableListCheckbox');
+            var listContainer = document.querySelector('.list-scrollable');
+
+            function displayList() {
+              if (disableListCheckbox.checked) {
+                return;
+              }
+
+              // Set the display property to "block"
+              listContainer.style.display = 'block';
+            }
+            // Add a change event listener to the checkbox
+            disableListCheckbox.addEventListener('change', function() {
+              if (disableListCheckbox.checked) {
+                // Set the display property to "none" when the checkbox is checked
+                listContainer.style.display = 'none';
+              } else {
+                // Display the list when the checkbox is unchecked
+                displayList();
+              }
+            });
+
+            // Display the list initially
+            displayList();
+        </script>
+
+
     </div>
+</div>
 
-    <form action = "/generate_summary" id="summary_form" method = "post">
-        <!-- <input type="text"  placeholder="{{gptin.prompt}}" name="prompt" /> <br> -->
-        <input type="checkbox" id="slack_check" name="slack-checkbox" value="Slack-Check">
-        <label for="slack-checkbox"> Get slack unreads from cache </label> <br>
-
-        <input type="checkbox" id="gmail_check" name="gmail-checkbox" value="Gmail-Check">
-        <label for="gmail-checkbox"> Get gmail unreads from cache </label> <br>
-
-        <input type="submit" value="Generate">
-    </form>
-
-    <p> Slack input: </p>
-    {% for slack_obj in gptin.slack_list %}
-        <p> {{ slack_obj.text }} </p>
-    {% endfor %}
-
-    <p> Gmail input: </p>
-    {% for gmail_obj in gptin.gmail_list %}
-	    <p> {{ gmail_obj.subject }} </p>
-    {% endfor %}
 
 {% endblock %}

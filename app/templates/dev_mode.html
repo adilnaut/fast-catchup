@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <p> </p>
+        </div>
+        <div class="col-md-8">
+            <h1> Developer Mode </h1>
+            <form action="" method="post" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                <p>
+                    {{ form.pscore_method.label }}<br>
+                    {{ form.pscore_method }}
+                </p>
+                <p>
+                    {{ form.embedding_method.label }}<br>
+                    {{ form.embedding_method }}
+                </p>
+                <p>
+                    {{ form.num_neighbors.label }}<br>
+                    {{ form.num_neighbors(class="form-control", min=1, max=10, value=form.num_neighbors.data, step=1, oninput="this.nextElementSibling.value = this.value") }}
+                    <output> . </output>
+                </p>
+
+
+                <p>
+                    {{ form.num_gmail_msg.label }}<br>
+                    {{ form.num_gmail_msg(class="form-control", min=1, max=50, value=form.num_gmail_msg.data, step=1, oninput="this.nextElementSibling.value = this.value") }}
+                    <output> . </output>
+                </p>
+
+
+                <p>
+                    {{ form.num_days_slack.label }}<br>
+                    {{ form.num_days_slack(class="form-control", min=1, max=7, value=form.num_days_slack.data, step=1, oninput="this.nextElementSibling.value = this.value") }}
+                    <output> . </output>
+                </p>
+
+
+                <div>
+                    {% for platform in platforms %}
+                        <h3> {{platform.name}} </h3>
+                        <div class="list-group" id="platform_column-{{platform.name}}">
+
+                            {% for item in platform.body %}
+                                <a class="list-group-item" id="list-{{item.column_name}}-list" data-toggle="list" href="#list-{{item.column_name}}" draggable="true">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            {{item.column_name}}
+                                        </div>
+                                        <div class="col-2 column-order">
+                                            {{item.column_order_num}}
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="{{platform.name}}_order[]" value="{{item.column_name}}">
+                                </a>
+
+                            {% endfor %}
+
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <script>
+                    $(document).ready(function() {
+                        // Update column order numbers
+                        function updateColumnOrder() {
+                            $('.list-group').each(function() {
+                                var columnOrder = 1;
+                                $(this).find('.column-order').each(function() {
+                                    $(this).text(columnOrder++);
+                                });
+                            });
+                        }
+
+                        // Call the updateColumnOrder function when the user stops dragging a column
+                        $('.list-group').sortable({
+                            stop: function(event, ui) {
+                                updateColumnOrder();
+                            }
+                        });
+
+                        // Call the updateColumnOrder function when the page is loaded
+                        updateColumnOrder();
+                    });
+                </script>
+
+
+
+                <p>{{ form.submit() }}</p>
+            </form>
+
+
+
+        </div>
+        <div class="col-md-2">
+            <p>  </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

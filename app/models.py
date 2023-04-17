@@ -8,6 +8,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sklearn.neighbors import NearestNeighbors
 from sentence_transformers import SentenceTransformer
 import numpy as np
+from flask_login import current_user
+
 import importlib
 import pickle
 
@@ -26,15 +28,12 @@ def smart_filtering(TableName, columns_list, m_item, query, max_samples=10, min_
     _ = query.all()
     if len(_) <= max_samples:
         return _
-    # todo
     # TableName is message table
     # where query have query of PriorityItem elements
     result_query = None
     for column_name in columns_list[1:]:
-        # print(column_name)
         if '.' in column_name:
             meta_table, meta_column = column_name.split('.')
-            # MetaTable = getattr(models, meta_table)
             MetaTable = globals()[meta_table]
             # todo
             # here we should get MetaTable instance of m_item
@@ -55,16 +54,10 @@ def smart_filtering(TableName, columns_list, m_item, query, max_samples=10, min_
                     .join(TableName, getattr(TableName, columns_list[0]) == PriorityMessage.message_id) \
                     .join(MetaTable) \
                     .filter(getattr(MetaTable, meta_column) == getattr(MetaTable, meta_column))
-                # result = result_query.all()
                 results_list.append(result_query)
                 i += 1
             result_query = union(*results_list)
-            # result_query = union(results_list[0], results_list[1])
-            # print(result_query)
-            # result = result_query
-            # result_query = result_query.select()
             result = db.session.execute(result_query).fetchall()
-            # result = result.all()
             result = cast_tuples_to_p_items(result)
         else:
             result_query = query.join(PriorityMessage) \
@@ -103,6 +96,13 @@ def cast_tuples_to_p_items(rows):
     )
     return query.all()
 
+class Session(db.Model):
+    session_id = db.Column(db.Text(), primary_key=True)
+    workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
+    date = db.Column(db.Text())
+    summary = db.Column(db.Text())
+    neighbors = db.Column(db.Text())
+
 
 class PriorityList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -111,6 +111,7 @@ class PriorityList(db.Model):
     created = db.Column(db.Integer)
     p_a = db.Column(db.Float())
     items = db.relationship('PriorityItem', backref='list', lazy='dynamic')
+
 
     def update_p_a(self):
         items = db.session.query(PriorityItem) \
@@ -163,7 +164,7 @@ class PriorityListMethod(db.Model):
                     .first()
                 if p_item.p_b_a and p_item_method and p_item_method.p_b_m_a and p_item.p_a:
                     p_dif = abs(p_item_method.p_b_m_a - p_item.p_a)
-                    weighted_accuracy = 1 - p_dif if p_dif < 1 else 0.000001 
+                    weighted_accuracy = 1 - p_dif if p_dif < 1 else 0.000001
                     result.append(weighted_accuracy)
         self.p_m_a = np.array(result).mean() if result else 0.05
         db.session.commit()
@@ -200,7 +201,8 @@ class PriorityItem(db.Model):
             .filter(PriorityList.platform_id == platform_id) \
             .filter(PriorityList.id != self.id)
 
-        items = smart_filtering(TableName, columns_list, m_item, items_query)
+        setting = db.session.query(Setting).filter_by(user_id=current_user.id).first()
+        items = smart_filtering(TableName, columns_list, m_item, items_query, min_samples=setting.num_neighbors)
         # average real importance of message
         p_as = []
         for item in items:
@@ -211,8 +213,7 @@ class PriorityItem(db.Model):
 
     # expensive, we build knn model for each item
     def calculate_p_b_c(self, TableName, columns_list):
-        # ideally we should have 10 nearest neighbors classifiers object fitted on all previous data
-        # but for now we can train it right there
+
         result = PriorityList.query.filter_by(id=self.priority_list_id).first()
         platform_id = result.platform_id
 
@@ -223,34 +224,41 @@ class PriorityItem(db.Model):
         m_item = TableName.query \
             .join(PriorityMessage, getattr(TableName, columns_list[0]) == PriorityMessage.message_id) \
             .filter(PriorityMessage.id == self.priority_message_id).first()
-
-        p_items = smart_filtering(TableName, columns_list, m_item, p_items_query)
+        setting = db.session.query(Setting).filter_by(user_id=current_user.id).first()
+        p_items = smart_filtering(TableName, columns_list, m_item, p_items_query, min_samples=setting.num_neighbors)
 
         ids = []
         all_vectors = []
         nbrs = None
 
         for p_item in p_items:
-            # p_methods = PriorityListMethod.query.filter_by(priority_list_id=p_list.id).all()
             _ = PriorityMessage.query.filter_by(id=p_item.priority_message_id).first()
             ids.append(_.id)
-            # emb_vector = struct.unpack('<q', b'\x15\x00\x00\x00\x00\x00\x00\x00')
             emb_vector = np.frombuffer(_.embedding_vector, dtype='<f4')
+            emb_vector = np.array(emb_vector, dtype=np.float64)
             all_vectors.append(emb_vector)
+
+        # todo - if doesn't work call get_id() and then get user by db session query
+
+        setting = db.session.query(Setting).filter_by(user_id=current_user.id).first()
+        days_ago = setting.num_days_slack
 
         if all_vectors:
             X = np.array(all_vectors)
             # we want to build NN algorithm for any number of samples present
             # but initially there would not be many
-            # let's set this up to 2 for now
-            nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(X)
+            # let's set this up to 3 for now
+            nbrs = NearestNeighbors(n_neighbors=setting.num_neighbors
+                , metric='cosine'
+                , algorithm='brute'
+                ).fit(X)
 
         p_m_result = PriorityMessage.query.filter_by(id=self.priority_message_id).first()
         p_m_vector = p_m_result.embedding_vector
         p_m_vector = np.frombuffer(p_m_vector, dtype='<f4')
-        p_m_vector = np.array([p_m_vector])
+        p_m_vector = np.array([p_m_vector], dtype=np.float64)
 
-
+        nbrs_out = []
         if nbrs:
             distances, indices = nbrs.kneighbors(p_m_vector)
             p_as = []
@@ -259,11 +267,14 @@ class PriorityItem(db.Model):
                 n_id = ids[n_i]
                 n_item = PriorityItem.query.filter_by(priority_message_id=n_id).one()
                 if n_item and n_item.p_a:
+                    nbrs_out.append(n_item.priority_message_id)
                     p_as.append(n_item.p_a)
             self.p_b_c = np.array(p_as).mean()
         else:
             self.p_b_c = 0.2
         db.session.commit()
+        return nbrs_out
+
 
     def calculate_p_b(self, nbrs, ids):
         # get priority_message vector
@@ -275,9 +286,9 @@ class PriorityItem(db.Model):
         p_m_result = PriorityMessage.query.filter_by(id=self.priority_message_id).first()
         p_m_vector = p_m_result.embedding_vector
         p_m_vector = np.frombuffer(p_m_vector, dtype='<f4')
-        p_m_vector = np.array([p_m_vector])
+        p_m_vector = np.array([p_m_vector], dtype=np.float64)
 
-
+        nbrs_out = []
         if nbrs:
             distances, indices = nbrs.kneighbors(p_m_vector)
             p_as = []
@@ -286,11 +297,13 @@ class PriorityItem(db.Model):
                 n_id = ids[n_i]
                 n_item = PriorityItem.query.filter_by(priority_message_id=n_id).one()
                 if n_item and n_item.p_a:
+                    nbrs_out.append(n_item.priority_message_id)
                     p_as.append(n_item.p_a)
             self.p_b = np.array(p_as).mean()
         else:
-            self.p_b = 0.2
+            self.p_b = None
         db.session.commit()
+        return nbrs_out
 
     def calculate_p_b_a(self):
         # get all priority_item methods and sum over
@@ -312,11 +325,12 @@ class PriorityItem(db.Model):
 	    # call calculate_p_b
 	    # p_a_b = p_b_a * p_a / p_b
         p_a = PriorityList.query.filter_by(id=self.priority_list_id).first().p_a
-        # print(p_a)
-        # print(self.p_b)
-        # print(self.p_b_a)
+
         if self.p_b_a and p_a and self.p_b:
-            self.p_a_b = self.p_b_a * p_a / self.p_b
+            temp = self.p_b_a * p_a / ( 1 - self.p_b) if self.p_b != 1 else self.p_b_a * p_a
+            self.p_a_b = temp if temp <= 1 else 1
+        elif self.p_b_a:
+            self.p_a_b = self.p_b_a
         else:
             self.p_a_b = 0.497424242
         db.session.commit()
@@ -324,7 +338,9 @@ class PriorityItem(db.Model):
     def calculate_p_a_b_c(self):
 
         if self.p_b_a and self.p_a_c and self.p_b_c:
-            self.p_a_b_c = self.p_b_a * self.p_a_c / self.p_b_c
+            temp = self.p_b_a * self.p_a_c / (1 - self.p_b_c) if self.p_b_c  != 1 else self.p_b_a * self.p_a_c
+            # self.p_a_b_c = 1/(1 + np.exp(-temp))
+            self.p_a_b_c = temp if temp <= 1 else 1
         else:
             self.p_a_b_c = 0.49696969
         db.session.commit()
@@ -337,6 +353,7 @@ class PriorityItemMethod(db.Model):
     priority_item_id = db.Column(db.Integer, db.ForeignKey('priority_item.id'))
     priority_list_method_id = db.Column(db.Integer, db.ForeignKey('priority_list_method.id'))
     p_b_m_a = db.Column(db.Float())
+    model_justification = db.Column(db.Text())
 
     def calculate_p_b_m_a(self):
         # call python method by name in PriorityMethod
@@ -358,7 +375,9 @@ class PriorityItemMethod(db.Model):
         package_name, module_name = python_path.split('.')
         script_module = importlib.import_module('.%s' % module_name, package=package_name)
         method_function = getattr(script_module, name)
-        self.p_b_m_a = method_function(inp_text)
+        score, justification = method_function(inp_text)
+        self.p_b_m_a = score
+        self.model_justification = justification
         db.session.commit()
 
     __table_args__ = (db.UniqueConstraint('priority_item_id', 'priority_list_method_id', name='_unique_constraint_pitem_plmethod'),
@@ -378,6 +397,7 @@ class PriorityMessage(db.Model):
         db.session.commit()
 
     def enrich_vectors(self):
+        # depreciated - vectors are enriched in priority_engine.py -> fill_priority_list
         # at this stage just get w2v vector of input_text_value
         #  or even bag of words vectors
         #  0. plan where and when embedding builder will be called first and trained/fitted
@@ -404,15 +424,37 @@ class PriorityMessage(db.Model):
 
 class AudioFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
     created = db.Column(db.Integer)
+    session_id = db.Column(db.Text())
     file_path = db.Column(db.Text())
+    word_boundaries = db.Column(db.Text())
+
+
+class Setting(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    # can be either raw_llm, bayes, bayes_meta
+    pscore_method = db.Column(db.Text())
+    # can be local_bart or openai_ada_v2
+    embeddings = db.Column(db.Text())
+    # range 1 - 10 (?)
+    num_neighbors = db.Column(db.Integer)
+    # how many messages check if they are unread in gmail range 1 - 50 (?)
+    num_gmail_msg = db.Column(db.Integer)
+    # how many days of messages should it retrieve
+    # maybe allow last night/ 12 hours / hours generally
+    # think about it
+    num_days_slack = db.Column(db.Integer)
+
+
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    setting = db.relationship('Setting', backref='s_user', lazy='dynamic')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -438,7 +480,17 @@ class Platform(db.Model):
     workspace_id = db.Column(db.Integer, db.ForeignKey('workspace.id'))
     auth_method = db.Column(db.Text())
     auth_records = db.relationship('AuthData', backref='platform', lazy='dynamic')
+    columns = db.relationship('PlatformColumn', backref='platform', lazy='dynamic')
     __table_args__ = (db.UniqueConstraint('workspace_id', 'name', name='_unique_constraint_uc'),
+        )
+
+class PlatformColumn(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    platform_id = db.Column(db.Integer, db.ForeignKey('platform.id'))
+    order_num = db.Column(db.Integer)
+    column_name = db.Column(db.Text())
+
+    __table_args__ = (db.UniqueConstraint('platform_id', 'column_name', name='_unique_constraint_plat_col'),
         )
 
 class AuthData(db.Model):
@@ -687,6 +739,7 @@ class SlackAttachment(db.Model):
 
     def __repr__(self):
         return '<s-attachment with filename {}>'.format(self.filename)
+
 
 class SlackLink(db.Model):
     id = db.Column(db.Integer, primary_key=True)
