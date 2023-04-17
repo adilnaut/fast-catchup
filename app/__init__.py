@@ -27,12 +27,13 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 admin = Admin(app, name='fast-catchup', template_mode='bootstrap3')
-logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(message)s', level=logging.INFO)
+logging.basicConfig(filename='app.log', filemode='w', level=logging.DEBUG)
 
 
 
 metadata = MetaData(naming_convention=convention)
 db = SQLAlchemy(app, metadata=metadata)
+db.create_all()
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
