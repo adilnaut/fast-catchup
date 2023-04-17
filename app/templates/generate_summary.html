@@ -169,7 +169,7 @@
                             // var neighbors = JSON.parse(response);
                             var list = '';
                             response.forEach(function(neighbor) {
-                                list += '<li class="list-group-item">' + neighbor + '</li>';
+                                list += '<li class="list-group-item list-nbr">' + neighbor + '</li>';
                             });
                             document.querySelector('#list-g').innerHTML = list;
                             document.querySelector('#list-g').style.display = "block";
