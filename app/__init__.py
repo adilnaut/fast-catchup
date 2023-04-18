@@ -33,7 +33,6 @@ logging.basicConfig(filename='app.log', filemode='w', level=logging.DEBUG)
 
 metadata = MetaData(naming_convention=convention)
 db = SQLAlchemy(app, metadata=metadata)
-db.create_all()
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
