@@ -23,7 +23,6 @@ from quickstart.quickstart import generate_summary, get_p_items_by_session
 from quickstart.slack_utils import get_slack_comms, clear_slack_tables, slack_test_etl
 from quickstart.gmail_utils import get_gmail_comms, test_etl, clean_gmail_tables
 from quickstart.priority_engine import create_priority_list_methods
-from setup import setup_sentence_embeddings_model, setup_sentiment_analysis_model
 from datetime import timedelta
 from flask import send_from_directory
 
@@ -566,12 +565,6 @@ def index():
         .filter(Workspace.user_id == current_user.get_id()).all()
     return render_template('index.html',title='Home', auth_data=auth_data)
 
-@app.route('/setup', methods=['GET'])
-@login_required
-def setup_workspace():
-    # setup_sentence_embeddings_model()
-    # setup_sentiment_analysis_model()
-    return redirect(url_for('index'))
 
 # todo: check that user assoiciated with auth_id is current user
 @app.route('/delete_auth/<auth_id>')

@@ -212,7 +212,7 @@ def generate_summary(session_id):
 
     if not sess:
         # do not catch them all - exceptions: openai rate etc., sql conflicts, parsing/converting type exception
-        safe = False
+        safe = True
         if safe:
             try:
                 msg_gmail = get_gmail_comms(session_id=session_id)

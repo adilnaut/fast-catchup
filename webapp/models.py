@@ -6,7 +6,6 @@ from sqlalchemy import select
 import sqlalchemy as sa
 from werkzeug.security import generate_password_hash, check_password_hash
 from sklearn.neighbors import NearestNeighbors
-from sentence_transformers import SentenceTransformer
 import numpy as np
 from flask_login import current_user
 

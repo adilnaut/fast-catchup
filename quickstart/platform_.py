@@ -1,11 +1,11 @@
-import torch
 import time
 import numpy as np
 import os
+import re
 import hashlib
 import openai
 
-
+import tiktoken
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil import parser
@@ -21,11 +21,6 @@ from openai.error import Timeout
 from openai.error import APIConnectionError
 
 from PyPDF2 import PdfReader
-from nltk.tokenize import word_tokenize
-from nltk.tokenize import sent_tokenize
-from transformers import pipeline
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-from transformers import GPT2TokenizerFast
 
 from quickstart.connection import db_ops, get_platform_id
 from quickstart.sqlite_utils import get_upsert_query
@@ -206,57 +201,30 @@ def summarize_with_gpt3(input_text):
     return text_response
 
 def build_abstract_for_unbounded_text_2(text, truncate=False):
-    chunk_length = 2000
+    chunk_length = 3500
     chunk_start = 0
     chunk_end = chunk_length
-    tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
-    tokens = tokenizer(text)
+    text = re.sub(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', " ", text)
+    tokenizer = tiktoken.encoding_for_model("gpt-3.5-turbo")
+    tokens = tokenizer.encode(text)
     inputs_batch_lst = []
     while chunk_start <= len(tokens):
-        inputs_batch = tokens['input_ids'][chunk_start:chunk_end]
-        in_text = ' '.join([ text[tokens.token_to_chars(i).start:tokens.token_to_chars(i).end] \
-            for i in range(chunk_start + len(inputs_batch))])
+        inputs_batch = tokens[chunk_start:chunk_end]
+        in_text = tokenizer.decode(inputs_batch)
         inputs_batch_lst.append(in_text)
         chunk_start += chunk_length
-        chunk_end += chunk_start + chunk_length - (len(inputs_batch) - chunk_length)
+        chunk_end += chunk_start + len(inputs_batch)
     summaries = [summarize_with_gpt3(x) for x in inputs_batch_lst]
     summary = '\n'.join(summaries)
     return summary
 
 
-def build_abstract_for_unbounded_text(text, truncate=False):
-    # model_name="knkarthick/MEETING_SUMMARY"
-    model_name="sshleifer/distilbart-cnn-12-6"
-    model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    inputs_no_trunc = tokenizer(text, max_length=None, return_tensors='pt', truncation=truncate)
-    chunk_start = 0
-    chunk_end = tokenizer.model_max_length  # == 1024 for Bart
-    inputs_batch_lst = []
-    while chunk_start <= len(inputs_no_trunc['input_ids'][0]):
-        inputs_batch = inputs_no_trunc['input_ids'][0][chunk_start:chunk_end]  # get batch of n tokens
-        inputs_batch = torch.unsqueeze(inputs_batch, 0)
-        inputs_batch_lst.append(inputs_batch)
-        chunk_start += tokenizer.model_max_length  # == 1024 for Bart
-        chunk_end += tokenizer.model_max_length  # == 1024 for Bart
-
-    summary_ids_lst = [model.generate(inputs, num_beams=4, max_length=100, early_stopping=True) for inputs in inputs_batch_lst]
-
-    # summary_ids_lst = [model.generate(inputs, max_length=100, do_sample=False) for inputs in inputs_batch_lst]
-
-    # decode the output and join into one string with one paragraph per summary batch
-    summary_batch_lst = []
-    for summary_id in summary_ids_lst:
-        summary_batch = [tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in summary_id]
-        summary_batch_lst.append(summary_batch[0])
-    summary_all = '\n'.join(summary_batch_lst)
-    return summary_all
 
 def test_doc_summary(filepath):
     texts = extract_text_from_pdf(filepath)
     summaries = []
     for text in texts:
-        summaries.append(build_abstract_for_unbounded_text(text))
+        summaries.append(build_abstract_for_unbounded_text_2(text))
     logging.debug(summaries)
     summary = '\n'.join(summaries)
     final_summary = build_abstract_for_unbounded_text(summary)
