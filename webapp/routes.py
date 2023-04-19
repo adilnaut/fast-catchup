@@ -7,12 +7,12 @@ from sqlalchemy.sql import text
 
 from flask import render_template, send_file, request, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
-from app import app, db
-from app.models import (User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod, PriorityItemMethod,
+from webapp import app, db
+from webapp.models import (User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod, PriorityItemMethod,
     PriorityItem, PriorityMessage, PriorityList, Session, SlackChannel, SlackUser, SlackMessage, SlackAttachment,
     SlackLink, GmailMessage, GmailLink, GmailUser, GmailAttachment, GmailMessageTag, GmailMessageText,
     GmailMessageListMetadata, GmailMessageLabel, Setting, PlatformColumn)
-from app.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthDataForm, DevModeForm
+from webapp.forms import LoginForm, RegistrationForm, GmailAuthDataForm, SlackAuthDataForm, DevModeForm
 
 
 from werkzeug.utils import secure_filename

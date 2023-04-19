@@ -4,7 +4,7 @@ from flask_wtf.file import FileField, FileRequired
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DecimalRangeField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange
 
-from app.models import User
+from webapp.models import User
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])

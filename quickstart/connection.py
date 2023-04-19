@@ -8,8 +8,8 @@ import os
 import sys
 sys.path.append(str(Path(sys.path[0]).parent))
 
-from app import app, db
-from app import models
+from webapp import app, db
+from webapp import models
 
 from flask_login import current_user
 
@@ -74,7 +74,7 @@ def get_auth_data(platform_name, authdata_name):
         return auth_data
 
 def clear_session_data(session_id=None):
-    from app.models import (User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod, PriorityItemMethod,
+    from webapp.models import (User, Workspace, AudioFile, Platform, AuthData, PriorityListMethod, PriorityItemMethod,
         PriorityItem, PriorityMessage, PriorityList, Session, SlackChannel, SlackUser, SlackMessage, SlackAttachment,
         SlackLink, GmailMessage, GmailLink, GmailUser, GmailAttachment, GmailMessageTag, GmailMessageText,
         GmailMessageListMetadata, GmailMessageLabel)

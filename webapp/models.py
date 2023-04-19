@@ -1,7 +1,7 @@
-from app import db
+from webapp import db
 from sqlalchemy import func, union
 from flask_login import UserMixin
-from app import login
+from webapp import login
 from sqlalchemy import select
 import sqlalchemy as sa
 from werkzeug.security import generate_password_hash, check_password_hash

@@ -38,4 +38,4 @@ login = LoginManager(app)
 login.login_view = 'login'
 
 
-from app import routes, models, admin_views
+from webapp import routes, models, admin_views
