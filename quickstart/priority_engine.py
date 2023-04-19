@@ -166,7 +166,7 @@ def fill_priority_list(db, messages, get_abstract_func, plist_id, \
     for message_id in message_ids:
         p_item_kwargs = OrderedDict([('priority_list_id', plist_id)
             , ('priority_message_id', message_id)])
-        p_item_query = get_insert_query('priority_item', p_item_kwargs.keys(), returning_id=True)
+        p_item_query = get_insert_query('priority_item', p_item_kwargs.keys(), returning_id=False)
         db.session.execute(p_item_query, p_item_kwargs)
     db.session.commit()
 

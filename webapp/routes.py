@@ -62,21 +62,22 @@ def upload_gmail_auth():
         workspace_id = workspace.id
 
         #  not an upsert cause no need to update values on conflict
+        # platform_query = '''INSERT OR IGNORE INTO platform (name, workspace_id, auth_method)
+        #         VALUES(:name, :workspace_id, :auth_method) returning id;'''
         platform_query = '''INSERT OR IGNORE INTO platform (name, workspace_id, auth_method)
-                VALUES(:name, :workspace_id, :auth_method) returning id;'''
+                VALUES(:name, :workspace_id, :auth_method);'''
 
         # platform auth methods: cookie, oauth,
         platform_kwargs = {'name': 'gmail'
             , 'workspace_id': workspace_id
             , 'auth_method': 'oauth'}
 
-        platform_row = db.session.execute(text(platform_query), platform_kwargs).fetchone()
-        if not platform_row:
-            platform_row = Platform.query \
-                .filter_by(name='gmail') \
-                .filter_by(workspace_id=workspace_id) \
-                .filter_by(auth_method='oauth') \
-                .one()
+        db.session.execute(text(platform_query), platform_kwargs)
+        platform_row = Platform.query \
+            .filter_by(name='gmail') \
+            .filter_by(workspace_id=workspace_id) \
+            .filter_by(auth_method='oauth') \
+            .one()
         platform_id = platform_row.id
 
         # initial priority order
@@ -128,7 +129,7 @@ def upload_slack_auth():
         workspace_id = workspace.id
         #  not an upsert cause no need to update values on conflict
         platform_query = '''INSERT OR IGNORE INTO platform (name, workspace_id, auth_method)
-                VALUES(:name, :workspace_id, :auth_method) returning id;'''
+                VALUES(:name, :workspace_id, :auth_method);'''
 
 
         # platform auth methods: slack_bot, cookie
@@ -136,13 +137,12 @@ def upload_slack_auth():
             , 'workspace_id': workspace_id
             , 'auth_method': 'slack_bot'}
 
-        platform_row = db.session.execute(text(platform_query), platform_kwargs).fetchone()
-        if not platform_row:
-            platform_row = Platform.query \
-                .filter_by(name='slack') \
-                .filter_by(workspace_id=workspace_id) \
-                .filter_by(auth_method='slack_bot') \
-                .one()
+        db.session.execute(text(platform_query), platform_kwargs)
+        platform_row = Platform.query \
+            .filter_by(name='slack') \
+            .filter_by(workspace_id=workspace_id) \
+            .filter_by(auth_method='slack_bot') \
+            .one()
         platform_id = platform_row.id
 
         # initial priority order
