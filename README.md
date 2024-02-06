@@ -1,6 +1,6 @@
 # FAST CATCH-UP
 
-This is the proof-of-concept interface of an app that would:
+This is the proof-of-concept interface of an app that:
 1. Retrieve pipeline of various platform messages, emails and other signals, manage their credentials etc.
 2. Assign each message a priority score based on prompt, context and few-shots of similar messages and their priority. 
 3. Each priority score is provided with model justification of a score. 
