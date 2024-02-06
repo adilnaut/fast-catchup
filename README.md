@@ -8,4 +8,4 @@ This is the proof-of-concept interface of an app that:
 4. Generate a 1-2 minute narrated audio with most important messages from priority list 
 5. Send user interface to see email summaries, scores, justifications and allow to adjust scores. 
 
-![fast-catchup ui demo](./ui.jpeg)
+![fast-catchup ui demo](./ui-2.jpeg)
