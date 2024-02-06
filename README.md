@@ -7,3 +7,5 @@ This is the proof-of-concept interface of an app that:
 3. Collect a priority lists for each platform and combine all messages by their final priority score
 4. Generate a 1-2 minute narrated audio with most important messages from priority list 
 5. Send user interface to see email summaries, scores, justifications and allow to adjust scores. 
+
+![fast-catchup ui demo](./ui.jpeg)
